@@ -7,7 +7,23 @@ use Sidef::Types::Bool::Bool;
 use List::Util   qw(first);
 use Scalar::Util qw(refaddr);
 
-# our $REGMARK;
+# ---------------------------------------------------------------------------
+# Sidef::Parser
+#
+# A recursive-descent parser that builds the AST (nested hashes and objects) which is
+# used by the deparsers (Sidef::Deparse::Sidef and Sidef::Deparse::Perl).
+#
+# From the highest to the lowest level:
+#
+#   parse_script   a sequence of statements, until the end of the code or a closing delimiter
+#   parse_obj      an expression, with the operator precedence (parse_operand + parse_infix)
+#   parse_operand  a term with its prefix operator, calls, indices and method calls
+#   parse_expr     a single term: literals, keywords, declarations, variables (it dispatches
+#                  to the `_parse_*` handlers)
+#
+# The code is always passed as a reference (`code => \$code`) and the parsers move
+# `pos($code)` forward. When the code is invalid, they die with fatal_error().
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 # Operator precedence
@@ -86,13 +102,13 @@ my %INFIX_PREC;
 {
     my @table = (
                  [PREC_POW,        'R', '**'],
-                 [PREC_MUL,        'L', '*', '/', '//', '%', '%%', '÷', '×', '⋅', '∙', '∘', '∩', '⊗', '∣', '∤'],
-                 [PREC_ADD,        'L', '+', '-', '−',  '∪', '∖',  '⊕', '⊖', '⊎'],
-                 [PREC_OPERAND,    'L', ':='],
-                 [PREC_SHIFT,      'L', '<<', '>>',  '≪', '≫'],
+                 [PREC_MUL,        'L', '*',  '/',   '//', '%', '%%', '÷', '×', '⋅', '∙', '∘', '∩', '⊗', '∣', '∤'],
+                 [PREC_ADD,        'L', '+',  '-',   '−',  '∪', '∖',  '⊕', '⊖', '⊎'],
+                 [PREC_SHIFT,      'L', '<<', '>>',  '≪',  '≫'],
                  [PREC_RANGE,      'L', '..', '^..', '..^'],
                  [PREC_WORD_OP,    'L', '|>', '|>>', '|X>', '|Z>'],
                  [PREC_BITAND,     'L', '&'],
+                 [PREC_OPERAND,    'L', ':='],
                  [PREC_BITOR,      'L', '|',  '^',  '⊻'],
                  [PREC_RELATIONAL, 'L', '<',  '>',  '<=',  '>=', '≤',   '≥',   '∈', '∉', '∋', '∌', '⊂', '⊃', '⊄',  '⊅', '⊆', '⊇', '⊈', '⊉'],
                  [PREC_EQUALITY,   'L', '==', '!=', '<=>', '~~', '<~>', '=~=', '≅', '≠', '≡', '≢', '≈', '≉', '=~', '!~'],
@@ -123,6 +139,13 @@ my %CHAIN_CLASS = (
                    '≠'  => 'equality',
                   );
 
+# Closing delimiters: [counter of the open delimiters, name, opening delimiter]
+my %CLOSING_DELIMITERS = (
+    ']' => ['right_brackets', 'right bracket', '['],
+    '}' => ['curly_brackets', 'curly bracket', '{'],
+    ')' => ['parentheses',    'parenthesis',   '('],
+                         );
+
 # Precedence of the keyword operators
 my %KEYWORD_PREC = (
                     'if'     => PREC_STMT,
@@ -133,6 +156,338 @@ my %KEYWORD_PREC = (
                     'and'    => PREC_AND,
                    );
 
+# ---------------------------------------------------------------------------
+# Lexical tables and regular expressions (shared by all the parser objects)
+# ---------------------------------------------------------------------------
+
+# Postfix operators
+my %POSTFIX_OPS = map { $_ => 1 } qw(-- ++ ... ! !!);
+
+# Hyper-operators: type => [takes args, method name]
+my %HYPER_OPS = (
+                 map     => [1, 'map_operator'],
+                 pam     => [1, 'pam_operator'],
+                 zip     => [1, 'zip_operator'],
+                 wise    => [1, 'wise_operator'],
+                 scalar  => [1, 'scalar_operator'],
+                 rscalar => [1, 'rscalar_operator'],
+                 cross   => [1, 'cross_operator'],
+                 unroll  => [1, 'unroll_operator'],
+                 reduce  => [0, 'reduce_operator'],
+                 lmap    => [0, 'map_operator'],
+                );
+
+# Static objects: keywords and special variables that are replaced by objects
+my $STATIC_OBJ_RE = qr{\G
+    (?:
+           nil\b                          (?{ state $x = bless({}, 'Sidef::Types::Nil::Nil') })
+         | null\b                         (?{ state $x = Sidef::Types::Null::Null->new })
+         | true\b                         (?{ Sidef::Types::Bool::Bool::TRUE })
+         | false\b                        (?{ Sidef::Types::Bool::Bool::FALSE })
+         | next\b                         (?{ state $x = bless({}, 'Sidef::Types::Block::Next') })
+         | break\b                        (?{ state $x = bless({}, 'Sidef::Types::Block::Break') })
+         | Block\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Block::Block') })
+         | Backtick\b                     (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Backtick') })
+         | ARGF\b                         (?{ state $x = bless({}, 'Sidef::Meta::Glob::ARGF') })
+         | STDIN\b                        (?{ state $x = bless({}, 'Sidef::Meta::Glob::STDIN') })
+         | STDOUT\b                       (?{ state $x = bless({}, 'Sidef::Meta::Glob::STDOUT') })
+         | STDERR\b                       (?{ state $x = bless({}, 'Sidef::Meta::Glob::STDERR') })
+         | Bool\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Bool::Bool') })
+         | FileHandle\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::FileHandle') })
+         | DirHandle\b                    (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::DirHandle') })
+         | SocketHandle\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::SocketHandle') })
+         | Dir\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Dir') })
+         | File\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::File') })
+         | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
+         | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
+         | Vec(?:tor)?\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Vector') })
+         | Matrix\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Matrix') })
+         | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
+         | Set\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Set') })
+         | Bag\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Bag') })
+         | Str(?:ing)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::String::String') })
+         | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
+         | Mod\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Mod') })
+         | Gauss\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Gauss') })
+         | Quadratic\b                    (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quadratic') })
+         | Quaternion\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quaternion') })
+         | Poly(?:nomial)?\b              (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Polynomial') })
+         | Poly(?:nomial)?Mod\b           (?{ state $x = bless({}, 'Sidef::DataTypes::Number::PolynomialMod') })
+         | Frac(?:tion)?\b                (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Fraction') })
+         | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
+         | NaN\b                          (?{ state $x = Sidef::Types::Number::Number->nan })
+         | Infi\b                         (?{ state $x = Sidef::Types::Number::Complex->new(0, Sidef::Types::Number::Number->inf) })
+         | NaNi\b                         (?{ state $x = Sidef::Types::Number::Complex->new(0, Sidef::Types::Number::Number->nan) })
+         | RangeNum(?:ber)?+\b            (?{ state $x = bless({}, 'Sidef::DataTypes::Range::RangeNumber') })
+         | RangeStr(?:ing)?+\b            (?{ state $x = bless({}, 'Sidef::DataTypes::Range::RangeString') })
+         | Range\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Range::Range') })
+         | Socket\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Socket') })
+         | Pipe\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Pipe') })
+         | Ref\b                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
+         | NamedParam\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Variable::NamedParam') })
+         | Lazy\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Lazy') })
+         | LazyMethod\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Object::LazyMethod') })
+         | Enumerator\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Enumerator') })
+         | Complex\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Complex') })
+         | Regexp?\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Regex::Regex') })
+         | Object\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Object') })
+         | Sidef\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Sidef::Sidef') })
+         | Sig\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sig') })
+         | Sys\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sys') })
+         | Perl\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Perl::Perl') })
+         | Math\b                         (?{ state $x = bless({}, 'Sidef::Math::Math') })
+         | Time\b                         (?{ state $x = Sidef::Time::Time->new })
+         | Date\b                         (?{ state $x = Sidef::Time::Date->new })
+         | \$\.                           (?{ state $x = bless({name => '$.'}, 'Sidef::Variable::Magic') })
+         | \$\?                           (?{ state $x = bless({name => '$?'}, 'Sidef::Variable::Magic') })
+         | \$\$                           (?{ state $x = bless({name => '$$'}, 'Sidef::Variable::Magic') })
+         | \$\^T\b                        (?{ state $x = bless({name => '$^T'}, 'Sidef::Variable::Magic') })
+         | \$\|                           (?{ state $x = bless({name => '$|'}, 'Sidef::Variable::Magic') })
+         | \$!                            (?{ state $x = bless({name => '$!'}, 'Sidef::Variable::Magic') })
+         | \$"                            (?{ state $x = bless({name => '$"'}, 'Sidef::Variable::Magic') })
+         | \$\\                           (?{ state $x = bless({name => '$\\'}, 'Sidef::Variable::Magic') })
+         | \$@                            (?{ state $x = bless({name => '$@'}, 'Sidef::Variable::Magic') })
+         | \$%                            (?{ state $x = bless({name => '$%'}, 'Sidef::Variable::Magic') })
+         | \$~                            (?{ state $x = bless({name => '$~'}, 'Sidef::Variable::Magic') })
+         | \$/                            (?{ state $x = bless({name => '$/'}, 'Sidef::Variable::Magic') })
+         | \$&                            (?{ state $x = bless({name => '$&'}, 'Sidef::Variable::Magic') })
+         | \$'                            (?{ state $x = bless({name => '$\''}, 'Sidef::Variable::Magic') })
+         | \$`                            (?{ state $x = bless({name => '$`'}, 'Sidef::Variable::Magic') })
+         | \$:                            (?{ state $x = bless({name => '$:'}, 'Sidef::Variable::Magic') })
+         | \$\]                           (?{ state $x = bless({name => '$]'}, 'Sidef::Variable::Magic') })
+         | \$\[                           (?{ state $x = bless({name => '$['}, 'Sidef::Variable::Magic') })
+         | \$;                            (?{ state $x = bless({name => '$;'}, 'Sidef::Variable::Magic') })
+         | \$,                            (?{ state $x = bless({name => '$,'}, 'Sidef::Variable::Magic') })
+         | \$\^O\b                        (?{ state $x = bless({name => '$^O'}, 'Sidef::Variable::Magic') })
+         | \$\^PERL\b                     (?{ state $x = bless({name => '$^X', dump => '$^PERL'}, 'Sidef::Variable::Magic') })
+         | (?:\$0|\$\^SIDEF)\b            (?{ state $x = bless({name => '$0', dump => '$^SIDEF'}, 'Sidef::Variable::Magic') })
+         | \$\)                           (?{ state $x = bless({name => '$)'}, 'Sidef::Variable::Magic') })
+         | \$\(                           (?{ state $x = bless({name => '$('}, 'Sidef::Variable::Magic') })
+         | \$<                            (?{ state $x = bless({name => '$<'}, 'Sidef::Variable::Magic') })
+         | \$>                            (?{ state $x = bless({name => '$>'}, 'Sidef::Variable::Magic') })
+         | ∞                              (?{ state $x = Sidef::Types::Number::Number->inf })
+    ) (?!::)
+}x;
+
+# Prefix operators and control-flow keywords: (object, takes an argument, matched text)
+my $PREFIX_OBJ_RE = qr{\G
+  (?:
+      if\b                                       (?{ bless({}, 'Sidef::Types::Block::If') })
+    | with\b                                     (?{ bless({}, 'Sidef::Types::Block::With') })
+    | while\b                                    (?{ bless({}, 'Sidef::Types::Block::While') })
+    | unless\b                                   (?{ bless({}, 'Sidef::Types::Block::If') })
+    | until\b                                    (?{ bless({}, 'Sidef::Types::Block::While') })
+    | foreach\b                                  (?{ bless({}, 'Sidef::Types::Block::ForEach') })
+    | for\b                                      (?{ bless({}, 'Sidef::Types::Block::For') })
+    | return\b                                   (?{ state $x = bless({}, 'Sidef::Types::Block::Return') })
+    | read\b                                     (?{ state $x = Sidef::Sys::Sys->new })
+    | goto\b                                     (?{ state $x = bless({}, 'Sidef::Perl::Builtin') })
+    | (?:[*\\]|\+\+|--)                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
+    | (?:>>?|\@\|?|[√+~!\-\^]|
+        (?:
+            say
+          | print
+          | defined
+        )\b)                                     (?{ state $x = bless({}, 'Sidef::Operator::Unary') })
+    | :                                          (?{ state $x = bless({}, 'Sidef::Meta::PrefixColon') })
+  )
+}x;
+
+# Quote-like operators: [is double-quoted, method name, class name]
+my $QUOTE_OPERATORS_RE = qr{\G
+ (?:
+    # String
+     (?: ['‘‚’] | %q\b. )                                      (?{ [qw(0 new Sidef::Types::String::String)] })
+    |(?: ["“„”] | %(?:Q\b. | (?!\w). ))                        (?{ [qw(1 new Sidef::Types::String::String)] })
+
+    # File
+    | %f\b.                                                    (?{ [qw(0 new Sidef::Types::Glob::File)] })
+    | %F\b.                                                    (?{ [qw(1 new Sidef::Types::Glob::File)] })
+
+    # Dir
+    | %d\b.                                                    (?{ [qw(0 new Sidef::Types::Glob::Dir)] })
+    | %D\b.                                                    (?{ [qw(1 new Sidef::Types::Glob::Dir)] })
+
+    # Pipe
+    | %p\b.                                                    (?{ [qw(0 pipe Sidef::Types::Glob::Pipe)] })
+    | %P\b.                                                    (?{ [qw(1 pipe Sidef::Types::Glob::Pipe)] })
+
+    # Backtick
+    | %x\b.                                                    (?{ [qw(0 new Sidef::Types::Glob::Backtick)] })
+    | (?: %X\b. | ` )                                          (?{ [qw(1 new Sidef::Types::Glob::Backtick)] })
+
+    # Bytes
+    | %b\b.                                                    (?{ [qw(0 bytes Sidef::Types::Array::Array)] })
+    | %B\b.                                                    (?{ [qw(1 bytes Sidef::Types::Array::Array)] })
+
+    # Chars
+    | %c\b.                                                    (?{ [qw(0 chars Sidef::Types::Array::Array)] })
+    | %C\b.                                                    (?{ [qw(1 chars Sidef::Types::Array::Array)] })
+
+    # Graphemes
+    | %g\b.                                                    (?{ [qw(0 graphemes Sidef::Types::Array::Array)] })
+    | %G\b.                                                    (?{ [qw(1 graphemes Sidef::Types::Array::Array)] })
+
+    # Symbols
+    | %[Os]\b.                                                 (?{ [qw(0 __NEW__ Sidef::Module::OO)] })
+    | %S\b.                                                    (?{ [qw(0 __NEW__ Sidef::Module::Func)] })
+
+    # Arbitrary Perl code
+    | %perl\b.                                                 (?{ [qw(0 new Sidef::Types::Perl::Perl)] })
+    | %Perl\b.                                                 (?{ [qw(1 new Sidef::Types::Perl::Perl)] })
+ )
+}xs;
+
+# Names of the built-in classes (they can't be redefined)
+my %BUILT_IN_CLASSES = map { $_ => 1 } qw(
+  File                  FileHandle            Dir                   DirHandle
+  Arr                   Array                 Pair                  Vec
+  Vector                Matrix                Enumerator            Hash
+  Set                   Bag                   Str                   String
+  Num                   Number                Poly                  Polynomial
+  PolyMod               PolynomialMod         Frac                  Fraction
+  Mod                   Gauss                 Quadratic             Quaternion
+  Range                 RangeStr              RangeString           RangeNum
+  RangeNumber           Complex               Math                  Pipe
+  Ref                   Socket                SocketHandle          Bool
+  Sys                   Sig                   Regex                 Regexp
+  Time                  Date                  Perl                  Sidef
+  Object                Parser                Block                 Backtick
+  Lazy                  LazyMethod            NamedParam            true
+  false                 nil                   null
+);
+
+# Reserved words (they can't be used as variable names)
+my %KEYWORDS = map { $_ => 1 } qw(
+  next                  break                 return                for
+  foreach               if                    elsif                 else
+  unless                until                 not                   with
+  orwith                while                 given                 continue
+  import                include               eval                  read
+  die                   warn                  assert                assert_eq
+  assert_ne             local                 global                var
+  del                   const                 func                  enum
+  class                 static                define                struct
+  subset                module                DATA                  ARGV
+  ARGF                  ENV                   STDIN                 STDOUT
+  STDERR                __FILE__              __LINE__              __END__
+  __DATA__              __TIME__              __DATE__              __NAMESPACE__
+  __COMPILED__          __OPTIMIZED__
+);
+
+# Words that have a special meaning in parse_expr(). Any other plain identifier
+# is a variable, which allows skipping all the other checks (see `parse_expr`).
+my @SPECIAL_WORDS = qw(
+  say print defined goto unless until not do loop try catch gather take
+  when case default has method eval Parser Inf NaN Infi NaNi
+  Arr Array Vec Vector Str String Num Number Poly Polynomial
+  PolyMod PolynomialMod Frac Fraction Regex Regexp elif elseif
+  RangeNum RangeNumber RangeStr RangeString
+);
+
+# Small regular expressions
+my $MATCH_FLAGS_RE  = qr{[msixpogcaludn]+};
+my $VAR_NAME_RE     = qr/[^\W\d]\w*+(?>::[^\W\d]\w*)*/;
+my $METHOD_NAME_RE  = qr/[^\W\d]\w*+!?/;
+my $VAR_INIT_SEP_RE = qr/\G\h*(?:=>|[=:])\h*/;
+
+# Operators (the longest prefix first), including the hyper-operators and the method-like operators
+my $OPERATORS_RE = do {
+    local $" = q{|};
+
+    # Longest prefix first
+    my @operators = map { quotemeta } qw(
+
+      ||= ||
+      &&= &&
+
+      ^.. ..^
+
+      %% ≅
+      ~~ !~
+      <~>
+      <=> =~=
+      <<= >>=
+      << >>
+      |>> |> |X> |Z>
+      |= |
+      &= &
+      == =~
+      := =
+      <= >= < >
+      ++ --
+      += +
+      -= -
+      //= //
+      /= / ÷= ÷
+      **= **
+      %= %
+      ^= ^
+      *= *
+      ...
+      != ..
+      \\\\= \\\\
+      !! !
+      : ： ⫶
+      « » ~
+    );
+
+    qr{
+        (?(DEFINE)
+            (?<ops>
+                  @operators
+                | \p{Block: Mathematical_Operators}
+                | \p{Block: Supplemental_Mathematical_Operators}
+            )
+        )
+
+          »(?<unroll>[^\W\d]\w*+|(?&ops))«                # unroll operator (e.g.: »add« or »+«)
+        | >>(?<unroll>[^\W\d]\w*+|(?&ops))<<              # unroll operator (e.g.: >>add<< or >>+<<)
+
+        | ~X(?<cross>[^\W\d]\w*+|(?&ops)|)                # cross operator          (e.g.: ~X or ~X+)
+        | ~Z(?<zip>[^\W\d]\w*+|(?&ops)|)                  # zip operator            (e.g.: ~Z or ~Z+)
+        | ~W(?<wise>[^\W\d]\w*+|(?&ops)|)                 # wise operator           (e.g.: ~W or ~W+)
+        | ~S(?<scalar>[^\W\d]\w*+|(?&ops)|)               # scalar operator         (e.g.: ~S or ~S+)
+        | ~RS(?<rscalar>[^\W\d]\w*+|(?&ops)|)             # reverse scalar operator (e.g.: ~RS or ~RS/)
+
+        | »(?<map>[^\W\d]\w*+|(?&ops))»                   # mapping operator (e.g.: »add» or »+»)
+        | >>(?<map>[^\W\d]\w*+|(?&ops))>>                 # mapping operator (e.g.: >>add>> or >>+>>)
+
+        | «(?<pam>[^\W\d]\w*+|(?&ops))«                   # reverse mapping operator (e.g.: «add« or «+«)
+        | <<(?<pam>[^\W\d]\w*+|(?&ops))<<                 # reverse mapping operator (e.g.: <<add<< or <<+<<)
+
+        | »(?<lmap>[^\W\d]\w*+|(?&ops))\(\)»              # mapping operator (e.g.: »add()» or »+()»)
+        | >>(?<lmap>[^\W\d]\w*+|(?&ops))\(\)>>            # mapping operator (e.g.: >>add()>> or >>+()>>)
+
+        | <<(?<reduce>[^\W\d]\w*+|(?&ops))>>              # reduce operator (e.g.: <<add>> or <<+>>)
+        | «(?<reduce>[^\W\d]\w*+|(?&ops))»                # reduce operator (e.g.: «add» or «+»)
+
+        | `(?<op>[^\W\d]\w*+!?)`                          # method-like operator (e.g.: `add` or `add!`)
+        | (?<op>(?&ops))                                  # primitive operator   (e.g.: +, -, *, /)
+    }x;
+};
+
+# Reference: https://en.wikipedia.org/wiki/International_variation_in_quotation_marks
+my %DELIM_PAIRS = qw~
+  ( )       [ ]       { }       < >
+  « »       » «       ‹ ›       › ‹
+  „ ”       “ ”       ‘ ’       ‚ ’
+  〈 〉     ﴾ ﴿       〈 〉     《 》
+  「 」     『 』     【 】     〔 〕
+  〖 〗     〘 〙     〚 〛     ⸨ ⸩
+  ⌈ ⌉       ⌊ ⌋       〈 〉     ❨ ❩
+  ❪ ❫       ❬ ❭       ❮ ❯       ❰ ❱
+  ❲ ❳       ❴ ❵       ⟅ ⟆       ⟦ ⟧
+  ⟨ ⟩       ⟪ ⟫       ⟬ ⟭       ⟮ ⟯
+  ⦃ ⦄       ⦅ ⦆       ⦇ ⦈       ⦉ ⦊
+  ⦋ ⦌       ⦍ ⦎       ⦏ ⦐       ⦑ ⦒
+  ⦗ ⦘       ⧘ ⧙       ⧚ ⧛       ⧼ ⧽
+  ~;
+
+# ---------------------------------------------------------------------------
+# Constructor
+# ---------------------------------------------------------------------------
+
 sub new {
     my (undef, %opts) = @_;
 
@@ -140,417 +495,30 @@ sub new {
         line          => 1,
         inc           => [],
         class         => 'main',            # a.k.a. namespace
-        vars          => {'main' => []},
+        vars          => {'main' => []},    # the variables of the current scope, by namespace
         ref_vars_refs => {'main' => []},    # the chain of enclosing scopes (nearest first)
         seen_names    => {},                # the names that were declared (see `find_var`)
-        EOT           => [],
+        EOT           => [],                # the pending here-documents
 
-        postfix_ops => {                    # postfix operators
-           '--'  => 1,
-           '++'  => 1,
-           '...' => 1,
-           '!'   => 1,
-           '!!'  => 1,
-                       },
+        postfix_ops      => {%POSTFIX_OPS},
+        hyper_ops        => {%HYPER_OPS},
+        built_in_classes => {%BUILT_IN_CLASSES},
+        keywords         => {%KEYWORDS},
+        delim_pairs      => {%DELIM_PAIRS},
 
-        hyper_ops => {
+        static_obj_re      => $STATIC_OBJ_RE,
+        prefix_obj_re      => $PREFIX_OBJ_RE,
+        quote_operators_re => $QUOTE_OPERATORS_RE,
+        match_flags_re     => $MATCH_FLAGS_RE,
+        var_name_re        => $VAR_NAME_RE,
+        method_name_re     => $METHOD_NAME_RE,
+        var_init_sep_re    => $VAR_INIT_SEP_RE,
+        operators_re       => $OPERATORS_RE,
 
-            # type => [takes args, method name]
-            map     => [1, 'map_operator'],
-            pam     => [1, 'pam_operator'],
-            zip     => [1, 'zip_operator'],
-            wise    => [1, 'wise_operator'],
-            scalar  => [1, 'scalar_operator'],
-            rscalar => [1, 'rscalar_operator'],
-            cross   => [1, 'cross_operator'],
-            unroll  => [1, 'unroll_operator'],
-            reduce  => [0, 'reduce_operator'],
-            lmap    => [0, 'map_operator'],
-                     },
-
-        static_obj_re => qr{\G
-            (?:
-                   nil\b                          (?{ state $x = bless({}, 'Sidef::Types::Nil::Nil') })
-                 | null\b                         (?{ state $x = Sidef::Types::Null::Null->new })
-                 | true\b                         (?{ Sidef::Types::Bool::Bool::TRUE })
-                 | false\b                        (?{ Sidef::Types::Bool::Bool::FALSE })
-                 | next\b                         (?{ state $x = bless({}, 'Sidef::Types::Block::Next') })
-                 | break\b                        (?{ state $x = bless({}, 'Sidef::Types::Block::Break') })
-                 | Block\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Block::Block') })
-                 | Backtick\b                     (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Backtick') })
-                 | ARGF\b                         (?{ state $x = bless({}, 'Sidef::Meta::Glob::ARGF') })
-                 | STDIN\b                        (?{ state $x = bless({}, 'Sidef::Meta::Glob::STDIN') })
-                 | STDOUT\b                       (?{ state $x = bless({}, 'Sidef::Meta::Glob::STDOUT') })
-                 | STDERR\b                       (?{ state $x = bless({}, 'Sidef::Meta::Glob::STDERR') })
-                 | Bool\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Bool::Bool') })
-                 | FileHandle\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::FileHandle') })
-                 | DirHandle\b                    (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::DirHandle') })
-                 | SocketHandle\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::SocketHandle') })
-                 | Dir\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Dir') })
-                 | File\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::File') })
-                 | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
-                 | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
-                 | Vec(?:tor)?\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Vector') })
-                 | Matrix\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Matrix') })
-                 | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
-                 | Set\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Set') })
-                 | Bag\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Bag') })
-                 | Str(?:ing)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::String::String') })
-                 | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
-                 | Mod\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Mod') })
-                 | Gauss\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Gauss') })
-                 | Quadratic\b                    (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quadratic') })
-                 | Quaternion\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quaternion') })
-                 | Poly(?:nomial)?\b              (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Polynomial') })
-                 | Poly(?:nomial)?Mod\b           (?{ state $x = bless({}, 'Sidef::DataTypes::Number::PolynomialMod') })
-                 | Frac(?:tion)?\b                (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Fraction') })
-                 | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
-                 | NaN\b                          (?{ state $x = Sidef::Types::Number::Number->nan })
-                 | Infi\b                         (?{ state $x = Sidef::Types::Number::Complex->new(0, Sidef::Types::Number::Number->inf) })
-                 | NaNi\b                         (?{ state $x = Sidef::Types::Number::Complex->new(0, Sidef::Types::Number::Number->nan) })
-                 | RangeNum(?:ber)?+\b            (?{ state $x = bless({}, 'Sidef::DataTypes::Range::RangeNumber') })
-                 | RangeStr(?:ing)?+\b            (?{ state $x = bless({}, 'Sidef::DataTypes::Range::RangeString') })
-                 | Range\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Range::Range') })
-                 | Socket\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Socket') })
-                 | Pipe\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Pipe') })
-                 | Ref\b                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
-                 | NamedParam\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Variable::NamedParam') })
-                 | Lazy\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Lazy') })
-                 | LazyMethod\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Object::LazyMethod') })
-                 | Enumerator\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Enumerator') })
-                 | Complex\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Complex') })
-                 | Regexp?\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Regex::Regex') })
-                 | Object\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Object') })
-                 | Sidef\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Sidef::Sidef') })
-                 | Sig\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sig') })
-                 | Sys\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sys') })
-                 | Perl\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Perl::Perl') })
-                 | Math\b                         (?{ state $x = bless({}, 'Sidef::Math::Math') })
-                 | Time\b                         (?{ state $x = Sidef::Time::Time->new })
-                 | Date\b                         (?{ state $x = Sidef::Time::Date->new })
-                 | \$\.                           (?{ state $x = bless({name => '$.'}, 'Sidef::Variable::Magic') })
-                 | \$\?                           (?{ state $x = bless({name => '$?'}, 'Sidef::Variable::Magic') })
-                 | \$\$                           (?{ state $x = bless({name => '$$'}, 'Sidef::Variable::Magic') })
-                 | \$\^T\b                        (?{ state $x = bless({name => '$^T'}, 'Sidef::Variable::Magic') })
-                 | \$\|                           (?{ state $x = bless({name => '$|'}, 'Sidef::Variable::Magic') })
-                 | \$!                            (?{ state $x = bless({name => '$!'}, 'Sidef::Variable::Magic') })
-                 | \$"                            (?{ state $x = bless({name => '$"'}, 'Sidef::Variable::Magic') })
-                 | \$\\                           (?{ state $x = bless({name => '$\\'}, 'Sidef::Variable::Magic') })
-                 | \$@                            (?{ state $x = bless({name => '$@'}, 'Sidef::Variable::Magic') })
-                 | \$%                            (?{ state $x = bless({name => '$%'}, 'Sidef::Variable::Magic') })
-                 | \$~                            (?{ state $x = bless({name => '$~'}, 'Sidef::Variable::Magic') })
-                 | \$/                            (?{ state $x = bless({name => '$/'}, 'Sidef::Variable::Magic') })
-                 | \$&                            (?{ state $x = bless({name => '$&'}, 'Sidef::Variable::Magic') })
-                 | \$'                            (?{ state $x = bless({name => '$\''}, 'Sidef::Variable::Magic') })
-                 | \$`                            (?{ state $x = bless({name => '$`'}, 'Sidef::Variable::Magic') })
-                 | \$:                            (?{ state $x = bless({name => '$:'}, 'Sidef::Variable::Magic') })
-                 | \$\]                           (?{ state $x = bless({name => '$]'}, 'Sidef::Variable::Magic') })
-                 | \$\[                           (?{ state $x = bless({name => '$['}, 'Sidef::Variable::Magic') })
-                 | \$;                            (?{ state $x = bless({name => '$;'}, 'Sidef::Variable::Magic') })
-                 | \$,                            (?{ state $x = bless({name => '$,'}, 'Sidef::Variable::Magic') })
-                 | \$\^O\b                        (?{ state $x = bless({name => '$^O'}, 'Sidef::Variable::Magic') })
-                 | \$\^PERL\b                     (?{ state $x = bless({name => '$^X', dump => '$^PERL'}, 'Sidef::Variable::Magic') })
-                 | (?:\$0|\$\^SIDEF)\b            (?{ state $x = bless({name => '$0', dump => '$^SIDEF'}, 'Sidef::Variable::Magic') })
-                 | \$\)                           (?{ state $x = bless({name => '$)'}, 'Sidef::Variable::Magic') })
-                 | \$\(                           (?{ state $x = bless({name => '$('}, 'Sidef::Variable::Magic') })
-                 | \$<                            (?{ state $x = bless({name => '$<'}, 'Sidef::Variable::Magic') })
-                 | \$>                            (?{ state $x = bless({name => '$>'}, 'Sidef::Variable::Magic') })
-                 | ∞                              (?{ state $x = Sidef::Types::Number::Number->inf })
-            ) (?!::)
-        }x,
-        prefix_obj_re => qr{\G
-          (?:
-              if\b                                       (?{ bless({}, 'Sidef::Types::Block::If') })
-            | with\b                                     (?{ bless({}, 'Sidef::Types::Block::With') })
-            | while\b                                    (?{ bless({}, 'Sidef::Types::Block::While') })
-            | unless\b                                   (?{ bless({}, 'Sidef::Types::Block::If') })
-            | until\b                                    (?{ bless({}, 'Sidef::Types::Block::While') })
-            | foreach\b                                  (?{ bless({}, 'Sidef::Types::Block::ForEach') })
-            | for\b                                      (?{ bless({}, 'Sidef::Types::Block::For') })
-            | return\b                                   (?{ state $x = bless({}, 'Sidef::Types::Block::Return') })
-            #| next\b                                     (?{ bless({}, 'Sidef::Types::Block::Next') })
-            #| break\b                                    (?{ bless({}, 'Sidef::Types::Block::Break') })
-            | read\b                                     (?{ state $x = Sidef::Sys::Sys->new })
-            | goto\b                                     (?{ state $x = bless({}, 'Sidef::Perl::Builtin') })
-            | (?:[*\\]|\+\+|--)                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
-            | (?:>>?|\@\|?|[√+~!\-\^]|
-                (?:
-                    say
-                  | print
-                  | defined
-                )\b)                                     (?{ state $x = bless({}, 'Sidef::Operator::Unary') })
-            | :                                          (?{ state $x = bless({}, 'Sidef::Meta::PrefixColon') })
-          )
-        }x,
-        quote_operators_re => qr{\G
-         (?:
-            # String
-             (?: ['‘‚’] | %q\b. )                                      (?{ [qw(0 new Sidef::Types::String::String)] })
-            |(?: ["“„”] | %(?:Q\b. | (?!\w). ))                        (?{ [qw(1 new Sidef::Types::String::String)] })
-
-            # File
-            | %f\b.                                                    (?{ [qw(0 new Sidef::Types::Glob::File)] })
-            | %F\b.                                                    (?{ [qw(1 new Sidef::Types::Glob::File)] })
-
-            # Dir
-            | %d\b.                                                    (?{ [qw(0 new Sidef::Types::Glob::Dir)] })
-            | %D\b.                                                    (?{ [qw(1 new Sidef::Types::Glob::Dir)] })
-
-            # Pipe
-            | %p\b.                                                    (?{ [qw(0 pipe Sidef::Types::Glob::Pipe)] })
-            | %P\b.                                                    (?{ [qw(1 pipe Sidef::Types::Glob::Pipe)] })
-
-            # Backtick
-            | %x\b.                                                    (?{ [qw(0 new Sidef::Types::Glob::Backtick)] })
-            | (?: %X\b. | ` )                                          (?{ [qw(1 new Sidef::Types::Glob::Backtick)] })
-
-            # Bytes
-            | %b\b.                                                    (?{ [qw(0 bytes Sidef::Types::Array::Array)] })
-            | %B\b.                                                    (?{ [qw(1 bytes Sidef::Types::Array::Array)] })
-
-            # Chars
-            | %c\b.                                                    (?{ [qw(0 chars Sidef::Types::Array::Array)] })
-            | %C\b.                                                    (?{ [qw(1 chars Sidef::Types::Array::Array)] })
-
-            # Graphemes
-            | %g\b.                                                    (?{ [qw(0 graphemes Sidef::Types::Array::Array)] })
-            | %G\b.                                                    (?{ [qw(1 graphemes Sidef::Types::Array::Array)] })
-
-            # Symbols
-            | %[Os]\b.                                                 (?{ [qw(0 __NEW__ Sidef::Module::OO)] })
-            | %S\b.                                                    (?{ [qw(0 __NEW__ Sidef::Module::Func)] })
-
-            # Arbitrary Perl code
-            | %perl\b.                                                 (?{ [qw(0 new Sidef::Types::Perl::Perl)] })
-            | %Perl\b.                                                 (?{ [qw(1 new Sidef::Types::Perl::Perl)] })
-         )
-        }xs,
-        built_in_classes => {
-            map { $_ => 1 }
-              qw(
-              File
-              FileHandle
-              Dir
-              DirHandle
-              Arr Array
-              Pair
-              Vec Vector
-              Matrix
-              Enumerator
-              Hash
-              Set
-              Bag
-              Str String
-              Num Number
-              Poly Polynomial
-              PolyMod PolynomialMod
-              Frac Fraction
-              Mod
-              Gauss
-              Quadratic
-              Quaternion
-              Range
-              RangeStr RangeString
-              RangeNum RangeNumber
-              Complex
-              Math
-              Pipe
-              Ref
-              Socket
-              SocketHandle
-              Bool
-              Sys
-              Sig
-              Regex Regexp
-              Time
-              Date
-              Perl
-              Sidef
-              Object
-              Parser
-              Block
-              Backtick
-              Lazy
-              LazyMethod
-              NamedParam
-
-              true false
-              nil null
-              )
-        },
-        keywords => {
-            map { $_ => 1 }
-              qw(
-              next
-              break
-              return
-              for foreach
-              if elsif else unless until not
-              with orwith
-              while
-              given
-              with
-              continue
-              import
-              include
-              eval
-              read
-              die
-              warn
-
-              assert
-              assert_eq
-              assert_ne
-
-              local
-              global
-              var
-              del
-              const
-              func
-              enum
-              class
-              static
-              define
-              struct
-              subset
-              module
-
-              DATA
-              ARGV
-              ARGF
-              ENV
-
-              STDIN
-              STDOUT
-              STDERR
-
-              __FILE__
-              __LINE__
-              __END__
-              __DATA__
-              __TIME__
-              __DATE__
-              __NAMESPACE__
-              __COMPILED__
-              __OPTIMIZED__
-              )
-        },
-        match_flags_re  => qr{[msixpogcaludn]+},
-        var_name_re     => qr/[^\W\d]\w*+(?>::[^\W\d]\w*)*/,
-        method_name_re  => qr/[^\W\d]\w*+!?/,
-        var_init_sep_re => qr/\G\h*(?:=>|[=:])\h*/,
-        operators_re    => do {
-            local $" = q{|};
-
-            # Longest prefix first
-            my @operators = map { quotemeta } qw(
-
-              ||= ||
-              &&= &&
-
-              ^.. ..^
-
-              %% ≅
-              ~~ !~
-              <~>
-              <=> =~=
-              <<= >>=
-              << >>
-              |>> |> |X> |Z>
-              |= |
-              &= &
-              == =~
-              := =
-              <= >= < >
-              ++ --
-              += +
-              -= -
-              //= //
-              /= / ÷= ÷
-              **= **
-              %= %
-              ^= ^
-              *= *
-              ...
-              != ..
-              \\\\= \\\\
-              !! !
-              : ： ⫶
-              « » ~
-            );
-
-            qr{
-                (?(DEFINE)
-                    (?<ops>
-                          @operators
-                        | \p{Block: Mathematical_Operators}
-                        | \p{Block: Supplemental_Mathematical_Operators}
-                    )
-                )
-
-                  »(?<unroll>[^\W\d]\w*+|(?&ops))«                # unroll operator (e.g.: »add« or »+«)
-                | >>(?<unroll>[^\W\d]\w*+|(?&ops))<<              # unroll operator (e.g.: >>add<< or >>+<<)
-
-                | ~X(?<cross>[^\W\d]\w*+|(?&ops)|)                # cross operator          (e.g.: ~X or ~X+)
-                | ~Z(?<zip>[^\W\d]\w*+|(?&ops)|)                  # zip operator            (e.g.: ~Z or ~Z+)
-                | ~W(?<wise>[^\W\d]\w*+|(?&ops)|)                 # wise operator           (e.g.: ~W or ~W+)
-                | ~S(?<scalar>[^\W\d]\w*+|(?&ops)|)               # scalar operator         (e.g.: ~S or ~S+)
-                | ~RS(?<rscalar>[^\W\d]\w*+|(?&ops)|)             # reverse scalar operator (e.g.: ~RS or ~RS/)
-
-                | »(?<map>[^\W\d]\w*+|(?&ops))»                   # mapping operator (e.g.: »add» or »+»)
-                | >>(?<map>[^\W\d]\w*+|(?&ops))>>                 # mapping operator (e.g.: >>add>> or >>+>>)
-
-                | «(?<pam>[^\W\d]\w*+|(?&ops))«                   # reverse mapping operator (e.g.: «add« or «+«)
-                | <<(?<pam>[^\W\d]\w*+|(?&ops))<<                 # reverse mapping operator (e.g.: <<add<< or <<+<<)
-
-                | »(?<lmap>[^\W\d]\w*+|(?&ops))\(\)»              # mapping operator (e.g.: »add()» or »+()»)
-                | >>(?<lmap>[^\W\d]\w*+|(?&ops))\(\)>>            # mapping operator (e.g.: >>add()>> or >>+()>>)
-
-                | <<(?<reduce>[^\W\d]\w*+|(?&ops))>>              # reduce operator (e.g.: <<add>> or <<+>>)
-                | «(?<reduce>[^\W\d]\w*+|(?&ops))»                # reduce operator (e.g.: «add» or «+»)
-
-                | `(?<op>[^\W\d]\w*+!?)`                          # method-like operator (e.g.: `add` or `add!`)
-                | (?<op>(?&ops))                                  # primitive operator   (e.g.: +, -, *, /)
-            }x;
-        },
-
-        # Reference: https://en.wikipedia.org/wiki/International_variation_in_quotation_marks
-        delim_pairs => {
-            qw~
-              ( )       [ ]       { }       < >
-              « »       » «       ‹ ›       › ‹
-              „ ”       “ ”       ‘ ’       ‚ ’
-              〈 〉     ﴾ ﴿       〈 〉     《 》
-              「 」     『 』     【 】     〔 〕
-              〖 〗     〘 〙     〚 〛     ⸨ ⸩
-              ⌈ ⌉       ⌊ ⌋       〈 〉     ❨ ❩
-              ❪ ❫       ❬ ❭       ❮ ❯       ❰ ❱
-              ❲ ❳       ❴ ❵       ⟅ ⟆       ⟦ ⟧
-              ⟨ ⟩       ⟪ ⟫       ⟬ ⟭       ⟮ ⟯
-              ⦃ ⦄       ⦅ ⦆       ⦇ ⦈       ⦉ ⦊
-              ⦋ ⦌       ⦍ ⦎       ⦏ ⦐       ⦑ ⦒
-              ⦗ ⦘       ⧘ ⧙       ⧚ ⧛       ⧼ ⧽
-              ~
-        },
         %opts,
     );
 
-    # Words that have a special meaning in parse_expr(). Any other plain identifier
-    # is a variable, which allows skipping all the other checks (see `parse_expr`).
-    $options{special_words} //= {
-        map { $_ => 1 } (
-            keys(%{$options{keywords}}),
-            keys(%{$options{built_in_classes}}),
-            qw(
-              say print defined goto unless until not do loop try catch gather take
-              when case default has method eval Parser Inf NaN Infi NaNi
-              Arr Array Vec Vector Str String Num Number Poly Polynomial
-              PolyMod PolynomialMod Frac Fraction Regex Regexp elif elseif
-              RangeNum RangeNumber RangeStr RangeString
-              )
-        )
-    };
+    $options{special_words} //= {map { $_ => 1 } (keys(%{$options{keywords}}), keys(%{$options{built_in_classes}}), @SPECIAL_WORDS)};
 
     $options{ref_vars} = $options{vars};
     $options{file_name}   //= '-';
@@ -559,18 +527,101 @@ sub new {
     bless \%options, __PACKAGE__;
 }
 
+# Messages that start the error reports
+my @ERROR_QUIPS = (
+
+    "Your code forgot how to 'human.' Please give it some structure!",
+    "Were you trying to summon Cthulhu, or is this just a typo?",
+    "This line of code is in denial. It doesn't want to cooperate.",
+    "Parser has encountered a disturbance in the Force. It appears your code has gone to the dark side.",
+    "Code drunk. Fix before it starts ordering random APIs online.",
+    "Did you mean to do that? Because your code just broke the Matrix.",
+    "Your syntax seems to have taken a coffee break.",
+    "Your code is trying to summon Skynet. Abort while you can!",
+    "This isn’t a Choose Your Own Adventure. Stick to the script!",
+    "Well, that’s not going to work. Try again, friend.",
+
+    "If this is what you meant, we need to have a talk.",
+    "Uh-oh! Looks like your code slipped on a banana peel.",
+    "Your code is having an existential crisis. It doesn’t know who it is anymore.",
+    "Something’s wrong… but hey, at least you tried!",
+    "The code didn’t like that. In fact, it’s offended.",
+    "You’re one typo away from greatness. Unfortunately, this isn’t it.",
+    "Well, that’s awkward. Let’s pretend that didn’t happen.",
+    "Your code needs more coffee. Or maybe you do.",
+
+    "I have no idea what I just read.",
+    "Oops! The parser is confused and needs a moment to reboot its brain.",
+    "The code is speaking in riddles. Try again in plain text.",
+    "Parser ran out of breadcrumbs to follow your logic trail.",
+    "It’s like trying to read a book with missing pages.",
+    "The code went that way… and then it didn’t.",
+    "Parser gave up. It’s currently hiding under the desk.",
+    "It’s not you, it’s… okay, it’s definitely you.",
+    "Parser needs a map and a flashlight to navigate this code.",
+    "Parser has encountered a wild puzzle. It refuses to continue without a cheat sheet.",
+
+    "Your code just sent me on a wild goose chase. No geese found.",
+    "The parser tried to follow the logic, but it got lost in the spaghetti code.",
+    "Your code just opened a wormhole. Destination: unknown.",
+    "I’ve parsed Shakespeare, but this? This is next level.",
+    "The parser tripped over a missing semicolon and is now in the fetal position.",
+    "This code smells… like it’s on fire. Someone grab an extinguisher!",
+    "The parser and the code had a staring contest. The parser blinked first.",
+    "Parser has lost the plot. Please send a clearer script.",
+    "The code just threw a plot twist. Even the parser didn’t see that coming.",
+    "It tried to make sense of your code, then rage quit.",
+
+    "The code ventured into the unknown… and didn’t leave a map.",
+    "The parser tried to keep up, but your code is like a soap opera—too many plot twists.",
+    "Your code is speaking Parseltongue. I need an interpreter.",
+    "The parser has encountered an enigma wrapped in a mystery, coded in confusion.",
+    "The parser felt a great disturbance in the code, as if thousands of bugs cried out in terror.",
+    "The code just ghosted me. No clues, no closure, nothing.",
+    "Parser tangled in a logic loop. Send help. Or snacks.",
+    "The code is playing hide and seek. The parser isn’t winning.",
+    "The parser tried reasoning with the code, but it’s ignoring all logic.",
+    "Parser has encountered Schrödinger’s code. It’s both broken and not broken, but we won’t know until you fix it.",
+                  );
+
+# ---------------------------------------------------------------------------
+# Error reporting
+# ---------------------------------------------------------------------------
+
 sub fatal_error {
     my ($self, %opt) = @_;
 
-    my $code = $opt{code} // '';
-    my $pos  = $opt{pos}  // 0;
+    my ($error_line, $point, $column) = $self->_error_context($opt{code} // '', $opt{pos} // 0);
+
+    my $error = sprintf("%s\n\nFile : %s\nLine : %s : %s\nError: %s\n\n" . ("~" x 80) . "\n%s\n",
+                        $ERROR_QUIPS[rand @ERROR_QUIPS],
+                        $self->{file_name} // '-',
+                        $opt{line} // $self->{line},
+                        $column, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line);
+
+    $error .= ' ' x ($point) . '^' . "\n" . ('~' x 80) . "\n";
+
+    if (defined $opt{hint}) {
+        $error .= "[!] Hint: $opt{hint}\n";
+    }
+
+    if (exists($opt{var})) {
+        $error .= $self->_similar_names($opt{var});
+    }
+
+    die $error;
+}
+
+# Returns the source line of an error, the position of the pointer in this line (starting at 0)
+# and the column of the error (starting at 1). Long lines are cut around the error.
+sub _error_context {
+    my ($self, $code, $pos) = @_;
 
     $pos = 0             if $pos < 0;
     $pos = length($code) if $pos > length($code);
 
     my $start  = ($pos > 0 ? rindex($code, "\n", $pos - 1) + 1 : 0);
     my $point  = $pos - $start;
-    my $line   = $opt{line} // $self->{line};
     my $column = $point + 1;
 
     my $error_line = (split(/\R/, substr($code, $start, $point + 80)))[0] // '';
@@ -585,118 +636,64 @@ sub fatal_error {
         $error_line = substr($error_line, $from, 80);
     }
 
-    my @lines = (
-
-        "Your code forgot how to 'human.' Please give it some structure!",
-        "Were you trying to summon Cthulhu, or is this just a typo?",
-        "This line of code is in denial. It doesn't want to cooperate.",
-        "Parser has encountered a disturbance in the Force. It appears your code has gone to the dark side.",
-        "Code drunk. Fix before it starts ordering random APIs online.",
-        "Did you mean to do that? Because your code just broke the Matrix.",
-        "Your syntax seems to have taken a coffee break.",
-        "Your code is trying to summon Skynet. Abort while you can!",
-        "This isn’t a Choose Your Own Adventure. Stick to the script!",
-        "Well, that’s not going to work. Try again, friend.",
-
-        "If this is what you meant, we need to have a talk.",
-        "Uh-oh! Looks like your code slipped on a banana peel.",
-        "Your code is having an existential crisis. It doesn’t know who it is anymore.",
-        "Something’s wrong… but hey, at least you tried!",
-        "The code didn’t like that. In fact, it’s offended.",
-        "You’re one typo away from greatness. Unfortunately, this isn’t it.",
-        "Well, that’s awkward. Let’s pretend that didn’t happen.",
-        "Your code needs more coffee. Or maybe you do.",
-
-        "I have no idea what I just read.",
-        "Oops! The parser is confused and needs a moment to reboot its brain.",
-        "The code is speaking in riddles. Try again in plain text.",
-        "Parser ran out of breadcrumbs to follow your logic trail.",
-        "It’s like trying to read a book with missing pages.",
-        "The code went that way… and then it didn’t.",
-        "Parser gave up. It’s currently hiding under the desk.",
-        "It’s not you, it’s… okay, it’s definitely you.",
-        "Parser needs a map and a flashlight to navigate this code.",
-        "Parser has encountered a wild puzzle. It refuses to continue without a cheat sheet.",
-
-        "Your code just sent me on a wild goose chase. No geese found.",
-        "The parser tried to follow the logic, but it got lost in the spaghetti code.",
-        "Your code just opened a wormhole. Destination: unknown.",
-        "I’ve parsed Shakespeare, but this? This is next level.",
-        "The parser tripped over a missing semicolon and is now in the fetal position.",
-        "This code smells… like it’s on fire. Someone grab an extinguisher!",
-        "The parser and the code had a staring contest. The parser blinked first.",
-        "Parser has lost the plot. Please send a clearer script.",
-        "The code just threw a plot twist. Even the parser didn’t see that coming.",
-        "It tried to make sense of your code, then rage quit.",
-
-        "The code ventured into the unknown… and didn’t leave a map.",
-        "The parser tried to keep up, but your code is like a soap opera—too many plot twists.",
-        "Your code is speaking Parseltongue. I need an interpreter.",
-        "The parser has encountered an enigma wrapped in a mystery, coded in confusion.",
-        "The parser felt a great disturbance in the code, as if thousands of bugs cried out in terror.",
-        "The code just ghosted me. No clues, no closure, nothing.",
-        "Parser tangled in a logic loop. Send help. Or snacks.",
-        "The code is playing hide and seek. The parser isn’t winning.",
-        "The parser tried reasoning with the code, but it’s ignoring all logic.",
-        "Parser has encountered Schrödinger’s code. It’s both broken and not broken, but we won’t know until you fix it.",
-                );
-
-    my $error = sprintf("%s\n\nFile : %s\nLine : %s : %s\nError: %s\n\n" . ("~" x 80) . "\n%s\n",
-                        $lines[rand @lines],
-                        $self->{file_name} // '-',
-                        $line, $column, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line);
-
-    $error .= ' ' x ($point) . '^' . "\n" . ('~' x 80) . "\n";
-
-    if (defined $opt{hint}) {
-        $error .= "[!] Hint: $opt{hint}\n";
-    }
-
-    if (exists($opt{var})) {
-
-        my ($name, $class) = $self->get_name_and_class($opt{var});
-
-        my %seen;
-        my @names;
-        foreach my $var (@{$self->{vars}{$class}}) {
-            next if ref $var eq 'ARRAY';
-            if (!$seen{$var->{name}}++) {
-                push @names, $var->{name};
-            }
-        }
-
-        foreach my $scope (@{$self->{ref_vars_refs}{$class}}) {
-            foreach my $var (@{$scope}) {
-                next if ref $var eq 'ARRAY';
-                if (!$seen{$var->{name}}++) {
-                    push @names, $var->{name};
-                }
-            }
-        }
-
-        if ($class eq 'main') {
-            $class = '';
-        }
-        else {
-            $class .= '::';
-        }
-
-        # The keywords and the built-in classes can be suggested too (e.g.: `retrun` => `return`)
-        my %is_var = map { $_ => 1 } @names;
-        if ($class eq '') {
-            foreach my $word (sort(keys(%{$self->{keywords}}), keys(%{$self->{built_in_classes}}))) {
-                next                if substr($word, 0, 2) eq '__';
-                push(@names, $word) if !$is_var{$word}++;
-            }
-        }
-
-        if (my @candidates = Sidef::best_matches($name, [grep { $_ ne $name } @names])) {
-            $error .= ("[?] Did you mean: " . join("\n" . (' ' x 18), map { $class . $_ } sort(@candidates)) . "\n");
-        }
-    }
-
-    die $error;
+    return ($error_line, $point, $column);
 }
+
+# Suggestions for an undeclared name: the declared names, the keywords and the built-in classes
+# that are similar to it (e.g.: `retrun` => `return`)
+sub _similar_names {
+    my ($self, $var) = @_;
+
+    my ($name, $class) = $self->get_name_and_class($var);
+
+    my %seen;
+    my @names;
+
+    foreach my $scope ($self->{vars}{$class}, @{$self->{ref_vars_refs}{$class}}) {
+        foreach my $declared (@{$scope}) {
+            next if ref $declared eq 'ARRAY';
+            if (!$seen{$declared->{name}}++) {
+                push @names, $declared->{name};
+            }
+        }
+    }
+
+    $class = ($class eq 'main' ? '' : $class . '::');
+
+    if ($class eq '') {
+        foreach my $word (sort(keys(%{$self->{keywords}}), keys(%{$self->{built_in_classes}}))) {
+            next                if substr($word, 0, 2) eq '__';
+            push(@names, $word) if !$seen{$word}++;
+        }
+    }
+
+    if (my @candidates = Sidef::best_matches($name, [grep { $_ ne $name } @names])) {
+        return ("[?] Did you mean: " . join("\n" . (' ' x 18), map { $class . $_ } sort(@candidates)) . "\n");
+    }
+
+    return '';
+}
+
+use constant REDO_PARSE => \'redo';    # returned by a handler to parse the expression again
+
+# Fails when the name is a keyword or the name of a built-in class
+sub _check_reserved_name {
+    my ($self, $code, $name, $pos) = @_;
+
+    if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
+        $self->fatal_error(
+                           code  => $code,
+                           pos   => $pos,
+                           error => "`$name` is either a keyword or a predefined variable!",
+                          );
+    }
+
+    return;
+}
+
+# ---------------------------------------------------------------------------
+# Scopes and declared names
+# ---------------------------------------------------------------------------
 
 # Declares a new variable (or function, class, etc.) in the current scope
 sub _unshift_var {
@@ -706,6 +703,8 @@ sub _unshift_var {
     return;
 }
 
+# Finds a declared name, starting with the current scope and continuing with the enclosing scopes.
+# In list context it also returns true when the name was found in the current scope.
 sub find_var {
     my ($self, $var_name, $class) = @_;
 
@@ -732,6 +731,7 @@ sub find_var {
     return;
 }
 
+# Warns about the variables that were declared, but never used.
 sub check_declarations {
     my ($self, $hash_ref) = @_;
 
@@ -764,6 +764,7 @@ sub check_declarations {
     }
 }
 
+# Splits a name into its namespace and its basename: `Foo::bar` => (bar, Foo)
 sub get_name_and_class {
     my ($self, $var_name) = @_;
 
@@ -775,21 +776,182 @@ sub get_name_and_class {
       : ($var_name, $self->{class});
 }
 
-sub get_quoted_words {
+# ---------------------------------------------------------------------------
+# Whitespace, comments, and quoted strings
+# ---------------------------------------------------------------------------
+
+sub parse_whitespace {
     my ($self, %opt) = @_;
 
-    my $string = $self->get_quoted_string(code => $opt{code}, no_count_line => 1);
-    $self->parse_whitespace(code => \$string);
+    my $found_space = -1;
+    local *_ = $opt{code};
+    {
+        ++$found_space;
 
-    my @words;
-    while ($string =~ /\G((?>[^\s\\]+|\\.)++)/gcs) {
-        push @words, $1 =~ s{\\#}{#}gr;
-        $self->parse_whitespace(code => \$string);
+        # Fast exit: the next character can't start whitespace or a comment
+        if (!/\G(?=[\s#\/\x{200B}])/) {
+            return ($found_space > 0 ? 1 : ());
+        }
+
+        # Whitespace
+        if (/\G(?=\s)/) {
+
+            # Horizontal space
+            if (/\G\h+/gc) {
+                redo;
+            }
+
+            # Generic line
+            if (/\G\R/gc) {
+                ++$self->{line};
+
+                # Here-documents
+                while (@{$self->{EOT}}) {
+                    $self->_read_heredoc(shift(@{$self->{EOT}}), code => $opt{code});
+                }
+
+                /\G\h+/gc;
+                redo;
+            }
+
+            # Vertical space
+            if (/\G\v+/gc) {    # should not reach here
+                redo;
+            }
+        }
+
+        # ZERO WIDTH SPACE
+        # https://www.fileformat.info/info/unicode/char/200b/index.htm
+        if (/\G\x{200B}+/gc) {
+            redo;
+        }
+
+        # Embedded comments (https://docs.raku.org/language/syntax#Multi-line_/_embedded_comments)
+        if (/\G#`(?=[[:punct:]])/gc) {
+            $self->get_quoted_string(code => $opt{code});
+            redo;
+        }
+
+        # One-line comment
+        if (/\G#.*/gc) {
+            redo;
+        }
+
+        # Multi-line C comment
+        if (m{\G/\*}gc) {
+            $self->_skip_c_comment(code => $opt{code});
+            redo;
+        }
+
+        if ($found_space > 0) {
+            return 1;
+        }
+
+        return;
     }
-
-    return \@words;
 }
 
+# Reads the content of a here-document that starts on the next line
+sub _read_heredoc {
+    my ($self, $eot, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $name   = $eot->{name};
+    my $indent = $eot->{indent};
+
+    my $spaces = 0;
+    my $acc    = '';
+    until (/\G\Q$name\E(?:\R|\z)/gc) {
+
+        if (/\G(.*)/gc) {
+            $acc .= "$1\n";
+        }
+
+        # Indentation is true
+        if ($indent && /\G\R(\h*)\Q$name\E(?:\R|\z)/gc) {
+            $spaces = length($1);
+            ++$self->{line};
+            last;
+        }
+
+        /\G\R/gc
+          ? ++$self->{line}
+          : $self->fatal_error(
+                               error => "can't find string terminator <<$name>> anywhere before end-of-file",
+                               code  => $_,
+                               pos   => $eot->{pos},
+                               line  => $eot->{line},
+                              );
+    }
+
+    if ($indent and $spaces > 0) {
+        $acc =~ s/^\h{1,$spaces}//gm;
+    }
+
+    ++$self->{line};
+    push @{$eot->{obj}{$self->{class}}},
+      {
+        self => (
+                 $eot->{type} == 0
+                 ? Sidef::Types::String::String->new($acc)
+                 : Sidef::Types::String::String->new($acc)->apply_escapes($self)
+                )
+      };
+
+    return;
+}
+
+# Skips a multi-line C comment (the opening `/*` was consumed)
+sub _skip_c_comment {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my ($comment_pos, $comment_line) = (pos($_) - 2, $self->{line});
+    while (1) {
+        m{\G.*?\*/}gc && last;
+        /\G.+/gc
+          || (
+              /\G\R/gc
+              ? $self->{line}++
+              : $self->fatal_error(
+                                   error => "can't find the end of the multi-line comment",
+                                   code  => $_,
+                                   pos   => $comment_pos,
+                                   line  => $comment_line,
+                                  )
+             );
+    }
+
+    return;
+}
+
+# Moves back to the end of the last statement, before the whitespace that was skipped.
+sub backtrack_whitespace {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    # Backtrack the removal of whitespace
+    while (1) {
+        my $s = substr($_, pos($_) - 1, 1);
+
+        if ($s =~ /\R/) {
+            $self->{line} -= 1;
+            pos($_) -= 1;
+            last;
+        }
+        elsif ($s =~ /\h/) {
+            pos($_) -= 1;
+        }
+        else {
+            last;
+        }
+    }
+}
+
+# Parses a string that starts with any delimiter (including the paired ones) and returns its content.
 sub get_quoted_string {
     my ($self, %opt) = @_;
 
@@ -822,23 +984,15 @@ sub get_quoted_string {
         my $end_delim = quotemeta $pair_delim;
         my $re_delim  = $beg_delim . $end_delim;
 
-        # if (m{\G(?<main>$beg_delim((?>[^$re_delim\\]+|\\.|(?&main))*+)$end_delim)}sgc) {
-        # if (m{\G(?<main>$beg_delim((?>[^\\$re_delim]*+(?>\\.[^\\$re_delim]*|(?&main)){0,}){0,})(?:$end_delim(*ACCEPT:term))?)(*PRUNE)(*FAIL)}sgc) {
-
         if (m{\G(?<main>$beg_delim((?>[^\\$re_delim]*+(?>\\.[^\\$re_delim]*|(?&main)){0,}){0,})$end_delim)}sgc) {
             $string = $2 =~ s/\\([$re_delim])/$1/gr;
         }
     }
 
-    # elsif (m{\G$beg_delim([^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*)*)}sgc) {    # limited to 2^15-1 escapes
-    # elsif (m{\G$beg_delim((?>(?>[^$beg_delim\\]++|\\.){0,}+){0,}+)}sgc) {
-    # elsif (m{\G$beg_delim((?>[^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*){0,}){0,})(?:$beg_delim(*ACCEPT:term))?(*PRUNE)(*FAIL)}sgc) {
-
     elsif (m{\G$beg_delim((?>[^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*){0,}){0,})}sgc) {
         $string = $1 =~ s/\\([$beg_delim])/$1/gr;
     }
 
-    # $REGMARK eq 'term'
     (defined($pair_delim) ? /\G(?<=\Q$pair_delim\E)/ : /\G$beg_delim/gc)
       || $self->fatal_error(
                             error => sprintf(qq{can't find the quoted string terminator <<%s>>}, $pair_delim // $delim),
@@ -850,47 +1004,23 @@ sub get_quoted_string {
     return $string;
 }
 
-## get_method_name() returns the following values:
-# 1st: method/operator (or undef)
-# 2nd: a true value if the operator requires an argument
-# 3rd: type of operator (defined in $self->{hyper_ops})
-sub get_method_name {
+# Parses a quoted list of words and returns an array-ref with them: %w(a b c)
+sub get_quoted_words {
     my ($self, %opt) = @_;
 
-    local *_ = $opt{code};
+    my $string = $self->get_quoted_string(code => $opt{code}, no_count_line => 1);
+    $self->parse_whitespace(code => \$string);
 
-    # Parse whitespace
-    $self->parse_whitespace(code => $opt{code});
-
-    # Alpha-numeric method name
-    if (/\G((?:SUPER::)*$self->{method_name_re})/goc) {
-        return ($1, 0, '');
+    my @words;
+    while ($string =~ /\G((?>[^\s\\]+|\\.)++)/gcs) {
+        push @words, $1 =~ s{\\#}{#}gr;
+        $self->parse_whitespace(code => \$string);
     }
 
-    # Super-script power
-    if (/\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/) {
-        return ('**', 1, 'op');
-    }
-
-    # Operator-like method name
-    if (m{\G$self->{operators_re}}goc) {
-        my ($key) = keys(%+);
-        return (
-                $+,
-                (
-                 exists($self->{hyper_ops}{$key})
-                 ? $self->{hyper_ops}{$key}[0]
-                 : not(exists $self->{postfix_ops}{$+})
-                ),
-                $key
-               );
-    }
-
-    # Method name as expression
-    my ($obj) = $self->parse_expr(code => $opt{code});
-    return ({self => $obj // return}, 0, '');
+    return \@words;
 }
 
+# Parses the opening delimiter of a list of declarations: `(`, `|`, etc. Returns the closing delimiter.
 sub parse_delim {
     my ($self, %opt) = @_;
 
@@ -917,6 +1047,10 @@ sub parse_delim {
 
     return $end_delim;
 }
+
+# ---------------------------------------------------------------------------
+# Declaration lists: variables, parameters and class attributes
+# ---------------------------------------------------------------------------
 
 sub get_init_vars {
     my ($self, %opt) = @_;
@@ -1019,6 +1153,8 @@ sub get_init_vars {
     return \@vars;
 }
 
+# Parses a list of declarations, such as `a, Num b = 1, *args` and returns an array-ref of variable objects.
+# Options: type (var, global, del, has, ...), params, private, callback.
 sub parse_init_vars {
     my ($self, %opt) = @_;
 
@@ -1034,23 +1170,7 @@ sub parse_init_vars {
         my ($attr, $name) = ($1, $2);
         my $name_pos = $-[2] // pos($_);
 
-        my $ref_type;
-        if (defined($+{type})) {
-
-            my $type = $+{type};
-            my $obj  = $self->parse_expr(code => \$type);
-
-            if (not defined($obj) or ref($obj) eq 'HASH') {
-                $self->fatal_error(
-                                   code   => $_,
-                                   pos    => pos($_),
-                                   error  => "invalid type <<$type>> for variable `$name`",
-                                   reason => "expected a type, such as: Str, Num, File, etc...",
-                                  );
-            }
-
-            $ref_type = $obj;
-        }
+        my $ref_type = (defined($+{type}) ? $self->_parse_variable_type($+{type}, $name, code => $opt{code}) : undef);
 
         my ($subset);
         if (ref($ref_type) eq 'Sidef::Variable::Subset') {
@@ -1085,56 +1205,15 @@ sub parse_init_vars {
             }
         }
 
-        if (exists($self->{keywords}{$var_name}) or exists($self->{built_in_classes}{$var_name})) {
-            $self->fatal_error(
-                               code  => $_,
-                               pos   => $-[2],
-                               error => "`$var_name` is either a keyword or a predefined variable!",
-                              );
-        }
+        $self->_check_reserved_name($_, $var_name, $-[2]);
 
-        if (defined($end_delim) and m{\G<<?\h*}gc) {
-            my ($subset_name) = /\G($self->{var_name_re})/goc;
-
-            $subset_name // $self->fatal_error(
-                                               code  => $_,
-                                               pos   => pos($_),
-                                               error => "expected the name of the subset",
-                                              );
-
-            my $code = $subset_name;
-            my $obj  = $self->parse_expr(code => \$code);
-
-            (defined($obj) and ref($obj) ne 'HASH')
-              || $self->fatal_error(
-                                    code  => $_,
-                                    pos   => pos($_),
-                                    error => "expected a subset or a type",
-                                   );
-
-            $subset = $obj;
+        if (defined($end_delim)) {
+            $subset = $self->_parse_variable_subset(code => $opt{code}) // $subset;
         }
 
         my ($value, $where_expr, $where_block);
-
         if (defined($end_delim)) {
-
-            if (/\G\h*(?=\{)/gc) {
-                $where_block = $self->parse_block(code => $opt{code}, topic_var => 1);
-            }
-            elsif (/\G\h*(?=\()/gc) {
-                $where_expr = $self->parse_arg(code => $opt{code});
-            }
-
-            if (/$self->{var_init_sep_re}/goc) {
-                local $self->{no_pipe_op} = ($end_delim eq '|') ? 1 : 0;
-                my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
-                $value = (
-                          ref($obj) eq 'HASH'
-                          ? $obj
-                          : {$self->{class} => [{self => $obj}]}
-                         );
-            }
+            ($value, $where_expr, $where_block) = $self->_parse_variable_initializer($end_delim, code => $opt{code});
         }
 
 #<<<
@@ -1207,1937 +1286,88 @@ sub parse_init_vars {
     return \@var_objs;
 }
 
-sub parse_whitespace {
-    my ($self, %opt) = @_;
+# The type of a variable: `var Type name`
+sub _parse_variable_type {
+    my ($self, $type, $name, %opt) = @_;
 
-    my $beg_line    = $self->{line};
-    my $found_space = -1;
     local *_ = $opt{code};
-    {
-        ++$found_space;
 
-        # Fast exit: the next character can't start whitespace or a comment
-        if (!/\G(?=[\s#\/\x{200B}])/) {
-            return ($found_space > 0 ? 1 : ());
-        }
+    my $obj = $self->parse_expr(code => \$type);
 
-        # Whitespace
-        if (/\G(?=\s)/) {
-
-            # Horizontal space
-            if (/\G\h+/gc) {
-                redo;
-            }
-
-            # Generic line
-            if (/\G\R/gc) {
-                ++$self->{line};
-
-                # Here-document
-                while ($#{$self->{EOT}} != -1) {
-
-                    my $eot    = shift @{$self->{EOT}};
-                    my $name   = $eot->{name};
-                    my $indent = $eot->{indent};
-
-                    my $spaces = 0;
-                    my $acc    = '';
-                    until (/\G\Q$name\E(?:\R|\z)/gc) {
-
-                        if (/\G(.*)/gc) {
-                            $acc .= "$1\n";
-                        }
-
-                        # Indentation is true
-                        if ($indent && /\G\R(\h*)\Q$name\E(?:\R|\z)/gc) {
-                            $spaces = length($1);
-                            ++$self->{line};
-                            last;
-                        }
-
-                        /\G\R/gc
-                          ? ++$self->{line}
-                          : $self->fatal_error(
-                                               error => "can't find string terminator <<$name>> anywhere before end-of-file",
-                                               code  => $_,
-                                               pos   => $eot->{pos},
-                                               line  => $eot->{line},
-                                              );
-                    }
-
-                    if ($indent and $spaces > 0) {
-                        $acc =~ s/^\h{1,$spaces}//gm;
-                    }
-
-                    ++$self->{line};
-                    push @{$eot->{obj}{$self->{class}}},
-                      {
-                        self => (
-                                 $eot->{type} == 0
-                                 ? Sidef::Types::String::String->new($acc)
-                                 : Sidef::Types::String::String->new($acc)->apply_escapes($self)
-                                )
-                      };
-                }
-
-                /\G\h+/gc;
-                redo;
-            }
-
-            # Vertical space
-            if (/\G\v+/gc) {    # should not reach here
-                redo;
-            }
-        }
-
-        # ZERO WIDTH SPACE
-        # https://www.fileformat.info/info/unicode/char/200b/index.htm
-        if (/\G\x{200B}+/gc) {
-            redo;
-        }
-
-        # Embedded comments (https://docs.raku.org/language/syntax#Multi-line_/_embedded_comments)
-        if (/\G#`(?=[[:punct:]])/gc) {
-            $self->get_quoted_string(code => $opt{code});
-            redo;
-        }
-
-        # One-line comment
-        if (/\G#.*/gc) {
-            redo;
-        }
-
-        # Multi-line C comment
-        if (m{\G/\*}gc) {
-            my ($comment_pos, $comment_line) = (pos($_) - 2, $self->{line});
-            while (1) {
-                m{\G.*?\*/}gc && last;
-                /\G.+/gc
-                  || (
-                      /\G\R/gc
-                      ? $self->{line}++
-                      : $self->fatal_error(
-                                           error => "can't find the end of the multi-line comment",
-                                           code  => $_,
-                                           pos   => $comment_pos,
-                                           line  => $comment_line,
-                                          )
-                     );
-            }
-            redo;
-        }
-
-        if ($found_space > 0) {
-            return 1;
-        }
-
-        return;
+    if (not defined($obj) or ref($obj) eq 'HASH') {
+        $self->fatal_error(
+                           code   => $_,
+                           pos    => pos($_),
+                           error  => "invalid type <<$type>> for variable `$name`",
+                           reason => "expected a type, such as: Str, Num, File, etc...",
+                          );
     }
+
+    return $obj;
 }
 
-sub parse_expr {
+# The subset of a variable: `var name < Subset` or `var name << Subset`
+# Returns nothing when there is no subset.
+sub _parse_variable_subset {
     my ($self, %opt) = @_;
 
     local *_ = $opt{code};
-    {
-        $self->parse_whitespace(code => $opt{code});
 
-        # End of an expression, or end of the script
-        if (/\G;/gc || /\G\z/) {
-            return;
-        }
+    m{\G<<?\h*}gc || return;
 
-        # Fast paths for the most common tokens (decimal numbers and plain identifiers),
-        # which skip all the checks for keywords and special objects
-        if (not $self->{no_fast_path}) {
+    my ($subset_name) = /\G($self->{var_name_re})/goc;
 
-            if (/\G(?=[0-9])/) {
-                goto PARSE_NUMBER;
-            }
-
-            if (    /\G(?=[^\W\d])/
-                and /\G([^\W\d]\w*+)(?!::|![^\W\d]|:(?![=:])|\h*=>)/
-                and not exists($self->{special_words}{$1})
-                and index($1, '__') != 0) {
-                goto VARIABLE_ACCESS;
-            }
-        }
-
-        if (/$self->{quote_operators_re}/goc) {
-            my ($double_quoted, $method, $package) = @{$^R};
-
-            pos($_) -= 1;
-            my ($string, $pos) = $self->get_quoted_string(code => $opt{code});
-
-            # Special case for array-like objects (bytes and chars)
-            my @array_like;
-            if ($method ne 'new' and $method ne '__NEW__') {
-                @array_like = ($package, $method);
-                $package    = 'Sidef::Types::String::String';
-                $method     = 'new';
-            }
-
-            if ($package eq 'Sidef::Module::Func' or $package eq 'Sidef::Module::OO') {
-                if ($string !~ /^$self->{var_name_re}\z/) {
-                    $self->fatal_error(
-                                       code   => $_,
-                                       pos    => (pos($_) - length($string) - 1),
-                                       error  => "invalid symbol declaration",
-                                       reason => "expected a variable-like name",
-                                      );
-                }
-            }
-
-            my $obj = (
-                $double_quoted
-                ? do {
-                    state $str = Sidef::Types::String::String->new;    # load the string module
-                    Sidef::Types::String::String::apply_escapes($package->$method($string), $self);
-                  }
-                : $package->$method($string =~ s{\\\\}{\\}gr)
-            );
-
-            # Special case for backticks and Perl code (add method 'run')
-            if ($package eq 'Sidef::Types::Glob::Backtick' or $package eq 'Sidef::Types::Perl::Perl') {
-                my $struct =
-                    $double_quoted && ref($obj) eq 'HASH'
-                  ? $obj
-                  : {
-                     $self->{class} => [
-                                        {
-                                         self => $obj,
-                                         call => [],
-                                        }
-                                       ]
-                    };
-
-                push @{$struct->{$self->{class}}[-1]{call}}, {method => 'run'};
-                $obj = $struct;
-            }
-            elsif (@array_like) {
-                if ($double_quoted and ref($obj) eq 'HASH') {
-                    push @{$obj->{$self->{class}}[-1]{call}}, {method => $array_like[1]};
-                }
-                else {
-                    my $method = $array_like[1];
-                    $obj = $obj->$method;
-                }
-            }
-
-            return $obj;
-        }
-
-        # Object as expression
-        if (/\G(?=\()/) {
-            my $obj = $self->parse_arg(code => $opt{code});
-            return $obj;
-        }
-
-        # Block as object
-        if (/\G(?=\{)/) {
-            my $obj = $self->parse_block(code => $opt{code}, topic_var => 1);
-            return $obj;
-        }
-
-        # Array as object
-        if (/\G(?=\[)/) {
-
-            my @array;
-            my $obj = $self->parse_array(code => $opt{code});
-
-            if (ref($obj->{$self->{class}}) eq 'ARRAY') {
-                push @array, @{$obj->{$self->{class}}};
-            }
-
-            return bless(\@array, 'Sidef::Types::Array::HCArray');
-        }
-
-        # Bareword followed by a fat comma or preceded by a colon
-        if (   /\G:(\w+)/gc
-            || /\G([^\W\d]\w*+)(?=\h*=>)/gc) {
-
-            # || /\G([^\W\d]\w*+)(?=\h*=>|:(?![=:]))/gc) {
-            return Sidef::Types::String::String->new($1);
-        }
-
-        # Bareword followed by a colon becomes a NamedParam with the bareword
-        # on the LHS
-        if (/\G([^\W\d]\w*+):(?![=:])/gc) {
-            my $name = $1;
-            my $obj  = $self->parse_obj(code => $opt{code});
-            return Sidef::Variable::NamedParam->new($name, $obj);
-        }
-
-        # Declaration of variables (global and lexical)
-        if (/\G(var|global|del)\b\h*/gc) {
-            my $type     = $1;
-            my $vars     = $self->parse_init_vars(code => $opt{code}, type => $type);
-            my $init_obj = bless({vars => $vars}, 'Sidef::Variable::Init');
-
-            @{$vars}
-              || $self->fatal_error(
-                                    code   => $_,
-                                    pos    => pos($_),
-                                    error  => "expected a variable name after `$type`",
-                                    reason => "a variable name can contain letters, digits and underscores, but it can't start with a digit",
-                                   );
-
-            if (/\G\h*=\h*/gc) {
-
-                my $args = $self->parse_obj(code => $opt{code}, multiline => 1);
-
-                $args // $self->fatal_error(
-                                            code  => $_,
-                                            pos   => pos($_),
-                                            error => "expected an expression after variable declaration",
-                                           );
-
-                $init_obj->{args} = $args;
-            }
-
-            #if ($type eq 'del') {
-            #    return bless {vars => []}, 'Sidef::Variable::Init';
-            #}
-
-            return $init_obj;
-        }
-
-        # "has" class attributes
-        if (exists($self->{current_class}) and /\Ghas\b\h*/gc) {
-
-            local $self->{allow_class_variable} = 0;
-
-            my $vars = $self->parse_init_vars(
-                                              code    => $opt{code},
-                                              type    => 'has',
-                                              private => 1,
-                                             );
-
-            foreach my $var (@{$vars}) {
-                my $name = $var->{name};
-                if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => (pos($_) - length($name)),
-                                       error => "`$name` is either a keyword or a predefined variable!",
-                                      );
-                }
-            }
-
-            my $args;
-            if (/\G\h*=\h*/gc) {
-                $args = $self->parse_obj(code => $opt{code}, multiline => 1);
-                $args // $self->fatal_error(
-                                            code  => $_,
-                                            pos   => pos($_) - 2,
-                                            error => qq{expected an expression after "=" in `has` declaration},
-                                           );
-            }
-
-            my $obj = bless {vars => $vars, defined($args) ? (args => $args) : ()}, 'Sidef::Variable::ClassAttr';
-            push @{$self->{current_class}{attributes}}, $obj;
-            return $obj;
-        }
-
-        # Declaration of constants and static variables
-        if (/\G(define|const|static)\b\h*/gc) {
-            my $type = $1;
-            my $line = $self->{line};
-
-            my @var_objs;
-
-            my $callback = sub {
-                my ($v) = @_;
-
-                my $name       = $v->{name};
-                my $class_name = $v->{class};
-
-                my $var = (
-                             $type eq 'define' ? bless($v, 'Sidef::Variable::Define')
-                           : $type eq 'static' ? bless($v, 'Sidef::Variable::Static')
-                           : $type eq 'const'  ? bless($v, 'Sidef::Variable::Const')
-                           :                     die "[PARSER ERROR] Invalid variable type: $type"
-                          );
-
-                push @var_objs, $var;
-
-                $self->_unshift_var(
-                                    $class_name,
-                                    {
-                                     obj   => $var,
-                                     name  => $name,
-                                     count => 0,
-                                     type  => $type,
-                                     line  => $line,
-                                    }
-                                   );
-            };
-
-            my $vars = $self->parse_init_vars(
-                                              code     => $opt{code},
-                                              type     => $type,
-                                              private  => 1,
-                                              callback => $callback,
-                                             );
-
-            foreach my $var (@var_objs) {
-                my $name = $var->{name};
-                if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => (pos($_) - length($name)),
-                                       error => "`$name` is either a keyword or a predefined variable!",
-                                      );
-                }
-            }
-
-            if (@var_objs == 1 and /\G\h*=\h*/gc) {
-
-                my $var = $var_objs[0];
-                my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
-
-                $obj // $self->fatal_error(
-                                           code  => $_,
-                                           pos   => pos($_) - 2,
-                                           error => qq{expected an expression after $type "$var->{name}"},
-                                          );
-
-                $var->{value} = $obj;
-            }
-
-            my $const_init = bless({vars => \@var_objs, type => $type}, 'Sidef::Variable::ConstInit');
-
-            if (/\G\h*=\h*/gc) {
-                $self->fatal_error(
-                                   code  => $_,
-                                   pos   => pos($_) - 2,
-                                   error => qq{the correct syntax is: `$type(x = ..., y = ...)`},
-                                  );
-            }
-
-            return $const_init;
-        }
-
-        # Struct declaration
-        if (/\Gstruct\b\h*/gc) {
-
-            my ($name, $class_name);
-            if (/\G($self->{var_name_re})\h*/goc) {
-                ($name, $class_name) = $self->get_name_and_class($1);
-            }
-
-            if (defined($name) and (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name}))) {
-                $self->fatal_error(
-                                   code  => $_,
-                                   pos   => (pos($_) - length($name)),
-                                   error => "`$name` is either a keyword or a predefined variable!",
-                                  );
-            }
-
-            my $struct = bless(
-                               {
-                                name  => $name,
-                                class => $class_name,
-                               },
-                               'Sidef::Variable::Struct'
-                              );
-
-            if (defined $name) {
-                $self->_unshift_var(
-                                    $class_name,
-                                    {
-                                     obj   => $struct,
-                                     name  => $name,
-                                     count => 0,
-                                     type  => 'struct',
-                                     line  => $self->{line},
-                                    }
-                                   );
-            }
-
-            my $vars =
-              $self->parse_init_vars(
-                                     code    => $opt{code},
-                                     type    => 'var',
-                                     private => 1,
-                                    );
-
-            $struct->{vars} = $vars;
-
-            return $struct;
-        }
-
-        # Subset declaration
-        if (/\Gsubset\b\h*/gc) {
-
-            my ($name, $class_name);
-            if (/\G($self->{var_name_re})\h*/goc) {
-                ($name, $class_name) = $self->get_name_and_class($1);
-            }
-            else {
-                $self->fatal_error(
-                                   code  => $_,
-                                   pos   => pos($_),
-                                   error => "expected a name after the keyword 'subset'",
-                                  );
-            }
-
-            if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
-                $self->fatal_error(
-                                   code  => $_,
-                                   pos   => (pos($_) - length($name)),
-                                   error => "`$name` is either a keyword or a predefined variable!",
-                                  );
-            }
-
-            my $subset = bless({name => $name, class => $class_name}, 'Sidef::Variable::Subset');
-
-            $self->_unshift_var(
-                                $class_name,
-                                {
-                                 obj   => $subset,
-                                 name  => $name,
-                                 count => 0,
-                                 type  => 'subset',
-                                 line  => $self->{line},
-                                }
-                               );
-
-            # Inheritance
-            if (/\G<<?\h*/gc) {
-                {
-                    my ($name) = /\G($self->{var_name_re})\h*/goc;
-
-                    $name // $self->fatal_error(
-                                                code  => $_,
-                                                pos   => pos($_),
-                                                error => "expected a type name for subsetting",
-                                               );
-
-                    my $code = $name;
-                    my $type = $self->parse_expr(code => \$code);
-
-                    push @{$subset->{inherits}}, $type;
-
-                    /\G,\h*/gc && redo;
-                }
-            }
-
-            if (/\G(?=\{)/) {
-                my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
-                $subset->{block} = $block;
-            }
-
-            return $subset;
-        }
-
-        # Declaration of enums
-        if (/\Genum\b\h*/gc) {
-            my $vars =
-              $self->parse_init_vars(
-                                     code    => $opt{code},
-                                     type    => 'var',
-                                     private => 1,
-                                    );
-
-            @{$vars}
-              || $self->fatal_error(
-                                    code  => $_,
-                                    pos   => pos($_),
-                                    error => q{expected one or more variable names after <enum>},
-                                   );
-
-            my $value = Sidef::Types::Number::Number::_set_int(-1);
-
-            foreach my $var (@{$vars}) {
-                my $name = $var->{name};
-
-                if (ref $var->{value} eq 'HASH') {
-                    $var->{value} = $var->{value}{$self->{class}}[-1]{self};
-                }
-
-                $value =
-                    $var->{has_value}
-                  ? $var->{value}
-                  : $value->inc;
-
-                if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => (pos($_) - length($name)),
-                                       error => "`$name` is either a keyword or a predefined variable!",
-                                      );
-                }
-
-                $self->_unshift_var(
-                                    $self->{class},
-                                    {
-                                     obj   => $value,
-                                     name  => $name,
-                                     count => 0,
-                                     type  => 'enum',
-                                     line  => $self->{line},
-                                    }
-                                   );
-            }
-
-            return $value;
-        }
-
-        # Local variables
-        if (/\Glocal\b\h*/gc) {
-            my $expr = $self->parse_obj(code => $opt{code}, prec => PREC_OPERAND);
-
-            $expr // $self->fatal_error(
-                                        code  => $_,
-                                        pos   => pos($_),
-                                        error => "expected a variable after `local`",
-                                       );
-
-            return bless({expr => $expr}, 'Sidef::Variable::Local');
-        }
-
-        # Declaration of classes, methods and functions
-        if (
-               /\G(func|class)\b\h*/gc
-            || /\G(->)\h*/gc
-            || (exists($self->{current_class})
-                && /\G(method)\b\h*/gc)
-          ) {
-
-            my $beg_pos = $-[0];
-            my $type =
-                $1 eq '->'
-              ? exists($self->{current_class}) && !(exists($self->{current_method}))
-                  ? 'method'
-                  : 'func'
-              : $1;
-
-            my $name       = '';
-            my $class_name = $self->{class};
-            my $built_in_obj;
-
-            if ($type eq 'class' and /\G($self->{var_name_re})\h*/gco) {
-
-                $name = $1;
-
-                if (exists($self->{built_in_classes}{$name}) and /\G(?=[{<])/) {
-
-                    my ($obj) = $self->parse_expr(code => \$name);
-
-                    if (defined($obj)) {
-                        $name         = '';
-                        $built_in_obj = $obj;
-                    }
-                }
-                else {
-                    ($name, $class_name) = $self->get_name_and_class($1);
-                }
-            }
-
-            if ($type eq 'method') {
-                $name = (
-                           /\G($self->{method_name_re})\h*/goc ? $1
-                         : /\G($self->{operators_re})\h*/goc   ? $+
-                         :                                       ''
-                        );
-                ($name, $class_name) = $self->get_name_and_class($name);
-            }
-            elsif ($type ne 'class') {
-                $name = /\G($self->{var_name_re})\h*/goc ? $1 : '';
-                ($name, $class_name) = $self->get_name_and_class($name);
-            }
-
-            if (    $type ne 'method'
-                and $type ne 'class'
-                and (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name}))) {
-                $self->fatal_error(
-                                   code  => $_,
-                                   pos   => $-[0],
-                                   error => "`$name` is either a keyword or a predefined variable!",
-                                  );
-            }
-
-            my $obj =
-                ($type eq 'func' or $type eq 'method') ? bless({name => $name, type => $type, class => $class_name}, 'Sidef::Variable::Variable')
-              : $type eq 'class' ? bless({name => ($built_in_obj // $name), class => $class_name}, 'Sidef::Variable::ClassInit')
-              : $self->fatal_error(
-                                   error  => "invalid type",
-                                   reason => "expected a magic thing to happen",
-                                   code   => $_,
-                                   pos    => pos($_),
-                                  );
-
-            if ($name ne '') {
-                my $var = $self->find_var($name, $class_name);
-
-                if (defined($var) and $var->{type} eq 'class') {
-                    $obj->{parent} = $var->{obj};
-                    push @{$obj->{inherit}}, ref($var->{obj}{name}) ? $var->{obj}{name} : $var->{obj};
-                }
-            }
-
-            my $has_kids = 0;
-            my $parent;
-            if (($type eq 'method' or $type eq 'func') and $name ne '') {
-                my $var = $self->find_var($name, $class_name);
-
-                # A function or a method must be declared in the same scope
-                if (defined($var) and $var->{obj}{type} eq $type) {
-
-                    $parent   = $var->{obj};
-                    $has_kids = 1;
-
-                    #~ push @{$var->{obj}{value}{kids}}, $obj;
-                    $parent->{has_kids} = 1;
-                    $obj->{parent}      = $parent;
-                }
-            }
-
-            if (not $has_kids) {
-                $self->_unshift_var(
-                                    $class_name,
-                                    {
-                                     obj   => $obj,
-                                     name  => $name,
-                                     count => 0,
-                                     type  => $type,
-                                     line  => $self->{line},
-                                    }
-                                   );
-            }
-
-            if ($type eq 'class') {
-                my $var_names =
-                  $self->parse_init_vars(
-                                         code         => $opt{code},
-                                         params       => 1,
-                                         private      => 1,
-                                         type         => 'has',
-                                         ignore_delim => {
-                                                          '{' => 1,
-                                                          '<' => 1,
-                                                         },
-                                        );
-
-                # Set the class parameters
-                $obj->{vars} = $var_names;
-
-                # Class inheritance (class Name(...) << Name1, Name2)
-                if (/\G\h*<<?\h*/gc) {
-                    while (/\G($self->{var_name_re})\h*/gco) {
-                        my ($name, $class_name) = $self->get_name_and_class($1);
-                        if (defined(my $class = $self->find_var($name, $class_name))) {
-                            if ($class->{type} eq 'class') {
-
-                                # Detect inheritance from the same class
-                                if (refaddr($obj) == refaddr($class->{obj})) {
-                                    $self->fatal_error(
-                                                       error => "Inheriting from the same class is not allowed",
-                                                       code  => $_,
-                                                       pos   => pos($_) - length($name) - 1,
-                                                      );
-                                }
-
-                                ++$class->{count};
-                                push @{$obj->{inherit}}, $class->{obj};
-                            }
-                            else {
-                                $self->fatal_error(
-                                                   error  => "this is not a class",
-                                                   reason => "expected a class name",
-                                                   code   => $_,
-                                                   pos    => pos($_) - length($name) - 1,
-                                                  );
-                            }
-                        }
-                        elsif (exists $self->{built_in_classes}{$name}) {
-                            $self->fatal_error(
-                                               error  => "Inheriting from built-in classes is not supported",
-                                               reason => "`$name` is a built-in class",
-                                               code   => $_,
-                                               pos    => pos($_) - length($name) - 1,
-                                              );
-                        }
-                        else {
-                            $self->fatal_error(
-                                               error  => "can't find `$name` class",
-                                               reason => "expected an existent class name",
-                                               var    => ($class_name . '::' . $name),
-                                               code   => $_,
-                                               pos    => pos($_) - length($name) - 1,
-                                              );
-                        }
-
-                        /\G,\h*/gc;
-                    }
-                }
-
-                /\G\h*(?=\{)/gc
-                  || $self->fatal_error(
-                                        error  => "invalid class declaration",
-                                        reason => "expected: class $name(...){...}",
-                                        code   => $_,
-                                        pos    => pos($_)
-                                       );
-
-                #~ if (ref($built_in_obj) eq 'Sidef::Variable::ClassInit') {
-                #~ $obj->{name} = $built_in_obj->{name};
-                #~ }
-
-                local $self->{class_name}    = (defined($built_in_obj) ? ref($built_in_obj) : $obj->{name});
-                local $self->{current_class} = $built_in_obj // $obj;
-                my $block = $self->parse_block(code => $opt{code});
-
-                # Set the block of the class
-                $obj->{block} = $block;
-            }
-
-            if ($type eq 'func' or $type eq 'method') {
-
-                my $var_names = do {
-                    local $self->{allow_class_variable} = 1 if $type eq 'method';
-                    $self->get_init_vars(
-                                         code         => $opt{code},
-                                         with_vals    => 1,
-                                         ignore_delim => {
-                                                          '{' => 1,
-                                                          '-' => 1,
-                                                         }
-                                        );
-                };
-
-                # Functions and method traits (example: "is cached")
-                if (/\G\h*is\h+(?=\w)/gc) {
-                    while (/\G(\w+)/gc) {
-                        my $trait = $1;
-                        if ($trait eq 'cached') {
-                            $obj->{cached} = 1;
-                        }
-
-                        #elsif ($type eq 'method' and $trait eq 'exported') {
-                        #    $obj->{exported} = 1;
-                        #}
-                        else {
-                            $self->fatal_error(
-                                               error => "Unknown $type trait: $trait",
-                                               code  => $_,
-                                               pos   => pos($_),
-                                              );
-                        }
-
-                        /\G\h*,\h*/gc || last;
-                    }
-                }
-
-                # Function return type (func name(...) -> Type {...})
-                if (/\G\h*->\h*/gc) {
-
-                    my @ref;
-                    if (/\G\(/gc) {    # multiple types
-                        while (1) {
-                            my ($ref) = $self->parse_expr(code => $opt{code});
-                            push @ref, $ref;
-
-                            /\G\s*\)/gc && last;
-                            /\G\s*,\s*/gc
-                              || $self->fatal_error(
-                                                    error  => "invalid return-type for $type $self->{class_name}<<$name>>",
-                                                    reason => "expected a comma",
-                                                    code   => $_,
-                                                    pos    => pos($_),
-                                                   );
-                        }
-                    }
-                    else {    # only one type
-                        my ($ref) = $self->parse_expr(code => $opt{code});
-                        push @ref, $ref;
-                    }
-
-                    foreach my $ref (@ref) {
-                        if (ref($ref) eq 'HASH') {
-                            $self->fatal_error(
-                                               error  => "invalid return-type for $type $self->{class_name}<<$name>>",
-                                               reason => "expected a valid type, such as: Str, Num, Arr, etc...",
-                                               code   => $_,
-                                               pos    => pos($_),
-                                              );
-                        }
-                    }
-
-                    $obj->{returns} = \@ref;
-                }
-
-                my $brace_pos;
-                (/\G\h*(?=\{)/gc and ($brace_pos = pos($_)) and /\G\{\h*/gc)
-                  || $self->fatal_error(
-                                        error  => "invalid `$type` declaration",
-                                        reason => "expected: $type $name(...){...}",
-                                        code   => $_,
-                                        pos    => pos($_)
-                                       );
-
-                local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $has_kids ? $parent : $obj;
-                my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
-
-                # The parameters are parsed from a separate string, to avoid copying the rest of the code
-                my $block = $self->parse_block(
-                                               code      => $opt{code},
-                                               with_vars => 1,
-                                               init_code => \$args,
-                                               no_brace  => $brace_pos,
-                                              );
-
-                # Set the block of the function/method
-                $obj->{value} = $block;
-            }
-
-            return $obj;
-        }
-
-        # "given(expr) {...}" construct
-        if (/\Ggiven\b\h*/gc) {
-            my $expr = (
-                        /\G(?=\()/
-                        ? $self->parse_arg(code => $opt{code})
-                        : $self->parse_obj(code => $opt{code})
-                       );
-
-            $expr // $self->fatal_error(
-                                        error  => "invalid declaration of the `given/when` construct",
-                                        reason => "expected `given(expr) {...}`",
-                                        code   => $_,
-                                        pos    => pos($_),
-                                       );
-
-            my $given_obj = bless({expr => $expr}, 'Sidef::Types::Block::Given');
-            local $self->{current_given} = $given_obj;
-            my $block = (
-                         /\G\h*(?=\{)/gc
-                         ? $self->parse_block(code => $opt{code}, topic_var => 1)
-                         : $self->fatal_error(
-                                              error => "expected a block after `given(expr)`",
-                                              code  => $_,
-                                              pos   => pos($_),
-                                             )
-                        );
-
-            $given_obj->{block} = $block;
-
-            return $given_obj;
-        }
-
-        # "when(expr) {...}" construct
-        if (exists($self->{current_given}) && /\Gwhen\b\h*/gc) {
-            my $expr = (
-                        /\G(?=\()/
-                        ? $self->parse_arg(code => $opt{code})
-                        : $self->parse_obj(code => $opt{code})
-                       );
-
-            $expr // $self->fatal_error(
-                                        error  => "invalid declaration of the `when` construct",
-                                        reason => "expected `when(expr) {...}`",
-                                        code   => $_,
-                                        pos    => pos($_),
-                                       );
-
-            my $block = (
-                         /\G\h*(?=\{)/gc
-                         ? $self->parse_block(code => $opt{code}, with_vars => 1)
-                         : $self->fatal_error(
-                                              error => "expected a block after `when(expr)`",
-                                              code  => $_,
-                                              pos   => pos($_),
-                                             )
-                        );
-
-            return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::When');
-        }
-
-        # "case(expr) {...}" construct
-        if (exists($self->{current_given}) && /\Gcase\b\h*/gc) {
-            my $expr = (
-                        /\G(?=\()/
-                        ? $self->parse_arg(code => $opt{code})
-                        : $self->parse_obj(code => $opt{code})
-                       );
-
-            $expr // $self->fatal_error(
-                                        error  => "invalid declaration of the `case` construct",
-                                        reason => "expected `case(expr) {...}`",
-                                        code   => $_,
-                                        pos    => pos($_),
-                                       );
-
-            my $block = (
-                         /\G\h*(?=\{)/gc
-                         ? $self->parse_block(code => $opt{code}, with_vars => 1)
-                         : $self->fatal_error(
-                                              error => "expected a block after `case(expr)`",
-                                              code  => $_,
-                                              pos   => pos($_),
-                                             )
-                        );
-
-            return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::Case');
-        }
-
-        # "default {...}" or "else { ... }" construct for `given/when`
-        if (exists($self->{current_given}) && /\G(?:default|else)\h*(?=\{)/gc) {
-            my $block = $self->parse_block(code => $opt{code});
-            return bless({block => $block}, 'Sidef::Types::Block::Default');
-        }
-
-        # `continue` keyword inside a given/when construct
-        if (exists($self->{current_given}) && /\Gcontinue\b/gc) {
-            state $x = bless({}, 'Sidef::Types::Block::Continue');
-            return $x;
-        }
-
-        # "do {...}" construct
-        if (/\Gdo\h*(?=\{)/gc) {
-            my $block = $self->parse_block(code => $opt{code});
-            return bless({block => $block}, 'Sidef::Types::Block::Do');
-        }
-
-        # "loop {...}" construct
-        if (/\Gloop\h*(?=\{)/gc) {
-            my $block = $self->parse_block(code => $opt{code});
-            return bless({block => $block}, 'Sidef::Types::Block::Loop');
-        }
-
-        # "try/catch" construct
-        if (/\Gtry\h*(?=\{)/gc) {
-            my $try_block = $self->parse_block(code => $opt{code});
-            my $obj       = bless({try => $try_block}, 'Sidef::Types::Block::Try');
-
-            $self->parse_whitespace(code => $opt{code});
-
-            if (/\Gcatch\h*(?=\{)/gc) {
-                $obj->{catch} = $self->parse_block(code => $opt{code}, with_vars => 1);
-            }
-            else {
-                $self->backtrack_whitespace(code => $opt{code});
-            }
-
-            return $obj;
-        }
-
-        # "gather/take" construct
-        if (/\Ggather\h*(?=\{)/gc) {
-            my $obj = bless({}, 'Sidef::Types::Block::Gather');
-
-            local $self->{current_gather} = $obj;
-
-            my $block = $self->parse_block(code => $opt{code});
-            $obj->{block} = $block;
-
-            return $obj;
-        }
-
-        if (exists($self->{current_gather}) and /\Gtake\b\h*/gc) {
-
-            my $obj = (
-                       /\G(?=\()/
-                       ? $self->parse_arg(code => $opt{code})
-                       : $self->parse_obj(code => $opt{code})
-                      );
-
-            return bless({expr => $obj, gather => $self->{current_gather}}, 'Sidef::Types::Block::Take');
-        }
-
-        # Declaration of a module
-        if (/\Gmodule\b\h*/gc) {
-            my $name =
-              /\G($self->{var_name_re})\h*/goc
-              ? $1
-              : $self->fatal_error(
-                                   error  => "invalid module declaration",
-                                   reason => "expected a name",
-                                   code   => $_,
-                                   pos    => pos($_)
-                                  );
-
-            $self->parse_whitespace(code => $opt{code});
-
-            if (/\G(?=\{)/) {
-                my $prev_class = $self->{class};
-                local $self->{class} = $name;
-                my $obj = $self->parse_block(code => $opt{code}, is_module => 1, prev_class => $prev_class);
-
-                return
-                  bless {
-                         name  => $name,
-                         block => $obj
-                        },
-                  'Sidef::Meta::Module';
-            }
-            else {
-                $self->fatal_error(
-                                   error  => "invalid module declaration",
-                                   reason => "expected: module $name {...}",
-                                   code   => $_,
-                                   pos    => pos($_)
-                                  );
-            }
-        }
-
-        if (/\Gimport\b\h*/gc) {
-
-            my $import_pos = pos($_);
-
-            my $var_names =
-              $self->get_init_vars(code      => $opt{code},
-                                   with_vals => 0);
-
-            $self->backtrack_whitespace(code => $opt{code});
-
-            @{$var_names}
-              || $self->fatal_error(
-                                    code  => $_,
-                                    pos   => $import_pos,
-                                    error => "expected a variable-like name for importing!",
-                                   );
-
-            foreach my $var_name (@{$var_names}) {
-                my ($name, $class) = $self->get_name_and_class($var_name);
-
-                if ($class eq ($self->{class})) {
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => $import_pos,
-                                       error => "can't import '${class}::${name}' into the same namespace",
-                                      );
-                }
-
-                my $var = $self->find_var($name, $class);
-
-                if (not defined $var) {
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => $import_pos,
-                                       error => "variable '${class}::${name}' does not exists",
-                                      );
-                }
-
-                $var->{count}++;
-
-                $self->_unshift_var(
-                                    $self->{class},
-                                    {
-                                     obj   => $var->{obj},
-                                     name  => $name,
-                                     count => 0,
-                                     type  => $var->{type},
-                                     line  => $self->{line},
-                                    }
-                                   );
-            }
-
-            return 1;
-        }
-
-        if (/\Ginclude\b\h*/gc) {
-
-            my $include_pos = pos($_);
-
-            state $x = do {
-                require Cwd;
-                require File::Spec;
-                require File::Basename;
-            };
-
-            if (@{$self->{inc}} == 0) {
-                push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
-
-                push @{$self->{inc}}, File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
-
-                if (-f $self->{script_name}) {
-                    push @{$self->{inc}}, File::Basename::dirname(Cwd::abs_path($self->{script_name}));
-                }
-
-                push @{$self->{inc}}, File::Spec->curdir;
-            }
-
-            my @abs_filenames;
-            if (/\G($self->{var_name_re})/gc) {
-                my $var_name = $1;
-
-                # The module is defined in the current file -- skip
-                if (exists $self->{ref_vars}{$var_name}) {
-                    redo;
-                }
-
-                # The module was already included -- skip
-                if (exists $Sidef::INCLUDED{$var_name}) {
-                    redo;
-                }
-
-                my @path     = split(/::/, $var_name);
-                my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
-
-                $Sidef::INCLUDED{$var_name} = $mod_path;
-
-                my ($full_path, $found_module);
-                foreach my $inc_dir (@{$self->{inc}}) {
-                    if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
-                        and -f _
-                        and -r _ ) {
-                        $found_module = 1;
-                        last;
-                    }
-                }
-
-                $found_module // $self->fatal_error(
-                                                    code  => $_,
-                                                    pos   => $include_pos,
-                                                    error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
-                                                   );
-
-                push @abs_filenames, [$full_path, $var_name];
-            }
-            else {
-
-                my $orig_dir  = Cwd::getcwd();
-                my $orig_file = Cwd::abs_path($self->{file_name});
-                my $file_dir  = File::Basename::dirname($orig_file);
-
-                my $chdired = 0;
-                if ($orig_dir ne $file_dir) {
-                    if (chdir($file_dir)) {
-                        $chdired = 1;
-                    }
-                }
-
-                my $expr = do {
-                    my ($obj) = $self->parse_expr(code => $opt{code});
-                    $obj;
-                };
-
-                my @files = (
-                    ref($expr) eq 'HASH'
-                    ? do {
-                        map { $_->{self} }
-                        map { @{$_->{self}->{$self->{class}}} }
-                        map { @{$expr->{$_}} }
-                          keys %{$expr};
-                      }
-                    : $expr
-                );
-
-                push @abs_filenames, map {
-                    my $filename = $_;
-
-                    if (index(ref($filename), 'Sidef::') == 0) {
-                        $filename = $filename->get_value;
-                    }
-
-                    ref($filename) ne ''
-                      and $self->fatal_error(
-                                             code  => ${$opt{code}},
-                                             pos   => $include_pos,
-                                             error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
-                                            );
-
-                    my @files;
-                    foreach my $file (glob($filename)) {
-
-                        my $resolved = 0;
-                        foreach my $base ('', @{$self->{inc}}) {
-                            my $abs_path = File::Spec->rel2abs($file, $base) // next;
-
-                            if (-f $abs_path) {
-                                push @files, $abs_path;
-                                $resolved = 1;
-                                last;
-                            }
-                        }
-
-                        if (!$resolved) {
-                            $self->fatal_error(
-                                               code  => ${$opt{code}},
-                                               pos   => $include_pos,
-                                               error => "include-error: could not resolve path to file `$file`",
-                                              );
-                        }
-                    }
-
-                    foreach my $file (@files) {
-                        if (exists $Sidef::INCLUDED{$file}) {
-                            $self->fatal_error(
-                                               code  => ${$opt{code}},
-                                               pos   => $include_pos,
-                                               error => "include-error: circular inclusion of file `$file`",
-                                              );
-                        }
-                    }
-
-                    map { [$_] } @files
-                } @files;
-
-                if ($chdired) { chdir($orig_dir) }
-            }
-
-            my @included;
-
-            foreach my $pair (@abs_filenames) {
-
-                my ($full_path, $name) = @{$pair};
-
-                open(my $fh, '<:utf8', $full_path)
-                  || $self->fatal_error(
-                                        code  => ${$opt{code}},
-                                        pos   => $include_pos,
-                                        error => "can't open file `$full_path`: $!"
-                                       );
-
-                my $content = do { local $/; <$fh> };
-                close $fh;
-
-                utf8::downgrade($content, 1);    # faster to parse, when there are no wide characters
-
-                next if $Sidef::INCLUDED{$full_path};
-
-                local $self->{class}               = $name if defined $name;    # new namespace
-                local $self->{line}                = 1;
-                local $self->{file_name}           = $full_path;
-                local $Sidef::INCLUDED{$full_path} = 1;
-
-                my $ast = $self->parse_script(code => \$content);
-
-                push @included,
-                  {
-                    name => $name,
-                    file => $full_path,
-                    ast  => $ast,
-                  };
-            }
-
-            return bless({included => \@included}, 'Sidef::Meta::Included');
-        }
-
-        # Super-script power
-        if (/\G([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gc) {
-            my $num = ($1 =~ tr/⁰¹²³⁴⁵⁶⁷⁸⁹/0-9/r);
-            return Sidef::Types::Number::Number::_set_int($num);
-        }
-
-        # Binary, hexadecimal and octal numbers
-      PARSE_NUMBER:
-        if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|o[0-7_]*|[0-7_]+)\b/gc) {
-            my $num = $1 =~ tr/_//dr;
-            return
-              Sidef::Types::Number::Number->new(
-                                                  $num =~ /^b/ ? (substr($num, 1) || 0, 2)
-                                                : $num =~ /^o/ ? (substr($num, 1) || 0, 8)
-                                                : $num =~ /^x/ ? (substr($num, 1) || 0, 16)
-                                                :                ($num            || 0, 8)
-                                               );
-        }
-
-        # Integer or float number
-        if (/\G((?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
-            my $num_text = $1;
-            my $num      = $1 =~ tr/_//dr;
-
-            # A number can't be directly followed by letters (e.g.: `0b102`, `12abc`)
-            if (/\G(?![if]\b)(?=[^\W\d])/) {
-                my ($rest) = /\G(\w+)/;
-                $self->fatal_error(
-                                   code   => $_,
-                                   pos    => pos($_) - length($num_text),
-                                   error  => "invalid numeric literal `$num_text$rest`",
-                                   reason => "unexpected `$rest` after the number `$num_text`",
-                                  );
-            }
-
-            if (/\Gi\b/gc) {    # imaginary
-                return Sidef::Types::Number::Complex->new(0, $num);
-            }
-            elsif (/\Gf\b/gc) {    # floating-point
-                return Sidef::Types::Number::Number::_set_str('float', $num);
-            }
-
-            return (
-                    $num =~ /^-?[0-9]+\z/
-                    ? Sidef::Types::Number::Number::_set_int($num)
-                    : Sidef::Types::Number::Number->new($num)
-                   );
-        }
-
-        # Prefix `...`
-        if (/\G\.\.\./gc) {
-            return
-              bless(
-                    {
-                     line => $self->{line},
-                     file => $self->{file_name},
-                    },
-                    'Sidef::Meta::Unimplemented'
-                   );
-        }
-
-        # Implicit method call on special variable: "_"
-        if (/\G\./) {
-
-            if (defined(my $var = $self->find_var('_', $self->{class}))) {
-                $var->{count}++;
-                return $var->{obj};
-            }
-
-            if (/\G\.(?!\.)(?!\h*(?:$self->{method_name_re}|[(\$])|\s*$self->{operators_re})/o) {
-                $self->fatal_error(
-                                   code   => $_,
-                                   pos    => pos($_),
-                                   error  => "incomplete method call",
-                                   reason => "expected a method name after `.`",
-                                  );
-            }
-
-            $self->fatal_error(
-                       code  => $_,
-                       pos   => pos($_),
-                       error => q{attempt of using an implicit method call on an inexistent "_" variable},
-                       hint => q{a leading `.method` is the method call on the topic variable `_`, which exists only inside blocks, such as: arr.each { .say }},
-            );
-        }
-
-        # Quoted words, numbers, vectors and matrices
-        # %w(...), %i(...), %n(...), %v(...), %m(...), «...», <...>
-        if (/\G%([wWinvm])\b/gc || /\G(?=(«|<(?!<)))/) {
-            my ($type) = $1;
-            my $strings = $self->get_quoted_words(code => $opt{code});
-
-            if ($type eq 'w' or $type eq '<') {
-                my @list = map { Sidef::Types::String::String->new(s{\\(?=[\\#\s])}{}gr) } @{$strings};
-                return Sidef::Types::Array::Array->new(\@list);
-            }
-
-            if ($type eq 'i') {
-                my @list = map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr)->int }
-                  split(/[\s,]+/, join(' ', @$strings));
-                return Sidef::Types::Array::Array->new(\@list);
-            }
-
-            if ($type eq 'n') {
-                my @list =
-                  map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, join(' ', @$strings));
-                return Sidef::Types::Array::Array->new(\@list);
-            }
-
-            if ($type eq 'v') {
-                my @list =
-                  map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, join(' ', @$strings));
-                return Sidef::Types::Array::Vector->new(@list);    # this must be passed as a list
-            }
-
-            if ($type eq 'm') {
-                my @matrix;
-                my $data = join(' ', @$strings);
-                foreach my $line (split(/\s*;\s*/, $data)) {
-                    my @row = map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, $line);
-                    push @matrix, Sidef::Types::Array::Array->new(\@row);
-                }
-                return Sidef::Types::Array::Matrix->new(@matrix);
-            }
-
-            my ($inline_expression, @objs);
-            foreach my $item (@{$strings}) {
-                my $str = Sidef::Types::String::String->new($item)->apply_escapes($self);
-                $inline_expression ||= ref($str) eq 'HASH';
-                push @objs, $str;
-            }
-
-            return (
-                    $inline_expression
-                    ? bless([map { {self => $_} } @objs], 'Sidef::Types::Array::HCArray')
-                    : Sidef::Types::Array::Array->new(\@objs)
-                   );
-        }
-
-        # Prefix method call (`::name(...)` or `::name ...`)
-        if (/\G::($self->{var_name_re})\h*/goc) {
-            my $name = $1;
-
-            my $pos = pos($_);
-            my $arg = (
-                       /\G(?=\()/
-                       ? $self->parse_arg(code => $opt{code})
-                       : $self->parse_obj(code => $opt{code})
-                      );
-
-            if (not exists($arg->{$self->{class}})) {
-                $self->fatal_error(
-                                   code  => $_,
-                                   pos   => ($pos - length($name)),
-                                   var   => $name,
-                                   error => "attempt to call method <$name> on an undefined value",
-                                  );
-            }
-
-            return
-              bless {
-                     name => $name,
-                     expr => $arg,
-                    },
-              'Sidef::Meta::PrefixMethod';
-        }
-
-        if (/($self->{prefix_obj_re})\h*/goc) {
-            return ($^R, 1, $1);
-        }
-
-        # Assertions
-        if (/\G(assert(?:_(?:eq|ne))?+)\b\h*/gc) {
-            my $action = $1;
-
-            my $arg = (
-                       /\G(?=\()/
-                       ? $self->parse_arg(code => $opt{code})
-                       : $self->parse_obj(code => $opt{code})
-                      );
-
-            return
-              bless(
-                    {
-                     arg  => $arg,
-                     act  => $action,
-                     line => $self->{line},
-                     file => $self->{file_name},
-                    },
-                    'Sidef::Meta::Assert'
-                   );
-        }
-
-        # Function-style `not(...)`: it is applied only on the parenthesized expression
-        if (/\Gnot(?=\()/gc) {
-            return $self->_negate($self->parse_arg(code => $opt{code}));
-        }
-
-        # Logical `not` (it has a lower precedence than comparisons: `not a == b` is `not (a == b)`)
-        if (/\Gnot\b\h*/gc) {
-            my $arg = $self->parse_obj(code => $opt{code}, prec => PREC_NOT);
-
-            $arg // $self->fatal_error(
+    $subset_name // $self->fatal_error(
                                        code  => $_,
                                        pos   => pos($_),
-                                       error => "expected an expression after `not`",
+                                       error => "expected the name of the subset",
                                       );
 
-            return $self->_negate($arg);
-        }
+    my $code = $subset_name;
+    my $obj  = $self->parse_expr(code => \$code);
 
-        # die/warn
-        if (/\G(die|warn)\b\h*/gc) {
-            my $action = $1;
+    (defined($obj) and ref($obj) ne 'HASH')
+      || $self->fatal_error(
+                            code  => $_,
+                            pos   => pos($_),
+                            error => "expected a subset or a type",
+                           );
 
-            my $arg = (
-                       /\G(?=\()/
-                       ? $self->parse_arg(code => $opt{code})
-                       : $self->parse_obj(code => $opt{code})
-                      );
-
-            return
-              bless(
-                    {
-                     arg  => $arg,
-                     line => $self->{line},
-                     file => $self->{file_name},
-                    },
-                    $action eq 'die'
-                    ? "Sidef::Meta::Error"
-                    : "Sidef::Meta::Warning"
-                   );
-        }
-
-        # Eval keyword
-        if (/\Geval\b\h*/gc) {
-
-            my $obj = (
-                       /\G(?=\()/
-                       ? $self->parse_arg(code => $opt{code})
-                       : $self->parse_obj(code => $opt{code})
-                      );
-
-#<<<
-            return bless(
-                {
-                 expr   => $obj,
-                 parser => Sidef::Object::Object::dclone(scalar {%$self}),
-
-                 #vars          => {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
-                 #ref_vars_refs => {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]},
-
-                }, 'Sidef::Eval::Eval');
-#>>>
-        }
-
-        if (/\GParser\b/gc) {
-            return $self;
-        }
-
-        # Regular expression
-        if (m{\G(?=/)} || /\G%r\b/gc) {
-            my $beg_pos = pos($_);
-            my $string  = $self->get_quoted_string(code => $opt{code});
-            my $flags   = (/\G($self->{match_flags_re})/goc ? $1 : undef);
-
-            my $regex = eval { Sidef::Types::Regex::Regex->new($string, $flags) };
-
-            if (not defined $regex) {
-                my $reason = (split(/\R/, $@ // ''))[0] // 'unknown error';
-                $reason =~ s/ at \S+ line \d+\.?.*//s;
-                $self->fatal_error(
-                                   code   => $_,
-                                   pos    => $beg_pos,
-                                   error  => "invalid regular expression",
-                                   reason => $reason,
-                                  );
-            }
-
-            return $regex;
-        }
-
-        # Class variable in form of `Class!var_name`
-        if (/\G($self->{var_name_re})!($self->{var_name_re})/goc) {
-            my ($class_name, $var_name) = ($1, $2);
-            my $class_obj = $self->parse_expr(code => \$class_name);
-            return (bless {class => $class_obj, name => $var_name}, 'Sidef::Variable::ClassVar');
-        }
-
-        # Static object (like String or nil)
-        if (/$self->{static_obj_re}/goc) {
-            return $^R;
-        }
-
-        if (/\G__MAIN__\b/gc) {
-            if (-e $self->{script_name}) {
-                state $x = require Cwd;
-                return Sidef::Types::String::String->new(Cwd::abs_path($self->{script_name}));
-            }
-            return Sidef::Types::String::String->new($self->{script_name});
-        }
-
-        if (/\G__FILE__\b/gc) {
-            if (-e $self->{file_name}) {
-                state $x = require Cwd;
-                return Sidef::Types::String::String->new(Cwd::abs_path($self->{file_name}));
-            }
-            return Sidef::Types::String::String->new($self->{file_name});
-        }
-
-        if (/\G__DATE__\b/gc) {
-            my (undef, undef, undef, $day, $mon, $year) = localtime;
-            return Sidef::Types::String::String->new(join('-', $year + 1900, map { sprintf "%02d", $_ } $mon + 1, $day));
-        }
-
-        if (/\G__TIME__\b/gc) {
-            my ($sec, $min, $hour) = localtime;
-            return Sidef::Types::String::String->new(join(':', map { sprintf "%02d", $_ } $hour, $min, $sec));
-        }
-
-        if (/\G__LINE__\b/gc) {
-            return Sidef::Types::Number::Number->new($self->{line});
-        }
-
-        if (/\G__COMPILED__\b/gc) {
-            return Sidef::Types::Bool::Bool->new($self->{opt}{R} eq 'Perl' or $self->{opt}{c});
-        }
-
-        if (/\G__OPTIMIZED__\b/gc) {
-            return Sidef::Types::Bool::Bool->new(($self->{opt}{O} || 0) > 0);
-        }
-
-        if (/\G__(?:END|DATA)__\b\h*+\R?/gc) {
-            if (exists $self->{'__DATA__'}) {
-                $self->{'__DATA__'} = substr($_, pos);
-            }
-            pos($_) = length($_);
-            return;
-        }
-
-        if (/\GDATA\b/gc) {
-            return (
-                $self->{static_objects}{'__DATA__'} //= do {
-                    bless({data => \$self->{'__DATA__'}}, 'Sidef::Meta::Glob::DATA');
-                }
-            );
-        }
-
-        # Beginning of a here-document (<<"EOT", <<'EOT', <<EOT)
-        if (/\G<<(-)?+(?=\S)/gc) {
-            my $indent = $1 ? 1 : 0;
-            my ($name, $type) = (undef, 1);
-
-            my $pos = pos($_);
-            if (/\G(?=(['"„]))/) {
-                $type = 0 if $1 eq q{'};
-                my $str = $self->get_quoted_string(code => $opt{code});
-                $name = $str;
-            }
-            elsif (/\G(\w+)/gc) {
-                $name = $1;
-            }
-            else {
-                $self->fatal_error(
-                                   error  => "invalid 'here-doc' declaration",
-                                   reason => "expected an alpha-numeric token after '<<'",
-                                   code   => $_,
-                                   pos    => pos($_)
-                                  );
-            }
-
-            my $obj = {$self->{class} => []};
-            push @{$self->{EOT}},
-              {
-                name   => $name,
-                indent => $indent,
-                type   => $type,
-                obj    => $obj,
-                pos    => $pos,
-                line   => $self->{line},
-              };
-
-            return $obj;
-        }
-
-        if (exists($self->{current_block}) && /\G__BLOCK__\b/gc) {
-            return $self->{current_block};
-        }
-
-        if (/\G__NAMESPACE__\b/gc) {
-            return Sidef::Types::String::String->new($self->{class});
-        }
-
-        if (exists($self->{current_function})) {
-            /\G__FUNC__\b/gc      && return $self->{current_function};
-            /\G__FUNC_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_function}{name});
-        }
-
-        if (exists($self->{current_class})) {
-            /\G__CLASS__\b/gc      && return $self->{current_class};
-            /\G__CLASS_NAME__\b/gc && return Sidef::Types::String::String->new($self->{class_name});
-        }
-
-        if (exists($self->{current_method})) {
-            /\G__METHOD__\b/gc      && return $self->{current_method};
-            /\G__METHOD_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_method}{name});
-        }
-
-        # Misplaced keywords (for better error messages)
-        if (/\G(elsif|else|orwith)\b/gc) {
-            my $word = $1;
-            $self->fatal_error(
-                               code   => $_,
-                               pos    => pos($_) - length($word),
-                               error  => "unexpected `$word`",
-                               reason => (
-                                          $word eq 'orwith'
-                                          ? "`orwith` must follow a `with` statement"
-                                          : "`$word` must follow an `if` statement"
-                                         ),
-                              );
-        }
-
-        if (/\G(elif|elseif)\b/gc) {
-            my $word = $1;
-            $self->fatal_error(
-                               code  => $_,
-                               pos   => pos($_) - length($word),
-                               error => "unknown keyword `$word`",
-                               hint  => "use `elsif` (or `else if`) instead",
-                              );
-        }
-
-        if (/\Gcatch\h*(?=\{)/gc) {
-            $self->fatal_error(
-                               code   => $_,
-                               pos    => pos($_) - 5,
-                               error  => "unexpected `catch`",
-                               reason => "`catch` must follow a `try` block",
-                              );
-        }
-
-        if (   /\G(when|case)\h*(?=\()/gc
-            || /\G(default)\h*(?=\{)/gc
-            || /\G(continue)\b/gc) {
-            my $word = $1;
-            if ($word eq 'continue' or not defined $self->find_var($word, $self->{class})) {
-                $self->fatal_error(
-                                   code   => $_,
-                                   pos    => pos($_) - length($word),
-                                   error  => "unexpected `$word`",
-                                   reason => "`$word` can only be used inside a `given(...) {...}` block",
-                                  );
-            }
-            pos($_) -= length($word);
-            /\G\Q$word\E\h*/gc;
-        }
-
-        # Variable access
-      VARIABLE_ACCESS:
-        if (/\G($self->{var_name_re})/goc) {
-            my $len_var = length($1);
-            my ($name, $class) = $self->get_name_and_class($1);
-
-            if (defined(my $var = $self->find_var($name, $class))) {
-
-                if ($var->{type} eq 'del') {
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => (pos($_) - length($name)),
-                                       var   => ($class . '::' . $name),
-                                       error => "attempt to use the deleted variable <$name>",
-                                      );
-                }
-
-                $var->{count}++;
-                return $var->{obj};
-            }
-
-            if ($name eq 'ARGV' or $name eq 'ENV') {
-
-                my $type     = 'var';
-                my $variable = bless({name => $name, type => $type, class => $class}, 'Sidef::Variable::Variable');
-
-                $self->_unshift_var(
-                                    $class,
-                                    {
-                                     obj   => $variable,
-                                     name  => $name,
-                                     count => 1,
-                                     type  => $type,
-                                     line  => $self->{line},
-                                    }
-                                   );
-
-                return $variable;
-            }
-
-            # Class instance variables
-            if (
-                ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
-                and defined(
-                        my $var = (first { $_->{name} eq $name } (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}}))
-                )
-              ) {
-                if (exists $self->{current_method}) {
-                    if (defined(my $var = $self->find_var('self', $class))) {
-
-                        if ($self->{opt}{k}) {
-                            print STDERR "[INFO] `$name` is parsed as `self.$name` at $self->{file_name} line $self->{line}\n";
-                        }
-
-                        $var->{count}++;
-                        return
-                          scalar {
-                                  $self->{class} => [
-                                                     {
-                                                      self => $var->{obj},
-                                                      ind  => [{hash => [$name]}],
-                                                     }
-                                                    ]
-                                 };
-                    }
-                }
-                elsif (exists $self->{allow_class_variable}) {
-                    return $var;
-                }
-                elsif ($var->{type} eq 'has') {
-                    $self->fatal_error(
-                                       error => "class variable <<$var->{name}>> can't be used outside a method",
-                                       pos   => (pos($_) - length($name)),
-                                       var   => $var,
-                                       code  => $_,
-                                      );
-                }
-                else {    # this should not happen
-                    $self->fatal_error(
-                                       error => "can't use undeclared variable <<$var->{name}>> in this context",
-                                       pos   => (pos($_) - length($name)),
-                                       var   => $var,
-                                       code  => $_,
-                                      );
-                }
-            }
-
-            if (/\G(?=\h*:?=(?![=~>]))/) {
-
-                if (not $self->{interactive}) {
-                    warn "[WARNING] Implicit declaration of global variable `$name`" . " at $self->{file_name} line $self->{line}\n";
-                }
-
-                my $code = "global $name";
-                return $self->parse_expr(code => \$code);
-            }
-
-            # Method call in functional style (deprecated -- use `::name()` instead)
-            if ($len_var == length($name)) {
-
-                if ($self->{opt}{k}) {
-                    print STDERR "[INFO] `$name` is parsed as a prefix method-call at $self->{file_name} line $self->{line}\n";
-                }
-
-                if ($self->{allow_class_variable}) {
-                    return $name;
-                }
-
-                my $pos = pos($_);
-                my $arg = (
-                           /\G\h*+(?=\()/gc
-                           ? $self->parse_arg(code => $opt{code})
-                           : $self->fatal_error(
-                                                code  => $_,
-                                                pos   => ($pos - length($name)),
-                                                var   => ($class . '::' . $name),
-                                                error => "variable <$name> is not declared in the current scope",
-                                               )
-                          );
-
-                if (not exists($arg->{$self->{class}})) {
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => ($pos - length($name)),
-                                       var   => $name,
-                                       error => "attempt to call method <$name> on an undefined value",
-                                      );
-                }
-
-                return
-                  bless {
-                         name => $name,
-                         expr => $arg,
-                        },
-                  'Sidef::Meta::PrefixMethod';
-            }
-
-            # Undeclared variable
-            $self->fatal_error(
-                               code  => $_,
-                               pos   => (pos($_) - length($name)),
-                               var   => ($class . '::' . $name),
-                               error => "variable <$class\::$name> is not declared in the current scope",
-                              );
-        }
-
-        # Regex variables ($1, $2, ...)
-        if (/\G\$([0-9]+)\b/gc) {
-            $self->fatal_error(
-                               code  => $_,
-                               pos   => (pos($_) - length($1)),
-                               error => "regex capture-variables are not supported",
-                              );
-        }
-
-        /\G\$/gc && redo;
-
-        #warn "$self->{script_name}:$self->{line}: unexpected char: " . substr($_, pos($_), 1) . "\n";
-        #return undef, pos($_) + 1;
-
-        return;
-    }
+    return $obj;
 }
+
+# The `where` condition and the default value of a variable
+# Returns: (default value, `where` expression, `where` block)
+sub _parse_variable_initializer {
+    my ($self, $end_delim, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my ($value, $where_expr, $where_block);
+
+    if (/\G\h*(?=\{)/gc) {
+        $where_block = $self->parse_block(code => $opt{code}, topic_var => 1);
+    }
+    elsif (/\G\h*(?=\()/gc) {
+        $where_expr = $self->parse_arg(code => $opt{code});
+    }
+
+    if (/$self->{var_init_sep_re}/goc) {
+        local $self->{no_pipe_op} = ($end_delim eq '|') ? 1 : 0;
+        my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
+        $value = (
+                  ref($obj) eq 'HASH'
+                  ? $obj
+                  : {$self->{class} => [{self => $obj}]}
+                 );
+    }
+
+    return ($value, $where_expr, $where_block);
+}
+
+# ---------------------------------------------------------------------------
+# Delimited constructs: (...), [...], {...}
+# ---------------------------------------------------------------------------
 
 sub parse_arg {
     my ($self, %opt) = @_;
@@ -3167,6 +1397,7 @@ sub parse_arg {
     return;
 }
 
+# Parses the content of an array in brackets: [...]
 sub parse_array {
     my ($self, %opt) = @_;
 
@@ -3195,6 +1426,7 @@ sub parse_array {
     return;
 }
 
+# Parses the content of a hash lookup, in curly brackets: {...}
 sub parse_lookup {
     my ($self, %opt) = @_;
 
@@ -3223,6 +1455,10 @@ sub parse_lookup {
     return;
 }
 
+# Parses a block in curly brackets: {...}
+#
+# Options: topic_var (declares the variable `_`), with_vars (the block parameters: {|a, b| ...}),
+# is_module, init_code (the parameters are parsed from another string), no_brace.
 sub parse_block {
     my ($self, %opt) = @_;
 
@@ -3288,11 +1524,6 @@ sub parse_block {
                                 line   => $line,
                                );
 
-        #$block->{vars} = [
-        #    map { $_->{obj} }
-        #    grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' } @{$self->{vars}{$class_name}}
-        #];
-
         if ($has_vars) {
             $block->{init_vars} = bless({vars => $var_objs}, 'Sidef::Variable::Init');
         }
@@ -3307,29 +1538,2674 @@ sub parse_block {
     return;
 }
 
-sub append_method {
+# ---------------------------------------------------------------------------
+# Expressions (parse_expr dispatches to the handlers below)
+# ---------------------------------------------------------------------------
+
+sub parse_expr {
     my ($self, %opt) = @_;
 
-    # Hyper-operator
-    if (exists $self->{hyper_ops}{$opt{op_type}}) {
-        push @{$opt{array}},
-          {
-            method => $self->{hyper_ops}{$opt{op_type}}[1],
-            arg    => [$opt{method}],
-          };
-    }
+    local *_ = $opt{code};
+    {
+        $self->parse_whitespace(code => $opt{code});
 
-    # Basic operator/method
-    else {
-        push @{$opt{array}}, {method => $opt{method}};
-    }
+        # End of an expression, or end of the script
+        if (/\G;/gc || /\G\z/) {
+            return;
+        }
 
-    # Append the argument (if any)
-    if (exists($opt{arg}) and (%{$opt{arg}} || ($opt{method} =~ /^$self->{operators_re}\z/))) {
-        push @{$opt{array}[-1]{arg}}, $opt{arg};
+        # Fast paths for the most common tokens (decimal numbers and plain identifiers),
+        # which skip all the other checks
+        if (not $self->{no_fast_path}) {
+
+            if (/\G(?=[0-9])/) {
+                return $self->_parse_number(code => $opt{code});
+            }
+
+            if (    /\G(?=[^\W\d])/
+                and /\G([^\W\d]\w*+)(?!::|![^\W\d]|:(?![=:])|\h*=>)/
+                and not exists($self->{special_words}{$1})
+                and index($1, '__') != 0) {
+                return $self->_parse_variable_access(code => $opt{code});
+            }
+        }
+
+        if (/$self->{quote_operators_re}/goc) {
+            return $self->_parse_quote_operator(code => $opt{code}, info => $^R);
+        }
+
+        # Object as expression
+        if (/\G(?=\()/) {
+            return $self->parse_arg(code => $opt{code});
+        }
+
+        # Block as object
+        if (/\G(?=\{)/) {
+            return $self->parse_block(code => $opt{code}, topic_var => 1);
+        }
+
+        # Array as object
+        if (/\G(?=\[)/) {
+            return $self->_parse_array_literal(code => $opt{code});
+        }
+
+        # Bareword followed by a fat comma or preceded by a colon
+        if (   /\G:(\w+)/gc
+            || /\G([^\W\d]\w*+)(?=\h*=>)/gc) {
+
+            return Sidef::Types::String::String->new($1);
+        }
+
+        # Bareword followed by a colon becomes a NamedParam with the bareword
+        # on the LHS
+        if (/\G([^\W\d]\w*+):(?![=:])/gc) {
+            my $name = $1;
+            my $obj  = $self->parse_obj(code => $opt{code});
+            return Sidef::Variable::NamedParam->new($name, $obj);
+        }
+
+        # Declaration of variables (global and lexical)
+        if (/\G(var|global|del)\b\h*/gc) {
+            return $self->_parse_variable_declaration(code => $opt{code}, match => $1);
+        }
+
+        # "has" class attributes
+        if (exists($self->{current_class}) and /\Ghas\b\h*/gc) {
+            return $self->_parse_class_attributes(code => $opt{code});
+        }
+
+        # Declaration of constants and static variables
+        if (/\G(define|const|static)\b\h*/gc) {
+            return $self->_parse_constant_declaration(code => $opt{code}, match => $1);
+        }
+
+        # Struct declaration
+        if (/\Gstruct\b\h*/gc) {
+            return $self->_parse_struct(code => $opt{code});
+        }
+
+        # Subset declaration
+        if (/\Gsubset\b\h*/gc) {
+            return $self->_parse_subset(code => $opt{code});
+        }
+
+        # Declaration of enums
+        if (/\Genum\b\h*/gc) {
+            return $self->_parse_enum(code => $opt{code});
+        }
+
+        # Local variables
+        if (/\Glocal\b\h*/gc) {
+            return $self->_parse_local(code => $opt{code});
+        }
+
+        # Declaration of classes, methods and functions
+        if (
+               /\G(func|class)\b\h*/gc
+            || /\G(->)\h*/gc
+            || (exists($self->{current_class})
+                && /\G(method)\b\h*/gc)
+          ) {
+            return $self->_parse_function_or_class(code => $opt{code}, match => $1);
+        }
+
+        # "given(expr) {...}" construct
+        if (/\Ggiven\b\h*/gc) {
+            return $self->_parse_given(code => $opt{code});
+        }
+
+        # "when(expr) {...}" construct
+        if (exists($self->{current_given}) && /\Gwhen\b\h*/gc) {
+            return $self->_parse_when(code => $opt{code});
+        }
+
+        # "case(expr) {...}" construct
+        if (exists($self->{current_given}) && /\Gcase\b\h*/gc) {
+            return $self->_parse_case(code => $opt{code});
+        }
+
+        # "default {...}" or "else { ... }" construct for `given/when`
+        if (exists($self->{current_given}) && /\G(?:default|else)\h*(?=\{)/gc) {
+            my $block = $self->parse_block(code => $opt{code});
+            return bless({block => $block}, 'Sidef::Types::Block::Default');
+        }
+
+        # `continue` keyword inside a given/when construct
+        if (exists($self->{current_given}) && /\Gcontinue\b/gc) {
+            state $x = bless({}, 'Sidef::Types::Block::Continue');
+            return $x;
+        }
+
+        # "do {...}" and "loop {...}" constructs
+        if (/\G(do|loop)\h*(?=\{)/gc) {
+            my $class = ($1 eq 'do' ? 'Sidef::Types::Block::Do' : 'Sidef::Types::Block::Loop');
+            return bless({block => $self->parse_block(code => $opt{code})}, $class);
+        }
+
+        # "try/catch" construct
+        if (/\Gtry\h*(?=\{)/gc) {
+            return $self->_parse_try(code => $opt{code});
+        }
+
+        # "gather/take" construct
+        if (/\Ggather\h*(?=\{)/gc) {
+            return $self->_parse_gather(code => $opt{code});
+        }
+
+        if (exists($self->{current_gather}) and /\Gtake\b\h*/gc) {
+
+            my $obj = $self->_parse_arg_or_obj(code => $opt{code});
+
+            return bless({expr => $obj, gather => $self->{current_gather}}, 'Sidef::Types::Block::Take');
+        }
+
+        # Declaration of a module
+        if (/\Gmodule\b\h*/gc) {
+            return $self->_parse_module(code => $opt{code});
+        }
+
+        if (/\Gimport\b\h*/gc) {
+            return $self->_parse_import(code => $opt{code});
+        }
+
+        if (/\Ginclude\b\h*/gc) {
+            my $included = $self->_parse_include(code => $opt{code});
+            redo if (ref($included) and refaddr($included) == refaddr(REDO_PARSE));
+            return $included;
+        }
+
+        # Numbers
+        if (/\G(?=\.?[0-9]|[⁰¹²³⁴⁵⁶⁷⁸⁹])/) {
+            my $number = $self->_parse_number(code => $opt{code});
+            return $number if defined($number);
+        }
+
+        # Prefix `...`
+        if (/\G\.\.\./gc) {
+            return
+              bless(
+                    {
+                     line => $self->{line},
+                     file => $self->{file_name},
+                    },
+                    'Sidef::Meta::Unimplemented'
+                   );
+        }
+
+        # Implicit method call on special variable: "_"
+        if (/\G\./) {
+            return $self->_parse_implicit_topic_call(code => $opt{code});
+        }
+
+        # Quoted words, numbers, vectors and matrices
+        # %w(...), %i(...), %n(...), %v(...), %m(...), «...», <...>
+        if (/\G%([wWinvm])\b/gc || /\G(?=(«|<(?!<)))/) {
+            return $self->_parse_quoted_words(code => $opt{code}, match => $1);
+        }
+
+        # Prefix method call (`::name(...)` or `::name ...`)
+        if (/\G::($self->{var_name_re})\h*/goc) {
+            return $self->_parse_prefix_method_call(code => $opt{code}, match => $1);
+        }
+
+        if (/($self->{prefix_obj_re})\h*/goc) {
+            return ($^R, 1, $1);
+        }
+
+        # Assertions
+        if (/\G(assert(?:_(?:eq|ne))?+)\b\h*/gc) {
+            return $self->_parse_assert(code => $opt{code}, match => $1);
+        }
+
+        # Function-style `not(...)`: it is applied only on the parenthesized expression
+        if (/\Gnot(?=\()/gc) {
+            return $self->_negate($self->parse_arg(code => $opt{code}));
+        }
+
+        # Logical `not` (it has a lower precedence than comparisons: `not a == b` is `not (a == b)`)
+        if (/\Gnot\b\h*/gc) {
+            return $self->_parse_not(code => $opt{code});
+        }
+
+        # die/warn
+        if (/\G(die|warn)\b\h*/gc) {
+            return $self->_parse_die_warn(code => $opt{code}, match => $1);
+        }
+
+        # Eval keyword
+        if (/\Geval\b\h*/gc) {
+            return $self->_parse_eval(code => $opt{code});
+        }
+
+        if (/\GParser\b/gc) {
+            return $self;
+        }
+
+        # Regular expression
+        if (m{\G(?=/)} || /\G%r\b/gc) {
+            return $self->_parse_regex_literal(code => $opt{code});
+        }
+
+        # Class variable in form of `Class!var_name`
+        if (/\G($self->{var_name_re})!($self->{var_name_re})/goc) {
+            my ($class_name, $var_name) = ($1, $2);
+            my $class_obj = $self->parse_expr(code => \$class_name);
+            return (bless {class => $class_obj, name => $var_name}, 'Sidef::Variable::ClassVar');
+        }
+
+        # Static object (like String or nil)
+        if (/$self->{static_obj_re}/goc) {
+            return $^R;
+        }
+
+        # Special constants
+        if (/\G(__MAIN__|__FILE__|__DATE__|__TIME__|__LINE__|__COMPILED__|__OPTIMIZED__)\b/gc) {
+            return $self->_parse_magic_constant(code => $opt{code}, match => $1);
+        }
+
+        if (/\G__(?:END|DATA)__\b\h*+\R?/gc) {
+            if (exists $self->{'__DATA__'}) {
+                $self->{'__DATA__'} = substr($_, pos);
+            }
+            pos($_) = length($_);
+            return;
+        }
+
+        if (/\GDATA\b/gc) {
+            return (
+                $self->{static_objects}{'__DATA__'} //= do {
+                    bless({data => \$self->{'__DATA__'}}, 'Sidef::Meta::Glob::DATA');
+                }
+            );
+        }
+
+        # Beginning of a here-document (<<"EOT", <<'EOT', <<EOT)
+        if (/\G<<(-)?+(?=\S)/gc) {
+            return $self->_parse_heredoc(code => $opt{code}, match => $1);
+        }
+
+        # Constants that depend on the context: __BLOCK__, __FUNC__, __CLASS__, __METHOD__, etc.
+        if (/\G__/) {
+            my $constant = $self->_parse_context_constant(code => $opt{code});
+            return $constant if defined($constant);
+        }
+
+        # Misplaced keywords (for better error messages)
+        $self->_check_misplaced_keyword(code => $opt{code});
+
+        # Variable access
+        if (/\G(?=[^\W\d])/) {
+            my $variable = $self->_parse_variable_access(code => $opt{code});
+            return $variable if defined($variable);
+        }
+
+        # Regex variables ($1, $2, ...)
+        if (/\G\$([0-9]+)\b/gc) {
+            $self->fatal_error(
+                               code  => $_,
+                               pos   => (pos($_) - length($1)),
+                               error => "regex capture-variables are not supported",
+                              );
+        }
+
+        /\G\$/gc && redo;
+
+        return;
     }
 }
 
+# Quote-like operators: strings, files, directories, pipes, backticks, bytes, chars, etc.
+sub _parse_quote_operator {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my ($double_quoted, $method, $package) = @{$opt{info}};
+
+    pos($_) -= 1;
+    my ($string, $pos) = $self->get_quoted_string(code => $opt{code});
+
+    # Special case for array-like objects (bytes and chars)
+    my @array_like;
+    if ($method ne 'new' and $method ne '__NEW__') {
+        @array_like = ($package, $method);
+        $package    = 'Sidef::Types::String::String';
+        $method     = 'new';
+    }
+
+    if ($package eq 'Sidef::Module::Func' or $package eq 'Sidef::Module::OO') {
+        if ($string !~ /^$self->{var_name_re}\z/) {
+            $self->fatal_error(
+                               code   => $_,
+                               pos    => (pos($_) - length($string) - 1),
+                               error  => "invalid symbol declaration",
+                               reason => "expected a variable-like name",
+                              );
+        }
+    }
+
+    my $obj = (
+        $double_quoted
+        ? do {
+            state $str = Sidef::Types::String::String->new;    # load the string module
+            Sidef::Types::String::String::apply_escapes($package->$method($string), $self);
+          }
+        : $package->$method($string =~ s{\\\\}{\\}gr)
+    );
+
+    # Special case for backticks and Perl code (add method 'run')
+    if ($package eq 'Sidef::Types::Glob::Backtick' or $package eq 'Sidef::Types::Perl::Perl') {
+        my $struct =
+            $double_quoted && ref($obj) eq 'HASH'
+          ? $obj
+          : {
+             $self->{class} => [
+                                {
+                                 self => $obj,
+                                 call => [],
+                                }
+                               ]
+            };
+
+        push @{$struct->{$self->{class}}[-1]{call}}, {method => 'run'};
+        $obj = $struct;
+    }
+    elsif (@array_like) {
+        if ($double_quoted and ref($obj) eq 'HASH') {
+            push @{$obj->{$self->{class}}[-1]{call}}, {method => $array_like[1]};
+        }
+        else {
+            my $method = $array_like[1];
+            $obj = $obj->$method;
+        }
+    }
+
+    return $obj;
+}
+
+# Array as object
+sub _parse_array_literal {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my @array;
+    my $obj = $self->parse_array(code => $opt{code});
+
+    if (ref($obj->{$self->{class}}) eq 'ARRAY') {
+        push @array, @{$obj->{$self->{class}}};
+    }
+
+    return bless(\@array, 'Sidef::Types::Array::HCArray');
+}
+
+# Numbers: super-script integers, binary/hexadecimal/octal numbers, and decimal numbers
+sub _parse_number {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    # Super-script power
+    if (/\G([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gc) {
+        my $num = ($1 =~ tr/⁰¹²³⁴⁵⁶⁷⁸⁹/0-9/r);
+        return Sidef::Types::Number::Number::_set_int($num);
+    }
+
+    # Binary, hexadecimal and octal numbers
+    if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|o[0-7_]*|[0-7_]+)\b/gc) {
+        my $num = $1 =~ tr/_//dr;
+        return
+          Sidef::Types::Number::Number->new(
+                                              $num =~ /^b/ ? (substr($num, 1) || 0, 2)
+                                            : $num =~ /^o/ ? (substr($num, 1) || 0, 8)
+                                            : $num =~ /^x/ ? (substr($num, 1) || 0, 16)
+                                            :                ($num            || 0, 8)
+                                           );
+    }
+
+    # Integer or float number
+    if (/\G((?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
+        my $num_text = $1;
+        my $num      = $1 =~ tr/_//dr;
+
+        # A number can't be directly followed by letters (e.g.: `0b102`, `12abc`)
+        if (/\G(?![if]\b)(?=[^\W\d])/) {
+            my ($rest) = /\G(\w+)/;
+            $self->fatal_error(
+                               code   => $_,
+                               pos    => pos($_) - length($num_text),
+                               error  => "invalid numeric literal `$num_text$rest`",
+                               reason => "unexpected `$rest` after the number `$num_text`",
+                              );
+        }
+
+        if (/\Gi\b/gc) {    # imaginary
+            return Sidef::Types::Number::Complex->new(0, $num);
+        }
+        elsif (/\Gf\b/gc) {    # floating-point
+            return Sidef::Types::Number::Number::_set_str('float', $num);
+        }
+
+        return (
+                $num =~ /^-?[0-9]+\z/
+                ? Sidef::Types::Number::Number::_set_int($num)
+                : Sidef::Types::Number::Number->new($num)
+               );
+    }
+
+    return;
+}
+
+# Quoted words, numbers, vectors and matrices
+# %w(...), %i(...), %n(...), %v(...), %m(...), «...», <...>
+sub _parse_quoted_words {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my ($type) = $opt{match};
+    my $strings = $self->get_quoted_words(code => $opt{code});
+
+    if ($type eq 'w' or $type eq '<') {
+        my @list = map { Sidef::Types::String::String->new(s{\\(?=[\\#\s])}{}gr) } @{$strings};
+        return Sidef::Types::Array::Array->new(\@list);
+    }
+
+    if ($type eq 'i') {
+        my @list = map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr)->int }
+          split(/[\s,]+/, join(' ', @$strings));
+        return Sidef::Types::Array::Array->new(\@list);
+    }
+
+    if ($type eq 'n') {
+        my @list =
+          map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, join(' ', @$strings));
+        return Sidef::Types::Array::Array->new(\@list);
+    }
+
+    if ($type eq 'v') {
+        my @list =
+          map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, join(' ', @$strings));
+        return Sidef::Types::Array::Vector->new(@list);    # this must be passed as a list
+    }
+
+    if ($type eq 'm') {
+        my @matrix;
+        my $data = join(' ', @$strings);
+        foreach my $line (split(/\s*;\s*/, $data)) {
+            my @row = map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, $line);
+            push @matrix, Sidef::Types::Array::Array->new(\@row);
+        }
+        return Sidef::Types::Array::Matrix->new(@matrix);
+    }
+
+    my ($inline_expression, @objs);
+    foreach my $item (@{$strings}) {
+        my $str = Sidef::Types::String::String->new($item)->apply_escapes($self);
+        $inline_expression ||= ref($str) eq 'HASH';
+        push @objs, $str;
+    }
+
+    return (
+            $inline_expression
+            ? bless([map { {self => $_} } @objs], 'Sidef::Types::Array::HCArray')
+            : Sidef::Types::Array::Array->new(\@objs)
+           );
+}
+
+# Beginning of a here-document (<<"EOT", <<'EOT', <<EOT)
+sub _parse_heredoc {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $indent = $opt{match} ? 1 : 0;
+    my ($name, $type) = (undef, 1);
+
+    my $pos = pos($_);
+    if (/\G(?=(['"„]))/) {
+        $type = 0 if $1 eq q{'};
+        my $str = $self->get_quoted_string(code => $opt{code});
+        $name = $str;
+    }
+    elsif (/\G(\w+)/gc) {
+        $name = $1;
+    }
+    else {
+        $self->fatal_error(
+                           error  => "invalid 'here-doc' declaration",
+                           reason => "expected an alpha-numeric token after '<<'",
+                           code   => $_,
+                           pos    => pos($_)
+                          );
+    }
+
+    my $obj = {$self->{class} => []};
+    push @{$self->{EOT}},
+      {
+        name   => $name,
+        indent => $indent,
+        type   => $type,
+        obj    => $obj,
+        pos    => $pos,
+        line   => $self->{line},
+      };
+
+    return $obj;
+}
+
+# Regular expression
+sub _parse_regex_literal {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $beg_pos = pos($_);
+    my $string  = $self->get_quoted_string(code => $opt{code});
+    my $flags   = (/\G($self->{match_flags_re})/goc ? $1 : undef);
+
+    my $regex = eval { Sidef::Types::Regex::Regex->new($string, $flags) };
+
+    if (not defined $regex) {
+        my $reason = (split(/\R/, $@ // ''))[0] // 'unknown error';
+        $reason =~ s/ at \S+ line \d+\.?.*//s;
+        $self->fatal_error(
+                           code   => $_,
+                           pos    => $beg_pos,
+                           error  => "invalid regular expression",
+                           reason => $reason,
+                          );
+    }
+
+    return $regex;
+}
+
+# Special constants: __MAIN__, __FILE__, __DATE__, __TIME__, __LINE__, __COMPILED__, __OPTIMIZED__
+sub _parse_magic_constant {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $name = $opt{match};
+
+    if ($name eq '__MAIN__') {
+        if (-e $self->{script_name}) {
+            state $x = require Cwd;
+            return Sidef::Types::String::String->new(Cwd::abs_path($self->{script_name}));
+        }
+        return Sidef::Types::String::String->new($self->{script_name});
+    }
+
+    if ($name eq '__FILE__') {
+        if (-e $self->{file_name}) {
+            state $x = require Cwd;
+            return Sidef::Types::String::String->new(Cwd::abs_path($self->{file_name}));
+        }
+        return Sidef::Types::String::String->new($self->{file_name});
+    }
+
+    if ($name eq '__DATE__') {
+        my (undef, undef, undef, $day, $mon, $year) = localtime;
+        return Sidef::Types::String::String->new(join('-', $year + 1900, map { sprintf "%02d", $_ } $mon + 1, $day));
+    }
+
+    if ($name eq '__TIME__') {
+        my ($sec, $min, $hour) = localtime;
+        return Sidef::Types::String::String->new(join(':', map { sprintf "%02d", $_ } $hour, $min, $sec));
+    }
+
+    if ($name eq '__LINE__') {
+        return Sidef::Types::Number::Number->new($self->{line});
+    }
+
+    if ($name eq '__COMPILED__') {
+        return Sidef::Types::Bool::Bool->new($self->{opt}{R} eq 'Perl' or $self->{opt}{c});
+    }
+
+    if ($name eq '__OPTIMIZED__') {
+        return Sidef::Types::Bool::Bool->new(($self->{opt}{O} || 0) > 0);
+    }
+
+    return;
+}
+
+# Constants that depend on the context (the names that don't match anything are variables)
+sub _parse_context_constant {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    if (exists($self->{current_block}) && /\G__BLOCK__\b/gc) {
+        return $self->{current_block};
+    }
+
+    if (/\G__NAMESPACE__\b/gc) {
+        return Sidef::Types::String::String->new($self->{class});
+    }
+
+    if (exists($self->{current_function})) {
+        /\G__FUNC__\b/gc      && return $self->{current_function};
+        /\G__FUNC_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_function}{name});
+    }
+
+    if (exists($self->{current_class})) {
+        /\G__CLASS__\b/gc      && return $self->{current_class};
+        /\G__CLASS_NAME__\b/gc && return Sidef::Types::String::String->new($self->{class_name});
+    }
+
+    if (exists($self->{current_method})) {
+        /\G__METHOD__\b/gc      && return $self->{current_method};
+        /\G__METHOD_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_method}{name});
+    }
+
+    return;
+}
+
+# Implicit method call on special variable: "_"
+sub _parse_implicit_topic_call {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    if (defined(my $var = $self->find_var('_', $self->{class}))) {
+        $var->{count}++;
+        return $var->{obj};
+    }
+
+    if (/\G\.(?!\.)(?!\h*(?:$self->{method_name_re}|[(\$])|\s*$self->{operators_re})/o) {
+        $self->fatal_error(
+                           code   => $_,
+                           pos    => pos($_),
+                           error  => "incomplete method call",
+                           reason => "expected a method name after `.`",
+                          );
+    }
+
+    $self->fatal_error(
+                       code  => $_,
+                       pos   => pos($_),
+                       error => q{attempt of using an implicit method call on an inexistent "_" variable},
+                       hint => q{a leading `.method` is the method call on the topic variable `_`, which exists only inside blocks, such as: arr.each { .say }},
+                      );
+}
+
+# Prefix method call (`::name(...)` or `::name ...`)
+sub _parse_prefix_method_call {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $name = $opt{match};
+
+    my $pos = pos($_);
+    my $arg = $self->_parse_arg_or_obj(code => $opt{code});
+
+    if (not exists($arg->{$self->{class}})) {
+        $self->fatal_error(
+                           code  => $_,
+                           pos   => ($pos - length($name)),
+                           var   => $name,
+                           error => "attempt to call method <$name> on an undefined value",
+                          );
+    }
+
+    return
+      bless {
+             name => $name,
+             expr => $arg,
+            },
+      'Sidef::Meta::PrefixMethod';
+}
+
+# Assertions
+sub _parse_assert {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $action = $opt{match};
+
+    my $arg = $self->_parse_arg_or_obj(code => $opt{code});
+
+    return
+      bless(
+            {
+             arg  => $arg,
+             act  => $action,
+             line => $self->{line},
+             file => $self->{file_name},
+            },
+            'Sidef::Meta::Assert'
+           );
+}
+
+# Logical `not` (it has a lower precedence than comparisons: `not a == b` is `not (a == b)`)
+sub _parse_not {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $arg = $self->parse_obj(code => $opt{code}, prec => PREC_NOT);
+
+    $arg // $self->fatal_error(
+                               code  => $_,
+                               pos   => pos($_),
+                               error => "expected an expression after `not`",
+                              );
+
+    return $self->_negate($arg);
+}
+
+# die/warn
+sub _parse_die_warn {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $action = $opt{match};
+
+    my $arg = $self->_parse_arg_or_obj(code => $opt{code});
+
+    return
+      bless(
+            {
+             arg  => $arg,
+             line => $self->{line},
+             file => $self->{file_name},
+            },
+            $action eq 'die'
+            ? "Sidef::Meta::Error"
+            : "Sidef::Meta::Warning"
+           );
+}
+
+# Eval keyword
+sub _parse_eval {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $obj = $self->_parse_arg_or_obj(code => $opt{code});
+
+#<<<
+    return bless(
+        {
+         expr   => $obj,
+         parser => Sidef::Object::Object::dclone(scalar {%$self}),
+
+         #vars          => {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
+         #ref_vars_refs => {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]},
+
+        }, 'Sidef::Eval::Eval');
+#>>>
+}
+
+# Misplaced keywords: the better error messages, for the keywords that can't be used as variables
+sub _check_misplaced_keyword {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    # Misplaced keywords (for better error messages)
+    if (/\G(elsif|else|orwith)\b/gc) {
+        my $word = $1;
+        $self->fatal_error(
+                           code   => $_,
+                           pos    => pos($_) - length($word),
+                           error  => "unexpected `$word`",
+                           reason => (
+                                      $word eq 'orwith'
+                                      ? "`orwith` must follow a `with` statement"
+                                      : "`$word` must follow an `if` statement"
+                                     ),
+                          );
+    }
+
+    if (/\G(elif|elseif)\b/gc) {
+        my $word = $1;
+        $self->fatal_error(
+                           code  => $_,
+                           pos   => pos($_) - length($word),
+                           error => "unknown keyword `$word`",
+                           hint  => "use `elsif` (or `else if`) instead",
+                          );
+    }
+
+    if (/\Gcatch\h*(?=\{)/gc) {
+        $self->fatal_error(
+                           code   => $_,
+                           pos    => pos($_) - 5,
+                           error  => "unexpected `catch`",
+                           reason => "`catch` must follow a `try` block",
+                          );
+    }
+
+    if (   /\G(when|case)\h*(?=\()/gc
+        || /\G(default)\h*(?=\{)/gc
+        || /\G(continue)\b/gc) {
+        my $word = $1;
+        if ($word eq 'continue' or not defined $self->find_var($word, $self->{class})) {
+            $self->fatal_error(
+                               code   => $_,
+                               pos    => pos($_) - length($word),
+                               error  => "unexpected `$word`",
+                               reason => "`$word` can only be used inside a `given(...) {...}` block",
+                              );
+        }
+        pos($_) -= length($word);
+        /\G\Q$word\E\h*/gc;
+    }
+
+    return;
+}
+
+# Variable access
+sub _parse_variable_access {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    /\G($self->{var_name_re})/goc || return;
+
+    my $len_var = length($1);
+    my ($name, $class) = $self->get_name_and_class($1);
+
+    # A declared variable
+    if (defined(my $var = $self->find_var($name, $class))) {
+
+        if ($var->{type} eq 'del') {
+            $self->fatal_error(
+                               code  => $_,
+                               pos   => (pos($_) - length($name)),
+                               var   => ($class . '::' . $name),
+                               error => "attempt to use the deleted variable <$name>",
+                              );
+        }
+
+        $var->{count}++;
+        return $var->{obj};
+    }
+
+    # The predefined variables
+    if ($name eq 'ARGV' or $name eq 'ENV') {
+
+        my $type     = 'var';
+        my $variable = bless({name => $name, type => $type, class => $class}, 'Sidef::Variable::Variable');
+
+        $self->_unshift_var(
+                            $class,
+                            {
+                             obj   => $variable,
+                             name  => $name,
+                             count => 1,
+                             type  => $type,
+                             line  => $self->{line},
+                            }
+                           );
+
+        return $variable;
+    }
+
+    # Class instance variables
+    if (ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
+        and defined(my $var = (first { $_->{name} eq $name } (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})))) {
+        my $result = $self->_parse_class_instance_variable($var, $name, $class, code => $opt{code});
+        return $result if defined($result);
+    }
+
+    # Implicit declaration of a global variable
+    if (/\G(?=\h*:?=(?![=~>]))/) {
+
+        if (not $self->{interactive}) {
+            warn "[WARNING] Implicit declaration of global variable `$name`" . " at $self->{file_name} line $self->{line}\n";
+        }
+
+        my $code = "global $name";
+        return $self->parse_expr(code => \$code);
+    }
+
+    # Method call in functional style (deprecated -- use `::name()` instead)
+    if ($len_var == length($name)) {
+        return $self->_parse_functional_call($name, $class, code => $opt{code});
+    }
+
+    # Undeclared variable
+    $self->fatal_error(
+                       code  => $_,
+                       pos   => (pos($_) - length($name)),
+                       var   => ($class . '::' . $name),
+                       error => "variable <$class\::$name> is not declared in the current scope",
+                      );
+}
+
+# A class variable that is used inside the class: it's the same as `self.name` inside a method.
+# Returns nothing when the variable should be handled as an ordinary variable.
+sub _parse_class_instance_variable {
+    my ($self, $var, $name, $class, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    if (exists $self->{current_method}) {
+        if (defined(my $self_var = $self->find_var('self', $class))) {
+
+            if ($self->{opt}{k}) {
+                print STDERR "[INFO] `$name` is parsed as `self.$name` at $self->{file_name} line $self->{line}\n";
+            }
+
+            $self_var->{count}++;
+            return
+              scalar {
+                      $self->{class} => [
+                                         {
+                                          self => $self_var->{obj},
+                                          ind  => [{hash => [$name]}],
+                                         }
+                                        ]
+                     };
+        }
+
+        return;
+    }
+
+    if (exists $self->{allow_class_variable}) {
+        return $var;
+    }
+
+    if ($var->{type} eq 'has') {
+        $self->fatal_error(
+                           error => "class variable <<$var->{name}>> can't be used outside a method",
+                           pos   => (pos($_) - length($name)),
+                           var   => $var,
+                           code  => $_,
+                          );
+    }
+
+    # this should not happen
+    $self->fatal_error(
+                       error => "can't use undeclared variable <<$var->{name}>> in this context",
+                       pos   => (pos($_) - length($name)),
+                       var   => $var,
+                       code  => $_,
+                      );
+}
+
+# A call in the functional style: `name(...)`, which is the same as `::name(...)`
+sub _parse_functional_call {
+    my ($self, $name, $class, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    if ($self->{opt}{k}) {
+        print STDERR "[INFO] `$name` is parsed as a prefix method-call at $self->{file_name} line $self->{line}\n";
+    }
+
+    if ($self->{allow_class_variable}) {
+        return $name;
+    }
+
+    my $pos = pos($_);
+    my $arg = (
+               /\G\h*+(?=\()/gc
+               ? $self->parse_arg(code => $opt{code})
+               : $self->fatal_error(
+                                    code  => $_,
+                                    pos   => ($pos - length($name)),
+                                    var   => ($class . '::' . $name),
+                                    error => "variable <$name> is not declared in the current scope",
+                                   )
+              );
+
+    if (not exists($arg->{$self->{class}})) {
+        $self->fatal_error(
+                           code  => $_,
+                           pos   => ($pos - length($name)),
+                           var   => $name,
+                           error => "attempt to call method <$name> on an undefined value",
+                          );
+    }
+
+    return
+      bless {
+             name => $name,
+             expr => $arg,
+            },
+      'Sidef::Meta::PrefixMethod';
+}
+
+# ---------------------------------------------------------------------------
+# Declarations: variables, constants, structs, subsets, enums
+# ---------------------------------------------------------------------------
+
+# Declaration of variables (global and lexical)
+sub _parse_variable_declaration {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $type     = $opt{match};
+    my $vars     = $self->parse_init_vars(code => $opt{code}, type => $type);
+    my $init_obj = bless({vars => $vars}, 'Sidef::Variable::Init');
+
+    @{$vars}
+      || $self->fatal_error(
+                            code   => $_,
+                            pos    => pos($_),
+                            error  => "expected a variable name after `$type`",
+                            reason => "a variable name can contain letters, digits and underscores, but it can't start with a digit",
+                           );
+
+    if (/\G\h*=\h*/gc) {
+
+        my $args = $self->parse_obj(code => $opt{code}, multiline => 1);
+
+        $args // $self->fatal_error(
+                                    code  => $_,
+                                    pos   => pos($_),
+                                    error => "expected an expression after variable declaration",
+                                   );
+
+        $init_obj->{args} = $args;
+    }
+
+    return $init_obj;
+}
+
+# "has" class attributes
+sub _parse_class_attributes {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    local $self->{allow_class_variable} = 0;
+
+    my $vars = $self->parse_init_vars(
+                                      code    => $opt{code},
+                                      type    => 'has',
+                                      private => 1,
+                                     );
+
+    foreach my $var (@{$vars}) {
+        my $name = $var->{name};
+        $self->_check_reserved_name($_, $name, (pos($_) - length($name)));
+    }
+
+    my $args;
+    if (/\G\h*=\h*/gc) {
+        $args = $self->parse_obj(code => $opt{code}, multiline => 1);
+        $args // $self->fatal_error(
+                                    code  => $_,
+                                    pos   => pos($_) - 2,
+                                    error => qq{expected an expression after "=" in `has` declaration},
+                                   );
+    }
+
+    my $obj = bless {vars => $vars, defined($args) ? (args => $args) : ()}, 'Sidef::Variable::ClassAttr';
+    push @{$self->{current_class}{attributes}}, $obj;
+    return $obj;
+}
+
+# Declaration of constants and static variables
+sub _parse_constant_declaration {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $type = $opt{match};
+    my $line = $self->{line};
+
+    my @var_objs;
+
+    my $callback = sub {
+        my ($v) = @_;
+
+        my $name       = $v->{name};
+        my $class_name = $v->{class};
+
+        my $var = (
+                     $type eq 'define' ? bless($v, 'Sidef::Variable::Define')
+                   : $type eq 'static' ? bless($v, 'Sidef::Variable::Static')
+                   : $type eq 'const'  ? bless($v, 'Sidef::Variable::Const')
+                   :                     die "[PARSER ERROR] Invalid variable type: $type"
+                  );
+
+        push @var_objs, $var;
+
+        $self->_unshift_var(
+                            $class_name,
+                            {
+                             obj   => $var,
+                             name  => $name,
+                             count => 0,
+                             type  => $type,
+                             line  => $line,
+                            }
+                           );
+    };
+
+    my $vars = $self->parse_init_vars(
+                                      code     => $opt{code},
+                                      type     => $type,
+                                      private  => 1,
+                                      callback => $callback,
+                                     );
+
+    foreach my $var (@var_objs) {
+        my $name = $var->{name};
+        $self->_check_reserved_name($_, $name, (pos($_) - length($name)));
+    }
+
+    if (@var_objs == 1 and /\G\h*=\h*/gc) {
+
+        my $var = $var_objs[0];
+        my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
+
+        $obj // $self->fatal_error(
+                                   code  => $_,
+                                   pos   => pos($_) - 2,
+                                   error => qq{expected an expression after $type "$var->{name}"},
+                                  );
+
+        $var->{value} = $obj;
+    }
+
+    my $const_init = bless({vars => \@var_objs, type => $type}, 'Sidef::Variable::ConstInit');
+
+    if (/\G\h*=\h*/gc) {
+        $self->fatal_error(
+                           code  => $_,
+                           pos   => pos($_) - 2,
+                           error => qq{the correct syntax is: `$type(x = ..., y = ...)`},
+                          );
+    }
+
+    return $const_init;
+}
+
+# Struct declaration
+sub _parse_struct {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my ($name, $class_name);
+    if (/\G($self->{var_name_re})\h*/goc) {
+        ($name, $class_name) = $self->get_name_and_class($1);
+    }
+
+    defined($name) and $self->_check_reserved_name($_, $name, pos($_) - length($name));
+
+    my $struct = bless(
+                       {
+                        name  => $name,
+                        class => $class_name,
+                       },
+                       'Sidef::Variable::Struct'
+                      );
+
+    if (defined $name) {
+        $self->_unshift_var(
+                            $class_name,
+                            {
+                             obj   => $struct,
+                             name  => $name,
+                             count => 0,
+                             type  => 'struct',
+                             line  => $self->{line},
+                            }
+                           );
+    }
+
+    my $vars = $self->parse_init_vars(
+                                      code    => $opt{code},
+                                      type    => 'var',
+                                      private => 1,
+                                     );
+
+    $struct->{vars} = $vars;
+
+    return $struct;
+}
+
+# Subset declaration
+sub _parse_subset {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my ($name, $class_name);
+    if (/\G($self->{var_name_re})\h*/goc) {
+        ($name, $class_name) = $self->get_name_and_class($1);
+    }
+    else {
+        $self->fatal_error(
+                           code  => $_,
+                           pos   => pos($_),
+                           error => "expected a name after the keyword 'subset'",
+                          );
+    }
+
+    $self->_check_reserved_name($_, $name, (pos($_) - length($name)));
+
+    my $subset = bless({name => $name, class => $class_name}, 'Sidef::Variable::Subset');
+
+    $self->_unshift_var(
+                        $class_name,
+                        {
+                         obj   => $subset,
+                         name  => $name,
+                         count => 0,
+                         type  => 'subset',
+                         line  => $self->{line},
+                        }
+                       );
+
+    # Inheritance
+    if (/\G<<?\h*/gc) {
+        {
+            my ($name) = /\G($self->{var_name_re})\h*/goc;
+
+            $name // $self->fatal_error(
+                                        code  => $_,
+                                        pos   => pos($_),
+                                        error => "expected a type name for subsetting",
+                                       );
+
+            my $code = $name;
+            my $type = $self->parse_expr(code => \$code);
+
+            push @{$subset->{inherits}}, $type;
+
+            /\G,\h*/gc && redo;
+        }
+    }
+
+    if (/\G(?=\{)/) {
+        my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
+        $subset->{block} = $block;
+    }
+
+    return $subset;
+}
+
+# Declaration of enums
+sub _parse_enum {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $vars = $self->parse_init_vars(
+                                      code    => $opt{code},
+                                      type    => 'var',
+                                      private => 1,
+                                     );
+
+    @{$vars}
+      || $self->fatal_error(
+                            code  => $_,
+                            pos   => pos($_),
+                            error => q{expected one or more variable names after <enum>},
+                           );
+
+    my $value = Sidef::Types::Number::Number::_set_int(-1);
+
+    foreach my $var (@{$vars}) {
+        my $name = $var->{name};
+
+        if (ref $var->{value} eq 'HASH') {
+            $var->{value} = $var->{value}{$self->{class}}[-1]{self};
+        }
+
+        $value =
+            $var->{has_value}
+          ? $var->{value}
+          : $value->inc;
+
+        $self->_check_reserved_name($_, $name, (pos($_) - length($name)));
+
+        $self->_unshift_var(
+                            $self->{class},
+                            {
+                             obj   => $value,
+                             name  => $name,
+                             count => 0,
+                             type  => 'enum',
+                             line  => $self->{line},
+                            }
+                           );
+    }
+
+    return $value;
+}
+
+# Local variables
+sub _parse_local {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $expr = $self->parse_obj(code => $opt{code}, prec => PREC_OPERAND);
+
+    $expr // $self->fatal_error(
+                                code  => $_,
+                                pos   => pos($_),
+                                error => "expected a variable after `local`",
+                               );
+
+    return bless({expr => $expr}, 'Sidef::Variable::Local');
+}
+
+# ---------------------------------------------------------------------------
+# Declarations: classes, functions and methods
+# ---------------------------------------------------------------------------
+
+# Declaration of classes, methods and functions
+sub _parse_function_or_class {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $type =
+        $opt{match} eq '->'
+      ? exists($self->{current_class}) && !(exists($self->{current_method}))
+          ? 'method'
+          : 'func'
+      : $opt{match};
+
+    my ($name, $class_name, $built_in_obj) = $self->_parse_declaration_name($type, code => $opt{code});
+
+    my ($obj, $has_kids, $parent) = $self->_declare_function_or_class($type, $name, $class_name, $built_in_obj, code => $opt{code});
+
+    if ($type eq 'class') {
+        $self->_parse_class_definition($obj, $name, $built_in_obj, code => $opt{code});
+    }
+    else {
+        $self->_parse_function_definition($obj, $type, $name, $has_kids, $parent, code => $opt{code});
+    }
+
+    return $obj;
+}
+
+# Parses the name of a class, function or method: returns (name, namespace, built-in object)
+sub _parse_declaration_name {
+    my ($self, $type, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $name       = '';
+    my $class_name = $self->{class};
+    my $built_in_obj;
+
+    if ($type eq 'class' and /\G($self->{var_name_re})\h*/gco) {
+
+        $name = $1;
+
+        if (exists($self->{built_in_classes}{$name}) and /\G(?=[{<])/) {
+
+            my ($obj) = $self->parse_expr(code => \$name);
+
+            if (defined($obj)) {
+                $name         = '';
+                $built_in_obj = $obj;
+            }
+        }
+        else {
+            ($name, $class_name) = $self->get_name_and_class($1);
+        }
+    }
+
+    if ($type eq 'method') {
+        $name = (
+                   /\G($self->{method_name_re})\h*/goc ? $1
+                 : /\G($self->{operators_re})\h*/goc   ? $+
+                 :                                       ''
+                );
+        ($name, $class_name) = $self->get_name_and_class($name);
+    }
+    elsif ($type ne 'class') {
+        $name = /\G($self->{var_name_re})\h*/goc ? $1 : '';
+        ($name, $class_name) = $self->get_name_and_class($name);
+    }
+
+    if ($type ne 'method' and $type ne 'class') {
+        $self->_check_reserved_name($_, $name, $-[0]);
+    }
+
+    return ($name, $class_name, $built_in_obj);
+}
+
+# Creates the object of a class, function or method, and registers it in the current scope
+# Returns: (object, true when it's a new definition of an existing function, the existing function)
+sub _declare_function_or_class {
+    my ($self, $type, $name, $class_name, $built_in_obj, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $obj =
+        ($type eq 'func' or $type eq 'method') ? bless({name => $name, type => $type, class => $class_name}, 'Sidef::Variable::Variable')
+      : $type eq 'class' ? bless({name => ($built_in_obj // $name), class => $class_name}, 'Sidef::Variable::ClassInit')
+      : $self->fatal_error(
+                           error  => "invalid type",
+                           reason => "expected a magic thing to happen",
+                           code   => $_,
+                           pos    => pos($_),
+                          );
+
+    if ($name ne '') {
+        my $var = $self->find_var($name, $class_name);
+
+        if (defined($var) and $var->{type} eq 'class') {
+            $obj->{parent} = $var->{obj};
+            push @{$obj->{inherit}}, ref($var->{obj}{name}) ? $var->{obj}{name} : $var->{obj};
+        }
+    }
+
+    my $has_kids = 0;
+    my $parent;
+    if (($type eq 'method' or $type eq 'func') and $name ne '') {
+        my $var = $self->find_var($name, $class_name);
+
+        # A function or a method must be declared in the same scope
+        if (defined($var) and $var->{obj}{type} eq $type) {
+
+            $parent   = $var->{obj};
+            $has_kids = 1;
+
+            $parent->{has_kids} = 1;
+            $obj->{parent}      = $parent;
+        }
+    }
+
+    if (not $has_kids) {
+        $self->_unshift_var(
+                            $class_name,
+                            {
+                             obj   => $obj,
+                             name  => $name,
+                             count => 0,
+                             type  => $type,
+                             line  => $self->{line},
+                            }
+                           );
+    }
+
+    return ($obj, $has_kids, $parent);
+}
+
+# Parses the parameters, the inheritance list and the block of a class
+sub _parse_class_definition {
+    my ($self, $obj, $name, $built_in_obj, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $var_names =
+      $self->parse_init_vars(
+                             code         => $opt{code},
+                             params       => 1,
+                             private      => 1,
+                             type         => 'has',
+                             ignore_delim => {
+                                              '{' => 1,
+                                              '<' => 1,
+                                             },
+                            );
+
+    # Set the class parameters
+    $obj->{vars} = $var_names;
+
+    $self->_parse_class_inheritance($obj, code => $opt{code});
+
+    /\G\h*(?=\{)/gc
+      || $self->fatal_error(
+                            error  => "invalid class declaration",
+                            reason => "expected: class $name(...){...}",
+                            code   => $_,
+                            pos    => pos($_)
+                           );
+
+    local $self->{class_name}    = (defined($built_in_obj) ? ref($built_in_obj) : $obj->{name});
+    local $self->{current_class} = $built_in_obj // $obj;
+    my $block = $self->parse_block(code => $opt{code});
+
+    # Set the block of the class
+    $obj->{block} = $block;
+
+    return;
+}
+
+# Class inheritance: class Name(...) << Name1, Name2
+sub _parse_class_inheritance {
+    my ($self, $obj, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    # Class inheritance (class Name(...) << Name1, Name2)
+    if (/\G\h*<<?\h*/gc) {
+        while (/\G($self->{var_name_re})\h*/gco) {
+            my ($name, $class_name) = $self->get_name_and_class($1);
+            if (defined(my $class = $self->find_var($name, $class_name))) {
+                if ($class->{type} eq 'class') {
+
+                    # Detect inheritance from the same class
+                    if (refaddr($obj) == refaddr($class->{obj})) {
+                        $self->fatal_error(
+                                           error => "Inheriting from the same class is not allowed",
+                                           code  => $_,
+                                           pos   => pos($_) - length($name) - 1,
+                                          );
+                    }
+
+                    ++$class->{count};
+                    push @{$obj->{inherit}}, $class->{obj};
+                }
+                else {
+                    $self->fatal_error(
+                                       error  => "this is not a class",
+                                       reason => "expected a class name",
+                                       code   => $_,
+                                       pos    => pos($_) - length($name) - 1,
+                                      );
+                }
+            }
+            elsif (exists $self->{built_in_classes}{$name}) {
+                $self->fatal_error(
+                                   error  => "Inheriting from built-in classes is not supported",
+                                   reason => "`$name` is a built-in class",
+                                   code   => $_,
+                                   pos    => pos($_) - length($name) - 1,
+                                  );
+            }
+            else {
+                $self->fatal_error(
+                                   error  => "can't find `$name` class",
+                                   reason => "expected an existent class name",
+                                   var    => ($class_name . '::' . $name),
+                                   code   => $_,
+                                   pos    => pos($_) - length($name) - 1,
+                                  );
+            }
+
+            /\G,\h*/gc;
+        }
+    }
+
+    return;
+}
+
+# Parses the signature, the traits, the return types and the block of a function or a method
+sub _parse_function_definition {
+    my ($self, $obj, $type, $name, $has_kids, $parent, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $var_names = do {
+        local $self->{allow_class_variable} = 1 if $type eq 'method';
+        $self->get_init_vars(
+                             code         => $opt{code},
+                             with_vals    => 1,
+                             ignore_delim => {
+                                              '{' => 1,
+                                              '-' => 1,
+                                             }
+                            );
+    };
+
+    $self->_parse_function_traits($obj, $type, code => $opt{code});
+    $self->_parse_return_types($obj, $type, $name, code => $opt{code});
+
+    my $brace_pos;
+    (/\G\h*(?=\{)/gc and ($brace_pos = pos($_)) and /\G\{\h*/gc)
+      || $self->fatal_error(
+                            error  => "invalid `$type` declaration",
+                            reason => "expected: $type $name(...){...}",
+                            code   => $_,
+                            pos    => pos($_)
+                           );
+
+    local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $has_kids ? $parent : $obj;
+    my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
+
+    # The parameters are parsed from a separate string, to avoid copying the rest of the code
+    my $block = $self->parse_block(
+                                   code      => $opt{code},
+                                   with_vars => 1,
+                                   init_code => \$args,
+                                   no_brace  => $brace_pos,
+                                  );
+
+    # Set the block of the function/method
+    $obj->{value} = $block;
+
+    return;
+}
+
+# Functions and method traits (example: "is cached")
+sub _parse_function_traits {
+    my ($self, $obj, $type, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    if (/\G\h*is\h+(?=\w)/gc) {
+        while (/\G(\w+)/gc) {
+            my $trait = $1;
+            if ($trait eq 'cached') {
+                $obj->{cached} = 1;
+            }
+
+            else {
+                $self->fatal_error(
+                                   error => "Unknown $type trait: $trait",
+                                   code  => $_,
+                                   pos   => pos($_),
+                                  );
+            }
+
+            /\G\h*,\h*/gc || last;
+        }
+    }
+
+    return;
+}
+
+# Function return type: func name(...) -> Type {...}
+sub _parse_return_types {
+    my ($self, $obj, $type, $name, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    if (/\G\h*->\h*/gc) {
+
+        my @ref;
+        if (/\G\(/gc) {    # multiple types
+            while (1) {
+                my ($ref) = $self->parse_expr(code => $opt{code});
+                push @ref, $ref;
+
+                /\G\s*\)/gc && last;
+                /\G\s*,\s*/gc
+                  || $self->fatal_error(
+                                        error  => "invalid return-type for $type $self->{class_name}<<$name>>",
+                                        reason => "expected a comma",
+                                        code   => $_,
+                                        pos    => pos($_),
+                                       );
+            }
+        }
+        else {    # only one type
+            my ($ref) = $self->parse_expr(code => $opt{code});
+            push @ref, $ref;
+        }
+
+        foreach my $ref (@ref) {
+            if (ref($ref) eq 'HASH') {
+                $self->fatal_error(
+                                   error  => "invalid return-type for $type $self->{class_name}<<$name>>",
+                                   reason => "expected a valid type, such as: Str, Num, Arr, etc...",
+                                   code   => $_,
+                                   pos    => pos($_),
+                                  );
+            }
+        }
+
+        $obj->{returns} = \@ref;
+    }
+
+    return;
+}
+
+# ---------------------------------------------------------------------------
+# Control flow: given/when, try/catch, gather/take
+# ---------------------------------------------------------------------------
+
+# "given(expr) {...}" construct
+sub _parse_given {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $expr = $self->_parse_arg_or_obj(code => $opt{code});
+
+    $expr // $self->fatal_error(
+                                error  => "invalid declaration of the `given/when` construct",
+                                reason => "expected `given(expr) {...}`",
+                                code   => $_,
+                                pos    => pos($_),
+                               );
+
+    my $given_obj = bless({expr => $expr}, 'Sidef::Types::Block::Given');
+    local $self->{current_given} = $given_obj;
+    my $block = (
+                 /\G\h*(?=\{)/gc
+                 ? $self->parse_block(code => $opt{code}, topic_var => 1)
+                 : $self->fatal_error(
+                                      error => "expected a block after `given(expr)`",
+                                      code  => $_,
+                                      pos   => pos($_),
+                                     )
+                );
+
+    $given_obj->{block} = $block;
+
+    return $given_obj;
+}
+
+# "when(expr) {...}" construct
+sub _parse_when {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $expr = $self->_parse_arg_or_obj(code => $opt{code});
+
+    $expr // $self->fatal_error(
+                                error  => "invalid declaration of the `when` construct",
+                                reason => "expected `when(expr) {...}`",
+                                code   => $_,
+                                pos    => pos($_),
+                               );
+
+    my $block = (
+                 /\G\h*(?=\{)/gc
+                 ? $self->parse_block(code => $opt{code}, with_vars => 1)
+                 : $self->fatal_error(
+                                      error => "expected a block after `when(expr)`",
+                                      code  => $_,
+                                      pos   => pos($_),
+                                     )
+                );
+
+    return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::When');
+}
+
+# "case(expr) {...}" construct
+sub _parse_case {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $expr = $self->_parse_arg_or_obj(code => $opt{code});
+
+    $expr // $self->fatal_error(
+                                error  => "invalid declaration of the `case` construct",
+                                reason => "expected `case(expr) {...}`",
+                                code   => $_,
+                                pos    => pos($_),
+                               );
+
+    my $block = (
+                 /\G\h*(?=\{)/gc
+                 ? $self->parse_block(code => $opt{code}, with_vars => 1)
+                 : $self->fatal_error(
+                                      error => "expected a block after `case(expr)`",
+                                      code  => $_,
+                                      pos   => pos($_),
+                                     )
+                );
+
+    return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::Case');
+}
+
+# "try/catch" construct
+sub _parse_try {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $try_block = $self->parse_block(code => $opt{code});
+    my $obj       = bless({try => $try_block}, 'Sidef::Types::Block::Try');
+
+    $self->parse_whitespace(code => $opt{code});
+
+    if (/\Gcatch\h*(?=\{)/gc) {
+        $obj->{catch} = $self->parse_block(code => $opt{code}, with_vars => 1);
+    }
+    else {
+        $self->backtrack_whitespace(code => $opt{code});
+    }
+
+    return $obj;
+}
+
+# "gather/take" construct
+sub _parse_gather {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $obj = bless({}, 'Sidef::Types::Block::Gather');
+
+    local $self->{current_gather} = $obj;
+
+    my $block = $self->parse_block(code => $opt{code});
+    $obj->{block} = $block;
+
+    return $obj;
+}
+
+# ---------------------------------------------------------------------------
+# Modules, imports and includes
+# ---------------------------------------------------------------------------
+
+# Declaration of a module
+sub _parse_module {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $name =
+      /\G($self->{var_name_re})\h*/goc
+      ? $1
+      : $self->fatal_error(
+                           error  => "invalid module declaration",
+                           reason => "expected a name",
+                           code   => $_,
+                           pos    => pos($_)
+                          );
+
+    $self->parse_whitespace(code => $opt{code});
+
+    if (/\G(?=\{)/) {
+        my $prev_class = $self->{class};
+        local $self->{class} = $name;
+        my $obj = $self->parse_block(code => $opt{code}, is_module => 1, prev_class => $prev_class);
+
+        return
+          bless {
+                 name  => $name,
+                 block => $obj
+                },
+          'Sidef::Meta::Module';
+    }
+    else {
+        $self->fatal_error(
+                           error  => "invalid module declaration",
+                           reason => "expected: module $name {...}",
+                           code   => $_,
+                           pos    => pos($_)
+                          );
+    }
+}
+
+# Imports variables from another namespace: import Name1, Name2
+sub _parse_import {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $import_pos = pos($_);
+
+    my $var_names = $self->get_init_vars(code      => $opt{code},
+                                         with_vals => 0);
+
+    $self->backtrack_whitespace(code => $opt{code});
+
+    @{$var_names}
+      || $self->fatal_error(
+                            code  => $_,
+                            pos   => $import_pos,
+                            error => "expected a variable-like name for importing!",
+                           );
+
+    foreach my $var_name (@{$var_names}) {
+        my ($name, $class) = $self->get_name_and_class($var_name);
+
+        if ($class eq ($self->{class})) {
+            $self->fatal_error(
+                               code  => $_,
+                               pos   => $import_pos,
+                               error => "can't import '${class}::${name}' into the same namespace",
+                              );
+        }
+
+        my $var = $self->find_var($name, $class);
+
+        if (not defined $var) {
+            $self->fatal_error(
+                               code  => $_,
+                               pos   => $import_pos,
+                               error => "variable '${class}::${name}' does not exists",
+                              );
+        }
+
+        $var->{count}++;
+
+        $self->_unshift_var(
+                            $self->{class},
+                            {
+                             obj   => $var->{obj},
+                             name  => $name,
+                             count => 0,
+                             type  => $var->{type},
+                             line  => $self->{line},
+                            }
+                           );
+    }
+
+    return 1;
+}
+
+# Parses an include statement: `include Module::Name` or `include "file.sf"`
+sub _parse_include {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $include_pos = pos($_);
+
+    $self->_init_include_paths;
+
+    my @abs_filenames;
+
+    if (/\G($self->{var_name_re})/gc) {
+        my $module = $self->_find_module_file($1, $include_pos, code => $opt{code});
+
+        # The module is already available -- skip
+        defined($module) || return REDO_PARSE;
+
+        push @abs_filenames, $module;
+    }
+    else {
+        push @abs_filenames, $self->_resolve_include_files($include_pos, code => $opt{code});
+    }
+
+    return $self->_load_included_files(\@abs_filenames, $include_pos, code => $opt{code});
+}
+
+# The directories where the included files are searched
+sub _init_include_paths {
+    my ($self) = @_;
+
+    state $x = do {
+        require Cwd;
+        require File::Spec;
+        require File::Basename;
+    };
+
+    if (@{$self->{inc}} == 0) {
+        push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
+
+        push @{$self->{inc}}, File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
+
+        if (-f $self->{script_name}) {
+            push @{$self->{inc}}, File::Basename::dirname(Cwd::abs_path($self->{script_name}));
+        }
+
+        push @{$self->{inc}}, File::Spec->curdir;
+    }
+    return;
+}
+
+# Finds the file of a module: returns [path, module name], or nothing when the module is already available
+sub _find_module_file {
+    my ($self, $var_name, $include_pos, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    # The module is defined in the current file -- skip
+    if (exists $self->{ref_vars}{$var_name}) {
+        return;
+    }
+
+    # The module was already included -- skip
+    if (exists $Sidef::INCLUDED{$var_name}) {
+        return;
+    }
+
+    my @path     = split(/::/, $var_name);
+    my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
+
+    $Sidef::INCLUDED{$var_name} = $mod_path;
+
+    my ($full_path, $found_module);
+    foreach my $inc_dir (@{$self->{inc}}) {
+        if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
+            and -f _
+            and -r _ ) {
+            $found_module = 1;
+            last;
+        }
+    }
+
+    $found_module // $self->fatal_error(
+                                        code  => $_,
+                                        pos   => $include_pos,
+                                        error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
+                                       );
+
+    return [$full_path, $var_name];
+}
+
+# Resolves the files of an include expression: returns a list of [path]
+sub _resolve_include_files {
+    my ($self, $include_pos, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $orig_dir  = Cwd::getcwd();
+    my $orig_file = Cwd::abs_path($self->{file_name});
+    my $file_dir  = File::Basename::dirname($orig_file);
+
+    # The working directory is restored when the guard is destroyed (even when an error is thrown)
+    my $restore_dir;
+    if ($orig_dir ne $file_dir) {
+        if (chdir($file_dir)) {
+            $restore_dir = bless(sub { chdir($orig_dir) }, 'Sidef::Parser::DirectoryGuard');
+        }
+    }
+
+    my $expr = do {
+        my ($obj) = $self->parse_expr(code => $opt{code});
+        $obj;
+    };
+
+    my @files = (
+        ref($expr) eq 'HASH'
+        ? do {
+            map { $_->{self} }
+            map { @{$_->{self}->{$self->{class}}} }
+            map { @{$expr->{$_}} }
+              keys %{$expr};
+          }
+        : $expr
+    );
+
+    my @resolved = map {
+        my $filename = $_;
+
+        if (index(ref($filename), 'Sidef::') == 0) {
+            $filename = $filename->get_value;
+        }
+
+        ref($filename) ne ''
+          and $self->fatal_error(
+                                 code  => ${$opt{code}},
+                                 pos   => $include_pos,
+                                 error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
+                                );
+
+        my @files;
+        foreach my $file (glob($filename)) {
+
+            my $resolved = 0;
+            foreach my $base ('', @{$self->{inc}}) {
+                my $abs_path = File::Spec->rel2abs($file, $base) // next;
+
+                if (-f $abs_path) {
+                    push @files, $abs_path;
+                    $resolved = 1;
+                    last;
+                }
+            }
+
+            if (!$resolved) {
+                $self->fatal_error(
+                                   code  => ${$opt{code}},
+                                   pos   => $include_pos,
+                                   error => "include-error: could not resolve path to file `$file`",
+                                  );
+            }
+        }
+
+        foreach my $file (@files) {
+            if (exists $Sidef::INCLUDED{$file}) {
+                $self->fatal_error(
+                                   code  => ${$opt{code}},
+                                   pos   => $include_pos,
+                                   error => "include-error: circular inclusion of file `$file`",
+                                  );
+            }
+        }
+
+        map { [$_] } @files
+    } @files;
+
+    return @resolved;
+}
+
+# Parses the included files: returns a `Sidef::Meta::Included` object
+sub _load_included_files {
+    my ($self, $abs_filenames, $include_pos, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my @included;
+
+    foreach my $pair (@{$abs_filenames}) {
+
+        my ($full_path, $name) = @{$pair};
+
+        open(my $fh, '<:utf8', $full_path)
+          || $self->fatal_error(
+                                code  => ${$opt{code}},
+                                pos   => $include_pos,
+                                error => "can't open file `$full_path`: $!"
+                               );
+
+        my $content = do { local $/; <$fh> };
+        close $fh;
+
+        utf8::downgrade($content, 1);    # faster to parse, when there are no wide characters
+
+        next if $Sidef::INCLUDED{$full_path};
+
+        local $self->{class}               = $name if defined $name;    # new namespace
+        local $self->{line}                = 1;
+        local $self->{file_name}           = $full_path;
+        local $Sidef::INCLUDED{$full_path} = 1;
+
+        my $ast = $self->parse_script(code => \$content);
+
+        push @included,
+          {
+            name => $name,
+            file => $full_path,
+            ast  => $ast,
+          };
+    }
+
+    return bless({included => \@included}, 'Sidef::Meta::Included');
+}
+
+# ---------------------------------------------------------------------------
+# Operands: prefix operators, control-flow statements, calls and indices
+# ---------------------------------------------------------------------------
+
+sub parse_operand {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    if (not($opt{multiline}) and /\G\h*(?=\R)/gc) {
+        $self->fatal_error(
+                           code  => $_,
+                           pos   => pos($_) - 1,
+                           error => "unexpected end-of-statement",
+                          );
+    }
+
+    my ($obj, $obj_key, $method) = $self->parse_expr(code => $opt{code});
+
+    defined($obj) || return;
+
+    my %struct = ($self->{class} => [{self => $obj}]);
+    my $wrap;
+
+    # for (var in array) { ... }
+    my $for_paren = 0;
+    if (ref($obj) eq 'Sidef::Types::Block::For'
+        and /\G\h*\((?=\h*[*:]?$self->{var_name_re}(?:\h*,\h*[*:]?$self->{var_name_re})*\h+(?:in|∈)\b)/goc) {
+        $for_paren = 1;
+        /\G\h*/gc;
+    }
+
+    # for var in array { ... }
+    if ($for_paren or (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h*(?=[*:]?$self->{var_name_re})/goc)) {
+        $self->_parse_for_in_loop($obj, $for_paren, code => $opt{code});
+    }
+
+    # A prefix operator or a control-flow keyword, followed by an argument
+    elsif ($obj_key) {
+        $wrap = $self->_parse_prefix_expression($obj, $method, \%struct, code => $opt{code});
+    }
+
+    $self->_parse_postfix(\%struct, $obj, code => $opt{code});
+
+    return (wantarray ? (\%struct, $wrap) : \%struct);
+}
+
+# Parses the argument of a prefix operator or of a keyword (e.g.: -x, !x, say x, return x, if (x) {...})
+sub _parse_prefix_arg {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $obj    = $opt{obj};
+    my $method = $opt{method};
+    my $ref    = ref($obj);
+
+    # Bare `return` (without a value): `return`, `return;`, `return if cond`, `cond or return`
+    if ($ref eq 'Sidef::Types::Block::Return'
+        and /\G(?=\h*(?:[;})\]#]|\R|\z|(?:if|unless|while|until|and|or)\b))/) {
+        return {};
+    }
+
+    # Block constructs: if (...) {...}, while (...) {...}, for (...) {...}, etc.
+    if ($ref =~ /^Sidef::Types::Block::(?:If|With|While|ForEach|For)\z/) {
+        return (
+                /\G(?=\()/
+                ? $self->parse_arg(code => $opt{code})
+                : $self->parse_obj(code => $opt{code}, prec => PREC_ASSIGN)
+               );
+    }
+
+    # Function-style operators: say (...), print (...), defined (...), @(...), :(...)
+    # The operator is applied only on the parenthesized expression, and any method call
+    # that follows is applied on the result: `@(1..2).combinations(2)` is `(@(1..2)).combinations(2)`
+    if (
+        $ref eq 'Sidef::Meta::PrefixColon'
+        or (
+            $ref eq 'Sidef::Operator::Unary'
+            and (   $method eq 'say'
+                 or $method eq 'print'
+                 or $method eq 'defined'
+                 or $method eq '>'
+                 or $method eq '>>'
+                 or $method eq '+'
+                 or $method eq '@'
+                 or $method eq '@|')
+           )
+      ) {
+        if (/\G(?=\()/) {
+            return $self->parse_arg(code => $opt{code});
+        }
+    }
+
+    # Prefix operators (! ~ \ + * √ ^ @ @|) are applied on the next operand: `!a == b` is `(!a) == b`
+    my $prec = PREC_OPERAND;
+
+    if ($ref eq 'Sidef::Operator::Unary') {
+        if ($method eq '-') {    # `-a ** b` is `-(a ** b)`
+            $prec = PREC_POW;
+        }
+        elsif ($method eq 'defined') {    # named unary operator: `defined a + 1` is `defined(a + 1)`
+            $prec = PREC_SHIFT;
+        }
+        elsif ($method eq 'say' or $method eq 'print' or $method eq '>' or $method eq '>>') {    # list operators
+            $prec = PREC_ASSIGN;
+        }
+        elsif ($method eq '@' or $method eq '@|') {
+            $prec = PREC_RANGE;
+        }
+    }
+    elsif ($ref eq 'Sidef::Variable::Ref' or $ref eq 'Sidef::Meta::PrefixColon') {
+        $prec = PREC_OPERAND;
+    }
+    else {    # return, read, goto
+        $prec = PREC_ASSIGN;
+    }
+
+    return $self->parse_obj(code => $opt{code}, prec => $prec);
+}
+
+# Parses the argument of a prefix operator or of a control-flow keyword.
+# Returns true when the result is a new operand (a call of a prefix operator).
+sub _parse_prefix_expression {
+    my ($self, $obj, $method, $struct, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $arg = $self->_parse_prefix_arg(code => $opt{code}, obj => $obj, method => $method);
+
+    defined($arg)
+      || $self->fatal_error(
+                            code  => $_,
+                            error => "expected an argument. Did you mean '$method()' instead?",
+                            pos   => pos($_) - 1,
+                           );
+
+    my $ref = ref($obj);
+
+    if ($ref eq 'Sidef::Types::Block::For') {
+        $self->_parse_for_statement($obj, $arg, code => $opt{code});
+    }
+    elsif ($ref eq 'Sidef::Types::Block::ForEach') {
+        $obj->{block} = $self->_parse_control_block(
+                                                    "invalid declaration of the `foreach` loop",
+                                                    "expected a block after `foreach(...)`",
+                                                    code       => $opt{code},
+                                                    block_opts => {topic_var => 1},
+                                                   );
+        $obj->{expr} = $arg;
+    }
+    elsif ($ref eq 'Sidef::Types::Block::If') {
+
+        # `unless (cond) {...}` is the same as `if (!cond) {...}`
+        $arg = $self->_negate($arg) if $method eq 'unless';
+
+        $self->_parse_conditional_statement(
+                                            $obj, $arg,
+                                            code       => $opt{code},
+                                            name       => 'if',
+                                            list       => 'if',
+                                            next_re    => qr/\G(?:elsif|else\h+if)\h*(?=\()/,
+                                            next_name  => 'elsif',
+                                            block_opts => {with_vars => 1},
+                                           );
+    }
+    elsif ($ref eq 'Sidef::Types::Block::With') {
+        $self->_parse_conditional_statement(
+                                            $obj, $arg,
+                                            code       => $opt{code},
+                                            name       => 'with',
+                                            list       => 'with',
+                                            next_re    => qr/\Gorwith\h*(?=\()/,
+                                            next_name  => 'orwith',
+                                            block_opts => {topic_var => 1},
+                                           );
+    }
+    elsif ($ref eq 'Sidef::Types::Block::While') {
+
+        # `until (cond) {...}` is the same as `while (!cond) {...}`
+        $arg = $self->_negate($arg) if $method eq 'until';
+
+        $obj->{block} = $self->_parse_control_block(
+                                                    "invalid declaration of the `while` statement",
+                                                    "expected a block after `while(...)`",
+                                                    code       => $opt{code},
+                                                    block_opts => {with_vars => 1},
+                                                   );
+        $obj->{expr} = $arg;
+    }
+    else {
+        push @{$struct->{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg]};
+        return 1;    # the result of a prefix operator is a new operand
+    }
+
+    return 0;
+}
+
+# Parses a `for` loop with variables: for var in array {...}
+sub _parse_for_in_loop {
+    my ($self, $obj, $for_paren, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $class_name = $self->{class};
+
+    my @loops;
+    {
+        my @vars;
+        while (/\G([*:])?($self->{var_name_re})/gc) {
+
+            my $type = $1;
+            my $name = $2;
+            push @vars,
+              bless(
+                    {
+                     name  => $name,
+                     type  => 'var',
+                     class => $class_name,
+                     (
+                      $type
+                      ? (
+                         slurpy => 1,
+                         ($type eq '*' ? (array => 1) : (hash => 1)),
+                        )
+                      : ()
+                     ),
+                    },
+                    'Sidef::Variable::Variable'
+                   );
+
+            $self->_unshift_var(
+                                $class_name,
+                                {
+                                 obj   => $vars[-1],
+                                 name  => $name,
+                                 count => 1,
+                                 type  => 'var',
+                                 line  => $self->{line},
+                                }
+                               );
+
+            $type && last;
+            /\G\h*,\h*/gc || last;
+        }
+
+        /\G\h*(?:in|∈|=|)\h*/gc
+          || $self->fatal_error(
+                                error => "expected the token <<in>> after variable declaration in for-loop",
+                                code  => $_,
+                                pos   => pos($_),
+                               );
+
+        my $expr = $self->_parse_arg_or_obj(code => $opt{code});
+
+        push @loops,
+          {
+            vars => \@vars,
+            expr => $expr,
+          };
+
+        /\G\h*,\h*/gc && redo;
+    }
+
+    if ($for_paren) {
+        $self->parse_whitespace(code => $opt{code});
+        /\G\)/gc
+          || $self->fatal_error(
+                                error => "unbalanced parenthesis in the `for` loop",
+                                code  => $_,
+                                pos   => pos($_),
+                               );
+    }
+
+    my $block = (
+                 /\G\h*(?=\{)/gc
+                 ? $self->parse_block(code => $opt{code})
+                 : $self->fatal_error(
+                                      error  => "invalid declaration of the `for` loop",
+                                      reason => "expected a block after the loop expression: for x in expr { ... }",
+                                      code   => $_,
+                                      pos    => pos($_),
+                                     )
+                );
+
+    # Remove the for-loop variables from the outer scope
+#<<<
+    my %loop_vars = map {
+        map { refaddr($_) => 1 } @{$_->{vars}}
+    } @loops;
+
+    @{$self->{vars}{$class_name}} = grep {
+           ref($_) ne 'HASH'
+        or not exists $loop_vars{refaddr($_->{obj})}
+    } @{$self->{vars}{$class_name}};
+#>>>
+
+    # Store the info
+    $obj->{block} = $block;
+    $obj->{loops} = \@loops;
+
+    # Re-bless the $obj into a different class
+    bless $obj, 'Sidef::Types::Block::ForIn';
+
+    return;
+}
+
+# Parses the rest of a `for` loop: `for(;;) {...}` or `for(...) {...}`
+sub _parse_for_statement {
+    my ($self, $obj, $arg, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $class = $self->{class};
+
+    # for(init; condition; step) {...}
+    if ($#{$arg->{$class}} == 2) {
+
+        my @arg = map {
+            { $class => [$_] }
+        } @{$arg->{$class}};
+
+        $obj->{block} = $self->_parse_control_block("invalid declaration of the `for` loop", "expected a block after `for(;;)`", code => $opt{code},);
+        $obj->{expr}  = \@arg;
+
+        bless $obj, 'Sidef::Types::Block::CFor';
+    }
+
+    # for(array) {...}
+    elsif ($#{$arg->{$class}} == 0) {
+
+        $obj->{block} = $self->_parse_control_block(
+                                                    "invalid declaration of the `for` loop",
+                                                    "expected a block after `for(...)`",
+                                                    code       => $opt{code},
+                                                    block_opts => {topic_var => 1},
+                                                   );
+        $obj->{expr} = $arg;
+
+        bless $obj, 'Sidef::Types::Block::ForEach';
+    }
+
+    else {
+        $self->fatal_error(
+                           code  => $_,
+                           pos   => pos($_) - 1,
+                           error => "invalid declaration of the `for` loop: incorrect number of arguments",
+                          );
+    }
+
+    return;
+}
+
+# Parses the blocks of an `if` (`elsif`, `else`) or a `with` (`orwith`, `else`) statement
+sub _parse_conditional_statement {
+    my ($self, $obj, $arg, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my ($name, $list, $next_name) = @opt{qw(name list next_name)};
+
+    my $block = $self->_parse_control_block(
+                                            "invalid declaration of the `$name` statement",
+                                            "expected a block after `$name(...)`",
+                                            code       => $opt{code},
+                                            block_opts => $opt{block_opts},
+                                           );
+
+    push @{$obj->{$list}}, {expr => $arg, block => $block};
+
+    # elsif(...) {...} / orwith(...) {...}
+    while (1) {
+
+        $self->parse_whitespace(code => $opt{code});
+
+        /$opt{next_re}/gc || last;
+
+        my $next_arg = $self->parse_arg(code => $opt{code});
+        $self->parse_whitespace(code => $opt{code});
+
+        my $next_block = $self->parse_block(code => $opt{code}, %{$opt{block_opts}}) // $self->fatal_error(
+                                                                                                        code  => $_,
+                                                                                                        pos   => pos($_) - 1,
+                                                                                                        error => "invalid declaration of the `$name` statement",
+                                                                                                        reason => "expected a block after `$next_name(...)`",
+        );
+
+        push @{$obj->{$list}}, {expr => $next_arg, block => $next_block};
+    }
+
+    # else {...}
+    if (/\Gelse\h*(?=\{)/gc) {
+        $obj->{else}{block} = $self->parse_block(code => $opt{code});
+    }
+
+    $self->backtrack_whitespace(code => $opt{code});
+
+    return;
+}
+
+# Parses a block that follows the condition of a control-flow statement
+sub _parse_control_block {
+    my ($self, $error, $reason, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    /\G\h*(?=\{)/gc
+      || $self->fatal_error(
+                            code   => $_,
+                            pos    => pos($_) - 1,
+                            error  => $error,
+                            reason => $reason,
+                           );
+
+    return $self->parse_block(code => $opt{code}, %{$opt{block_opts} // {}});
+}
+
+# Parses the calls, the indices and the postfix operators that follow an operand
+sub _parse_postfix {
+    my ($self, $struct, $obj, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    {
+        # Method call
+        if (/\G\h*(?=\.\s*(?:$self->{method_name_re}|[(\$]))/ogc) {
+            my $methods = $self->parse_methods(code => $opt{code});
+            push @{$struct->{$self->{class}}[-1]{call}}, @{$methods};
+            redo;
+        }
+
+        # Method call on the next line (leading dot):
+        #
+        #   obj
+        #     .method1
+        #     .method2(...)
+        #
+        # A leading dot at the beginning of a statement is the implicit method
+        # call on the special variable `_`. When this variable doesn't exist,
+        # the dot continues the expression from the previous line.
+        if (/\G(?=(?:[ \t]*(?:#[^\r\n]*)?\R)+\s*\.(?![.0-9]))/
+            and not defined($self->find_var('_', $self->{class}))) {
+            $self->parse_whitespace(code => $opt{code});
+            redo;
+        }
+
+        # Operators used with the method-call syntax: `a .+ b`, or `a \.` followed by
+        # the operator on the next line. The operator binds tighter than any other operator.
+        if (/\G\h*(?:\\(?!\\)\s*)?(?=\.(?!\.)\s*(?:$self->{operators_re}))/ogc) {
+            my $methods = $self->parse_methods(code => $opt{code});
+            push @{$struct->{$self->{class}}[-1]{call}}, @{$methods};
+            redo;
+        }
+
+        # Code extended on a newline
+        if (/\G\h*\\(?!\\)/gc) {
+            $self->parse_whitespace(code => $opt{code});
+            redo;
+        }
+
+        # Object call
+        if (/\G\h*(?=\()/gc) {
+            my $arg = $self->parse_arg(code => $opt{code});
+
+            push @{$struct->{$self->{class}}[-1]{call}},
+              {
+                method => 'call',
+                (%{$arg} ? (arg => [$arg]) : ())
+              };
+
+            redo;
+        }
+
+        # Do-while construct
+        if (ref($obj) eq 'Sidef::Types::Block::Do' and /\G\h*(while|until)\b/gc) {
+            my $kind = $1;
+            my $arg  = $self->parse_obj(code => $opt{code});
+            $arg = $self->_negate($arg) if $kind eq 'until';
+            push @{$struct->{$self->{class}}[-1]{call}}, {keyword => 'while', arg => [$arg]};
+        }
+
+        # Parse array and hash fetchers ([...] and {...})
+        if (/\G\.\h*(?=[\[\{])/gc or 1) {
+            $self->parse_suffixes(code => $opt{code}, struct => $struct) && redo;
+        }
+
+        # Postfix operators (e.g.: x++, x--, n!, n!!, x...)
+        if (defined(my $token = $self->_peek_operator(code => $opt{code}, postfix_only => 1))) {
+            $self->append_method(
+                                 array   => \@{$struct->{$self->{class}}[-1]{call}},
+                                 method  => $token->{method},
+                                 op_type => $token->{op_type},
+                                );
+            redo;
+        }
+    }
+
+    return;
+}
+
+# Parses a chain of method calls (the first one can be preceded by an arrow): .name(...).name2
 sub parse_methods {
     my ($self, %opt) = @_;
 
@@ -3390,6 +4266,7 @@ sub parse_methods {
     return \@methods;
 }
 
+# Parses the indices and the calls that follow an expression: [...], {...}, (...)
 sub parse_suffixes {
     my ($self, %opt) = @_;
 
@@ -3469,27 +4346,84 @@ sub parse_suffixes {
     $parsed;
 }
 
-sub backtrack_whitespace {
+# Appends a method (or an operator) with its optional argument, to a list of calls.
+sub append_method {
+    my ($self, %opt) = @_;
+
+    # Hyper-operator
+    if (exists $self->{hyper_ops}{$opt{op_type}}) {
+        push @{$opt{array}},
+          {
+            method => $self->{hyper_ops}{$opt{op_type}}[1],
+            arg    => [$opt{method}],
+          };
+    }
+
+    # Basic operator/method
+    else {
+        push @{$opt{array}}, {method => $opt{method}};
+    }
+
+    # Append the argument (if any)
+    if (exists($opt{arg}) and (%{$opt{arg}} || ($opt{method} =~ /^$self->{operators_re}\z/))) {
+        push @{$opt{array}[-1]{arg}}, $opt{arg};
+    }
+}
+
+## get_method_name() returns the following values:
+# 1st: method/operator (or undef)
+# 2nd: a true value if the operator requires an argument
+# 3rd: type of operator (defined in $self->{hyper_ops})
+sub get_method_name {
     my ($self, %opt) = @_;
 
     local *_ = $opt{code};
 
-    # Backtrack the removal of whitespace
-    while (1) {
-        my $s = substr($_, pos($_) - 1, 1);
+    # Parse whitespace
+    $self->parse_whitespace(code => $opt{code});
 
-        if ($s =~ /\R/) {
-            $self->{line} -= 1;
-            pos($_) -= 1;
-            last;
-        }
-        elsif ($s =~ /\h/) {
-            pos($_) -= 1;
-        }
-        else {
-            last;
-        }
+    # Alpha-numeric method name
+    if (/\G((?:SUPER::)*$self->{method_name_re})/goc) {
+        return ($1, 0, '');
     }
+
+    # Super-script power
+    if (/\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/) {
+        return ('**', 1, 'op');
+    }
+
+    # Operator-like method name
+    if (m{\G$self->{operators_re}}goc) {
+        my ($key) = keys(%+);
+        return (
+                $+,
+                (
+                 exists($self->{hyper_ops}{$key})
+                 ? $self->{hyper_ops}{$key}[0]
+                 : not(exists $self->{postfix_ops}{$+})
+                ),
+                $key
+               );
+    }
+
+    # Method name as expression
+    my ($obj) = $self->parse_expr(code => $opt{code});
+    return ({self => $obj // return}, 0, '');
+}
+
+# Parses an expression, using the operator precedence rules.
+#
+# The `prec` option sets the minimum precedence of the operators that are consumed.
+# By default, a full expression is parsed (everything that binds tighter than
+# a comma). The statement-level expressions (see parse_script) also consume the
+# pair constructors and the keyword operators (if, while, and, or).
+# Parses a parenthesized list of arguments `(...)`, or any other expression
+sub _parse_arg_or_obj {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    return (/\G(?=\()/ ? $self->parse_arg(code => $opt{code}) : $self->parse_obj(code => $opt{code}));
 }
 
 # Returns the logical negation of an expression: `!(expr)`
@@ -3503,6 +4437,206 @@ sub _negate {
                                }
                               ]
            };
+}
+
+# ---------------------------------------------------------------------------
+# Operators: precedence climbing
+# ---------------------------------------------------------------------------
+
+sub parse_obj {
+    my ($self, %opt) = @_;
+
+    my ($struct, $wrap) = $self->parse_operand(%opt);
+
+    defined($struct) || return;
+
+    return
+      $self->parse_infix(
+                         code   => $opt{code},
+                         struct => $struct,
+                         wrap   => $wrap,
+                         prec   => $opt{prec} // PREC_ASSIGN,
+                        );
+}
+
+# Parses the infix operators that follow an operand, using precedence climbing.
+#
+#   struct => the operand (as returned by parse_operand)
+#   wrap   => true when the operand is a prefix-operator expression
+#   prec   => the minimum precedence of the operators that are consumed
+#
+# The operators of the same precedence are chained, from left to right, in the
+# list of calls of the left-hand side:  a + b - c  =>  {self => a, call => [+b, -c]}
+# while the right-hand sides are parsed recursively:  a + b * c  =>  {self => a, call => [+(b*c)]}
+sub parse_infix {
+    my ($self, %opt) = @_;
+
+    my $struct   = $opt{struct};
+    my $wrap     = $opt{wrap};
+    my $min_prec = $opt{prec} // PREC_ASSIGN;
+
+    local *_ = $opt{code};
+
+    return $struct if $min_prec >= PREC_OPERAND;
+
+    # A pending chain of comparisons: `a < b < c`
+    my $chain;
+
+    while (1) {
+
+        # Fast exit: the end of an expression
+        if (/\G\h*(?:[;,)\]}]|\z)/) {
+            last;
+        }
+
+        # Arrow method call: `expr -> method(...)`
+        # It has the lowest precedence and it is applied on the whole expression
+        # from its left (e.g.: `^10 -> map {...}` is the same as `(^10).map {...}`).
+        if ($min_prec <= PREC_ARROW and /\G\h*(?:\\(?!\\)\s*)?->\h*/gc) {
+            $self->_flush_chain(\$struct, \$chain) if defined $chain;
+            $struct = $self->_parse_arrow_call(($wrap ? $self->_wrap_operand($struct) : $struct), code => $opt{code});
+            $wrap   = 0;
+            next;
+        }
+
+        # Ternary operator (the `?` is allowed to be on the next line)
+        if ($min_prec <= PREC_TERNARY and /\G(?=\s*\?)/) {
+            $self->_flush_chain(\$struct, \$chain) if defined $chain;
+            $struct = $self->_parse_ternary($struct, code => $opt{code});
+            $wrap   = 0;
+            next;
+        }
+
+        my $token = $self->_peek_operator(code => $opt{code}) // last;
+
+        # Keyword operators: if, unless, while, until, and, or
+        if ($token->{kind} eq 'keyword') {
+
+            my $name = $token->{name};
+            my $prec = $KEYWORD_PREC{$name};
+
+            if ($prec < $min_prec) {
+                pos($_) = $token->{start};
+                last;
+            }
+
+            $self->_flush_chain(\$struct, \$chain) if defined $chain;
+
+            my $arg = $self->parse_obj(code => $opt{code}, prec => $prec + 1);
+
+            $arg // $self->fatal_error(
+                                       code  => $_,
+                                       pos   => $token->{start},
+                                       error => "keyword `$name` requires a right-side expression",
+                                      );
+
+            if ($wrap) {
+                $struct = $self->_wrap_operand($struct);
+                $wrap   = 0;
+            }
+
+            # `unless` and `until` are the negated forms of `if` and `while`
+            if ($name eq 'unless' or $name eq 'until') {
+                $arg  = $self->_negate($arg);
+                $name = ($name eq 'unless' ? 'if' : 'while');
+            }
+
+            push @{$struct->{$self->{class}}[-1]{call}}, {keyword => $name, arg => [$arg]};
+            next;
+        }
+
+        # Infix and postfix operators
+        my ($method, $req_arg, $op_type) = @{$token}{qw(method req_arg op_type)};
+
+        # Hyper-operator with an empty argument list (e.g.: `x »name»()`): it is a postfix operator
+        if ($req_arg and $op_type ne 'op' and /\G\h*\(\h*\)/gc) {
+            $req_arg = 0;
+        }
+
+        # Postfix operator, applied on the whole left-hand side
+        if (not $req_arg) {
+
+            # Postfix operators that are not attached to the operand apply on the entire expression
+            if ($min_prec > PREC_ARROW) {
+                pos($_) = $token->{start};
+                last;
+            }
+
+            $self->_flush_chain(\$struct, \$chain) if defined $chain;
+
+            $self->append_method(
+                                 array   => \@{$struct->{$self->{class}}[-1]{call}},
+                                 method  => $method,
+                                 op_type => $op_type,
+                                );
+            next;
+        }
+
+        my ($prec, $assoc) = $self->_infix_info($token);
+
+        if ($prec < $min_prec) {
+            pos($_) = $token->{start};
+            last;
+        }
+
+        my $arg = $self->parse_obj(
+                                   code      => $opt{code},
+                                   multiline => 1,
+                                   prec      => ($assoc eq 'R' ? $prec : $prec + 1),
+                                  );
+
+        $arg // $self->fatal_error(
+                                   code  => $_,
+                                   pos   => $token->{start},
+                                   error => "operator `$method` requires a right-side operand",
+                                  );
+
+        # The result of a prefix operator is a new operand
+        if ($wrap) {
+            $struct = $self->_wrap_operand($struct);
+            $wrap   = 0;
+        }
+
+        # Comparison operators that can be chained: `a < b < c`
+        my $chain_class = ($op_type eq 'op' ? $CHAIN_CLASS{$method} : undef);
+
+        if (defined $chain_class) {
+
+            if (defined($chain) and $chain->{class} eq $chain_class) {
+                push @{$chain->{ops}},      $method;
+                push @{$chain->{operands}}, $arg;
+            }
+            else {
+                $self->_flush_chain(\$struct, \$chain) if defined $chain;
+                $chain = {
+                          class    => $chain_class,
+                          operands => [$struct, $arg],
+                          ops      => [$method],
+                         };
+            }
+
+            next;
+        }
+
+        $self->_flush_chain(\$struct, \$chain) if defined $chain;
+
+        $self->append_method(
+                             array   => \@{$struct->{$self->{class}}[-1]{call}},
+                             method  => $method,
+                             arg     => $arg,
+                             op_type => $op_type,
+                            );
+    }
+
+    $self->_flush_chain(\$struct, \$chain) if defined $chain;
+
+    return $struct;
+}
+
+# Makes an expression the operand of another expression
+sub _wrap_operand {
+    my ($self, $struct) = @_;
+    return {$self->{class} => [{self => $struct}]};
 }
 
 # Looks ahead (on the current line) for an infix operator, a postfix operator,
@@ -3633,26 +4767,105 @@ sub _infix_info {
     return @{$info};
 }
 
-# Returns true when the expression is a plain variable or literal, which is
-# safe to be used more than once (e.g.: the middle operand of `a < b < c`).
-sub _is_simple_operand {
-    my ($self, $struct) = @_;
+# Parses an arrow call (the arrow was consumed): `-> method(...)`
+sub _parse_arrow_call {
+    my ($self, $struct, %opt) = @_;
 
-    ref($struct) eq 'HASH' or return 0;
-    exists($struct->{call}) and return 0;
-    exists($struct->{ind})  and return 0;
+    local *_ = $opt{code};
 
-    if (exists $struct->{self}) {
-        my $obj = $struct->{self};
-        return $self->_is_simple_operand($obj) if ref($obj) eq 'HASH';
-        return 1 if ref($obj)                                                 =~ /^Sidef::Types::(?:Number::Number|String::String|Bool::Bool)\z/;
-        return 1 if ref($obj) eq 'Sidef::Variable::Variable' and $obj->{type} =~ /^(?:var|global)\z/;
-        return 0;
+    my $methods = $self->parse_methods(code => $opt{code}, arrow => 1);
+
+    @{$methods}
+      || $self->fatal_error(
+                            error => 'incomplete method name',
+                            code  => $_,
+                            pos   => pos($_) - 1,
+                           );
+
+    push @{$struct->{$self->{class}}[-1]{call}}, @{$methods};
+
+    # Calls and indices applied on the result: `x -> method(...)(...)`, `x -> method(...)[...]`
+    $self->parse_suffixes(code => $opt{code}, struct => $struct);
+
+    return $struct;
+}
+
+# Parses the ternary operator: `cond ? true : false`
+sub _parse_ternary {
+    my ($self, $cond, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    $self->parse_whitespace(code => $opt{code});
+    /\G\?/gc;
+    $self->parse_whitespace(code => $opt{code});
+
+    # The `:` that follows is the one from the ternary operator, not a pair constructor
+    my $true = do {
+        local $self->{no_pair_op} = 1;
+        $self->parse_obj(code => $opt{code}, multiline => 1, prec => PREC_ASSIGN);
+    };
+
+    $true // $self->fatal_error(
+                                code   => $_,
+                                pos    => pos($_),
+                                error  => "invalid usage of the ternary operator",
+                                reason => "expected an expression after '?'",
+                               );
+
+    $self->parse_whitespace(code => $opt{code});
+
+    /\G:/gc
+      || $self->fatal_error(
+                            code   => $_,
+                            pos    => pos($_),
+                            error  => "invalid usage of the ternary operator",
+                            reason => "expected ':'",
+                           );
+
+    $self->parse_whitespace(code => $opt{code});
+
+    my $false = $self->parse_obj(code => $opt{code}, multiline => 1, prec => PREC_TERNARY);
+
+    $false // $self->fatal_error(
+                                 code   => $_,
+                                 pos    => pos($_),
+                                 error  => "invalid usage of the ternary operator",
+                                 reason => "expected an expression after ':'",
+                                );
+
+    my $node = bless(
+                     {
+                      cond  => $cond,
+                      true  => $true,
+                      false => $false,
+                     },
+                     'Sidef::Types::Bool::Ternary'
+                    );
+
+    return $self->_wrap_operand($node);
+}
+
+# Appends a pending chain of comparisons to the expression
+sub _flush_chain {
+    my ($self, $struct_ref, $chain_ref) = @_;
+
+    my ($ops, $operands) = @{${$chain_ref}}{qw(ops operands)};
+    undef ${$chain_ref};
+
+    if (@{$ops} == 1) {
+        $self->append_method(
+                             array   => \@{${$struct_ref}->{$self->{class}}[-1]{call}},
+                             method  => $ops->[0],
+                             arg     => $operands->[1],
+                             op_type => 'op',
+                            );
+    }
+    else {
+        ${$struct_ref} = $self->_build_comparison_chain($operands, $ops);
     }
 
-    my @statements = map { ref($_) eq 'ARRAY' ? @{$_} : () } values %{$struct};
-    @statements == 1 or return 0;
-    return $self->_is_simple_operand($statements[0]);
+    return;
 }
 
 # Builds the AST of a chain of comparisons: `a < b <= c < d`
@@ -3727,777 +4940,31 @@ sub _build_comparison_chain {
              };
 }
 
-# Appends a pending chain of comparisons to the expression
-sub _flush_chain {
-    my ($self, $struct_ref, $chain_ref) = @_;
+# Returns true when the expression is a plain variable or literal, which is
+# safe to be used more than once (e.g.: the middle operand of `a < b < c`).
+sub _is_simple_operand {
+    my ($self, $struct) = @_;
 
-    my ($ops, $operands) = @{${$chain_ref}}{qw(ops operands)};
-    undef ${$chain_ref};
+    ref($struct) eq 'HASH' or return 0;
+    exists($struct->{call}) and return 0;
+    exists($struct->{ind})  and return 0;
 
-    if (@{$ops} == 1) {
-        $self->append_method(
-                             array   => \@{${$struct_ref}->{$self->{class}}[-1]{call}},
-                             method  => $ops->[0],
-                             arg     => $operands->[1],
-                             op_type => 'op',
-                            );
-    }
-    else {
-        ${$struct_ref} = $self->_build_comparison_chain($operands, $ops);
+    if (exists $struct->{self}) {
+        my $obj = $struct->{self};
+        return $self->_is_simple_operand($obj) if ref($obj) eq 'HASH';
+        return 1 if ref($obj)                                                 =~ /^Sidef::Types::(?:Number::Number|String::String|Bool::Bool)\z/;
+        return 1 if ref($obj) eq 'Sidef::Variable::Variable' and $obj->{type} =~ /^(?:var|global)\z/;
+        return 0;
     }
 
-    return;
+    my @statements = map { ref($_) eq 'ARRAY' ? @{$_} : () } values %{$struct};
+    @statements == 1 or return 0;
+    return $self->_is_simple_operand($statements[0]);
 }
 
-# Parses the infix operators that follow an operand, using precedence climbing.
-#
-#   struct => the operand (as returned by parse_operand)
-#   wrap   => true when the operand is a prefix-operator expression
-#   prec   => the minimum precedence of the operators that are consumed
-#
-# The operators of the same precedence are chained, from left to right, in the
-# list of calls of the left-hand side:  a + b - c  =>  {self => a, call => [+b, -c]}
-# while the right-hand sides are parsed recursively:  a + b * c  =>  {self => a, call => [+(b*c)]}
-sub parse_infix {
-    my ($self, %opt) = @_;
-
-    my $struct   = $opt{struct};
-    my $wrap     = $opt{wrap};
-    my $min_prec = $opt{prec} // PREC_ASSIGN;
-
-    local *_ = $opt{code};
-
-    return $struct if $min_prec >= PREC_OPERAND;
-
-    # A pending chain of comparisons: `a < b < c`
-    my $chain;
-
-    while (1) {
-
-        # Fast exit: the end of an expression
-        if (/\G\h*(?:[;,)\]}]|\z)/) {
-            last;
-        }
-
-        # Arrow method call: `expr -> method(...)`
-        # It has the lowest precedence and it is applied on the whole expression
-        # from its left (e.g.: `^10 -> map {...}` is the same as `(^10).map {...}`).
-        if ($min_prec <= PREC_ARROW and /\G\h*(?:\\(?!\\)\s*)?->\h*/gc) {
-
-            $self->_flush_chain(\$struct, \$chain) if defined $chain;
-
-            my $methods = $self->parse_methods(code => $opt{code}, arrow => 1);
-
-            @{$methods}
-              || $self->fatal_error(
-                                    error => 'incomplete method name',
-                                    code  => $_,
-                                    pos   => pos($_) - 1,
-                                   );
-
-            if ($wrap) {
-                $struct = {$self->{class} => [{self => $struct}]};
-                $wrap   = 0;
-            }
-
-            push @{$struct->{$self->{class}}[-1]{call}}, @{$methods};
-
-            # Calls and indices applied on the result: `x -> method(...)(...)`, `x -> method(...)[...]`
-            $self->parse_suffixes(code => $opt{code}, struct => $struct);
-            next;
-        }
-
-        # Ternary operator (the `?` is allowed to be on the next line)
-        if ($min_prec <= PREC_TERNARY and /\G(?=\s*\?)/) {
-
-            $self->_flush_chain(\$struct, \$chain) if defined $chain;
-
-            $self->parse_whitespace(code => $opt{code});
-            /\G\?/gc;
-            my $q_pos = pos($_);
-            $self->parse_whitespace(code => $opt{code});
-
-            # The `:` that follows is the one from the ternary operator, not a pair constructor
-            my $true = do {
-                local $self->{no_pair_op} = 1;
-                $self->parse_obj(code => $opt{code}, multiline => 1, prec => PREC_ASSIGN);
-            };
-
-            $true // $self->fatal_error(
-                                        code   => $_,
-                                        pos    => pos($_),
-                                        error  => "invalid usage of the ternary operator",
-                                        reason => "expected an expression after '?'",
-                                       );
-
-            $self->parse_whitespace(code => $opt{code});
-
-            /\G:/gc
-              || $self->fatal_error(
-                                    code   => $_,
-                                    pos    => pos($_),
-                                    error  => "invalid usage of the ternary operator",
-                                    reason => "expected ':'",
-                                   );
-
-            $self->parse_whitespace(code => $opt{code});
-
-            my $false = $self->parse_obj(code => $opt{code}, multiline => 1, prec => PREC_TERNARY);
-
-            $false // $self->fatal_error(
-                                         code   => $_,
-                                         pos    => pos($_),
-                                         error  => "invalid usage of the ternary operator",
-                                         reason => "expected an expression after ':'",
-                                        );
-
-            my $node = bless(
-                             {
-                              cond  => $struct,
-                              true  => $true,
-                              false => $false,
-                             },
-                             'Sidef::Types::Bool::Ternary'
-                            );
-
-            $struct = {$self->{class} => [{self => $node}]};
-            $wrap   = 0;
-            next;
-        }
-
-        my $token = $self->_peek_operator(code => $opt{code}) // last;
-
-        # Keyword operators: if, while, and, or
-        if ($token->{kind} eq 'keyword') {
-
-            my $name = $token->{name};
-            my $prec = $KEYWORD_PREC{$name};
-
-            if ($prec < $min_prec) {
-                pos($_) = $token->{start};
-                last;
-            }
-
-            $self->_flush_chain(\$struct, \$chain) if defined $chain;
-
-            my $arg = $self->parse_obj(code => $opt{code}, prec => $prec + 1);
-
-            $arg // $self->fatal_error(
-                                       code  => $_,
-                                       pos   => $token->{start},
-                                       error => "keyword `$name` requires a right-side expression",
-                                      );
-
-            if ($wrap) {
-                $struct = {$self->{class} => [{self => $struct}]};
-                $wrap   = 0;
-            }
-
-            # `unless` and `until` are the negated forms of `if` and `while`
-            if ($name eq 'unless' or $name eq 'until') {
-                $arg  = $self->_negate($arg);
-                $name = ($name eq 'unless' ? 'if' : 'while');
-            }
-
-            push @{$struct->{$self->{class}}[-1]{call}}, {keyword => $name, arg => [$arg]};
-            next;
-        }
-
-        # Infix and postfix operators
-        my ($method, $req_arg, $op_type) = @{$token}{qw(method req_arg op_type)};
-
-        # Hyper-operator with an empty argument list (e.g.: `x »name»()`): it is a postfix operator
-        if ($req_arg and $op_type ne 'op' and /\G\h*\(\h*\)/gc) {
-            $req_arg = 0;
-        }
-
-        if (not $req_arg) {    # postfix operator, applied on the whole left-hand side
-
-            # Postfix operators that are not attached to the operand apply on the entire expression
-            if ($min_prec > PREC_ARROW) {
-                pos($_) = $token->{start};
-                last;
-            }
-
-            $self->_flush_chain(\$struct, \$chain) if defined $chain;
-
-            $self->append_method(
-                                 array   => \@{$struct->{$self->{class}}[-1]{call}},
-                                 method  => $method,
-                                 op_type => $op_type,
-                                );
-            next;
-        }
-
-        my ($prec, $assoc) = $self->_infix_info($token);
-
-        if ($prec < $min_prec) {
-            pos($_) = $token->{start};
-            last;
-        }
-
-        my $arg = $self->parse_obj(
-                                   code      => $opt{code},
-                                   multiline => 1,
-                                   prec      => ($assoc eq 'R' ? $prec : $prec + 1),
-                                  );
-
-        $arg // $self->fatal_error(
-                                   code  => $_,
-                                   pos   => $token->{start},
-                                   error => "operator `$method` requires a right-side operand",
-                                  );
-
-        # The result of a prefix operator is a new operand
-        if ($wrap) {
-            $struct = {$self->{class} => [{self => $struct}]};
-            $wrap   = 0;
-        }
-
-        # Comparison operators that can be chained: `a < b < c`
-        my $chain_class = ($op_type eq 'op' ? $CHAIN_CLASS{$method} : undef);
-
-        if (defined $chain_class) {
-
-            if (defined($chain) and $chain->{class} eq $chain_class) {
-                push @{$chain->{ops}},      $method;
-                push @{$chain->{operands}}, $arg;
-            }
-            else {
-                $self->_flush_chain(\$struct, \$chain) if defined $chain;
-                $chain = {
-                          class    => $chain_class,
-                          operands => [$struct, $arg],
-                          ops      => [$method],
-                         };
-            }
-
-            next;
-        }
-
-        $self->_flush_chain(\$struct, \$chain) if defined $chain;
-
-        $self->append_method(
-                             array   => \@{$struct->{$self->{class}}[-1]{call}},
-                             method  => $method,
-                             arg     => $arg,
-                             op_type => $op_type,
-                            );
-    }
-
-    $self->_flush_chain(\$struct, \$chain) if defined $chain;
-
-    return $struct;
-}
-
-# Parses the argument of a prefix operator or of a keyword (e.g.: -x, !x, say x, return x, if (x) {...})
-sub _parse_prefix_arg {
-    my ($self, %opt) = @_;
-
-    local *_ = $opt{code};
-
-    my $obj    = $opt{obj};
-    my $method = $opt{method};
-    my $ref    = ref($obj);
-
-    # Bare `return` (without a value): `return`, `return;`, `return if cond`, `cond or return`
-    if ($ref eq 'Sidef::Types::Block::Return'
-        and /\G(?=\h*(?:[;})\]#]|\R|\z|(?:if|unless|while|until|and|or)\b))/) {
-        return {};
-    }
-
-    # Block constructs: if (...) {...}, while (...) {...}, for (...) {...}, etc.
-    if ($ref =~ /^Sidef::Types::Block::(?:If|With|While|ForEach|For)\z/) {
-        return (
-                /\G(?=\()/
-                ? $self->parse_arg(code => $opt{code})
-                : $self->parse_obj(code => $opt{code}, prec => PREC_ASSIGN)
-               );
-    }
-
-    # Function-style operators: say (...), print (...), defined (...), @(...), :(...)
-    # The operator is applied only on the parenthesized expression, and any method call
-    # that follows is applied on the result: `@(1..2).combinations(2)` is `(@(1..2)).combinations(2)`
-    if (
-        $ref eq 'Sidef::Meta::PrefixColon'
-        or (
-            $ref eq 'Sidef::Operator::Unary'
-            and (   $method eq 'say'
-                 or $method eq 'print'
-                 or $method eq 'defined'
-                 or $method eq '>'
-                 or $method eq '>>'
-                 or $method eq '+'
-                 or $method eq '@'
-                 or $method eq '@|')
-           )
-      ) {
-        if (/\G(?=\()/) {
-            return $self->parse_arg(code => $opt{code});
-        }
-    }
-
-    # Prefix operators (! ~ \ + * √ ^ @ @|) are applied on the next operand: `!a == b` is `(!a) == b`
-    my $prec = PREC_OPERAND;
-
-    if ($ref eq 'Sidef::Operator::Unary') {
-        if ($method eq '-') {    # `-a ** b` is `-(a ** b)`
-            $prec = PREC_POW;
-        }
-        elsif ($method eq 'defined') {    # named unary operator: `defined a + 1` is `defined(a + 1)`
-            $prec = PREC_SHIFT;
-        }
-        elsif ($method eq 'say' or $method eq 'print' or $method eq '>' or $method eq '>>') {    # list operators
-            $prec = PREC_ASSIGN;
-        }
-        elsif ($method eq '@' or $method eq '@|') {
-            $prec = PREC_RANGE;
-        }
-    }
-    elsif ($ref eq 'Sidef::Variable::Ref' or $ref eq 'Sidef::Meta::PrefixColon') {
-        $prec = PREC_OPERAND;
-    }
-    else {    # return, read, goto
-        $prec = PREC_ASSIGN;
-    }
-
-    return $self->parse_obj(code => $opt{code}, prec => $prec);
-}
-
-# Parses an expression, using the operator precedence rules.
-#
-# The `prec` option sets the minimum precedence of the operators that are consumed.
-# By default, a full expression is parsed (everything that binds tighter than
-# a comma). The statement-level expressions (see parse_script) also consume the
-# pair constructors and the keyword operators (if, while, and, or).
-sub parse_obj {
-    my ($self, %opt) = @_;
-
-    my ($struct, $wrap) = $self->parse_operand(%opt);
-
-    defined($struct) || return;
-
-    return
-      $self->parse_infix(
-                         code   => $opt{code},
-                         struct => $struct,
-                         wrap   => $wrap,
-                         prec   => $opt{prec} // PREC_ASSIGN,
-                        );
-}
-
-sub parse_operand {
-    my ($self, %opt) = @_;
-
-    my %struct;
-    my $wrap;
-    local *_ = $opt{code};
-
-    if (not($opt{multiline}) and /\G\h*(?=\R)/gc) {
-        $self->fatal_error(
-                           code  => $_,
-                           pos   => pos($_) - 1,
-                           error => "unexpected end-of-statement",
-                          );
-    }
-
-    my ($obj, $obj_key, $method) = $self->parse_expr(code => $opt{code});
-
-    if (defined $obj) {
-        push @{$struct{$self->{class}}}, {self => $obj};
-
-        # for (var in array) { ... }
-        my $for_paren = 0;
-        if (ref($obj) eq 'Sidef::Types::Block::For'
-            and /\G\h*\((?=\h*[*:]?$self->{var_name_re}(?:\h*,\h*[*:]?$self->{var_name_re})*\h+(?:in|∈)\b)/goc) {
-            $for_paren = 1;
-            /\G\h*/gc;
-        }
-
-        # for var in array { ... }
-        if ($for_paren or (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h*(?=[*:]?$self->{var_name_re})/goc)) {
-
-            my $class_name = $self->{class};
-
-            my @loops;
-            {
-                my @vars;
-                while (/\G([*:])?($self->{var_name_re})/gc) {
-
-                    my $type = $1;
-                    my $name = $2;
-                    push @vars,
-                      bless(
-                            {
-                             name  => $name,
-                             type  => 'var',
-                             class => $class_name,
-                             (
-                              $type
-                              ? (
-                                 slurpy => 1,
-                                 ($type eq '*' ? (array => 1) : (hash => 1)),
-                                )
-                              : ()
-                             ),
-                            },
-                            'Sidef::Variable::Variable'
-                           );
-
-                    $self->_unshift_var(
-                                        $class_name,
-                                        {
-                                         obj   => $vars[-1],
-                                         name  => $name,
-                                         count => 1,
-                                         type  => 'var',
-                                         line  => $self->{line},
-                                        }
-                                       );
-
-                    $type && last;
-                    /\G\h*,\h*/gc || last;
-                }
-
-                /\G\h*(?:in|∈|=|)\h*/gc
-                  || $self->fatal_error(
-                                        error => "expected the token <<in>> after variable declaration in for-loop",
-                                        code  => $_,
-                                        pos   => pos($_),
-                                       );
-
-                my $expr = (
-                            /\G(?=\()/
-                            ? $self->parse_arg(code => $opt{code})
-                            : $self->parse_obj(code => $opt{code})
-                           );
-
-                push @loops,
-                  {
-                    vars => \@vars,
-                    expr => $expr,
-                  };
-
-                /\G\h*,\h*/gc && redo;
-            }
-
-            if ($for_paren) {
-                $self->parse_whitespace(code => $opt{code});
-                /\G\)/gc
-                  || $self->fatal_error(
-                                        error => "unbalanced parenthesis in the `for` loop",
-                                        code  => $_,
-                                        pos   => pos($_),
-                                       );
-            }
-
-            my $block = (
-                         /\G\h*(?=\{)/gc
-                         ? $self->parse_block(code => $opt{code})
-                         : $self->fatal_error(
-                                              error  => "invalid declaration of the `for` loop",
-                                              reason => "expected a block after the loop expression: for x in expr { ... }",
-                                              code   => $_,
-                                              pos    => pos($_),
-                                             )
-                        );
-
-            # Remove the for-loop variables from the outer scope
-#<<<
-            my %loop_vars = map {
-                map { refaddr($_) => 1 } @{$_->{vars}}
-            } @loops;
-
-            @{$self->{vars}{$class_name}} = grep {
-                   ref($_) ne 'HASH'
-                or not exists $loop_vars{refaddr($_->{obj})}
-            } @{$self->{vars}{$class_name}};
-#>>>
-
-            # Store the info
-            $obj->{block} = $block;
-            $obj->{loops} = \@loops;
-
-            # Re-bless the $obj into a different class
-            bless $obj, 'Sidef::Types::Block::ForIn';
-        }
-        elsif ($obj_key) {
-            my $arg = $self->_parse_prefix_arg(code => $opt{code}, obj => $obj, method => $method);
-
-            if (defined $arg) {
-                my @arg = ($arg);
-
-                if (ref($obj) eq 'Sidef::Types::Block::For') {
-
-                    if ($#{$arg->{$self->{class}}} == 2) {
-                        @arg = (
-                            map {
-                                { $self->{class} => [$_] }
-                            } @{$arg->{$self->{class}}}
-                        );
-
-                        if (/\G\h*(?=\{)/gc) {
-                            my $block = $self->parse_block(code => $opt{code});
-
-                            $obj->{expr}  = \@arg;
-                            $obj->{block} = $block;
-
-                            bless $obj, 'Sidef::Types::Block::CFor';
-
-                        }
-                        else {
-                            $self->fatal_error(
-                                               code   => $_,
-                                               pos    => pos($_) - 1,
-                                               error  => "invalid declaration of the `for` loop",
-                                               reason => "expected a block after `for(;;)`",
-                                              );
-                        }
-                    }
-                    elsif ($#{$arg->{$self->{class}}} == 0) {
-
-                        if (/\G\h*(?=\{)/gc) {
-                            my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
-
-                            $obj->{expr}  = $arg;
-                            $obj->{block} = $block;
-
-                            bless $obj, 'Sidef::Types::Block::ForEach';
-                        }
-                        else {
-                            $self->fatal_error(
-                                               code   => $_,
-                                               pos    => pos($_) - 1,
-                                               error  => "invalid declaration of the `for` loop",
-                                               reason => "expected a block after `for(...)`",
-                                              );
-                        }
-                    }
-                    else {
-                        $self->fatal_error(
-                                           code  => $_,
-                                           pos   => pos($_) - 1,
-                                           error => "invalid declaration of the `for` loop: incorrect number of arguments",
-                                          );
-                    }
-                }
-                elsif (ref($obj) eq 'Sidef::Types::Block::ForEach') {
-                    if (/\G\h*(?=\{)/gc) {
-                        my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
-
-                        $obj->{expr}  = $arg;
-                        $obj->{block} = $block;
-
-                    }
-                    else {
-                        $self->fatal_error(
-                                           code   => $_,
-                                           pos    => pos($_) - 1,
-                                           error  => "invalid declaration of the `foreach` loop",
-                                           reason => "expected a block after `foreach(...)`",
-                                          );
-                    }
-                }
-                elsif (ref($obj) eq 'Sidef::Types::Block::If') {
-
-                    # `unless (cond) {...}` is the same as `if (!cond) {...}`
-                    $arg = $self->_negate($arg) if $method eq 'unless';
-
-                    if (/\G\h*(?=\{)/gc) {
-                        my $block = $self->parse_block(code => $opt{code}, with_vars => 1);
-                        push @{$obj->{if}}, {expr => $arg, block => $block};
-
-                      ELSIF: {
-
-                            $self->parse_whitespace(code => $opt{code});
-
-                            if (/\G(?:elsif|else\h+if)\h*(?=\()/gc) {
-                                my $arg = $self->parse_arg(code => $opt{code});
-                                $self->parse_whitespace(code => $opt{code});
-
-                                my $block = $self->parse_block(code => $opt{code}, with_vars => 1) // $self->fatal_error(
-                                                                                                           code  => $_,
-                                                                                                           pos   => pos($_) - 1,
-                                                                                                           error => "invalid declaration of the `if` statement",
-                                                                                                           reason => "expected a block after `elsif(...)`",
-                                );
-
-                                push @{$obj->{if}}, {expr => $arg, block => $block};
-                                redo ELSIF;
-                            }
-                        }
-
-                        if (/\Gelse\h*(?=\{)/gc) {
-                            my $block = $self->parse_block(code => $opt{code});
-                            $obj->{else}{block} = $block;
-                        }
-
-                        $self->backtrack_whitespace(code => $opt{code});
-                    }
-                    else {
-                        $self->fatal_error(
-                                           code   => $_,
-                                           pos    => pos($_) - 1,
-                                           error  => "invalid declaration of the `if` statement",
-                                           reason => "expected a block after `if(...)`",
-                                          );
-                    }
-                }
-                elsif (ref($obj) eq 'Sidef::Types::Block::With') {
-
-                    if (/\G\h*(?=\{)/gc) {
-                        my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
-                        push @{$obj->{with}}, {expr => $arg, block => $block};
-
-                      ORWITH: {
-
-                            $self->parse_whitespace(code => $opt{code});
-
-                            if (/\Gorwith\h*(?=\()/gc) {
-                                my $arg = $self->parse_arg(code => $opt{code});
-                                $self->parse_whitespace(code => $opt{code});
-
-                                my $block = $self->parse_block(code => $opt{code}, topic_var => 1) // $self->fatal_error(
-                                                                                                         code  => $_,
-                                                                                                         pos   => pos($_) - 1,
-                                                                                                         error => "invalid declaration of the `with` statement",
-                                                                                                         reason => "expected a block after `orwith(...)`",
-                                );
-
-                                push @{$obj->{with}}, {expr => $arg, block => $block};
-                                redo ORWITH;
-                            }
-                        }
-
-                        if (/\Gelse\h*(?=\{)/gc) {
-                            my $block = $self->parse_block(code => $opt{code});
-                            $obj->{else}{block} = $block;
-                        }
-
-                        $self->backtrack_whitespace(code => $opt{code});
-                    }
-                    else {
-                        $self->fatal_error(
-                                           code   => $_,
-                                           pos    => pos($_) - 1,
-                                           error  => "invalid declaration of the `with` statement",
-                                           reason => "expected a block after `with(...)`",
-                                          );
-                    }
-                }
-                elsif (ref($obj) eq 'Sidef::Types::Block::While') {
-
-                    # `until (cond) {...}` is the same as `while (!cond) {...}`
-                    $arg = $self->_negate($arg) if $method eq 'until';
-
-                    if (/\G\h*(?=\{)/gc) {
-                        my $block = $self->parse_block(code => $opt{code}, with_vars => 1);
-                        $obj->{expr}  = $arg;
-                        $obj->{block} = $block;
-                    }
-                    else {
-                        $self->fatal_error(
-                                           code   => $_,
-                                           pos    => pos($_) - 1,
-                                           error  => "invalid declaration of the `while` statement",
-                                           reason => "expected a block after `while(...)`",
-                                          );
-                    }
-                }
-                else {
-                    push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => \@arg};
-                    $wrap = 1;    # the result of a prefix operator is a new operand
-                }
-            }
-            else {
-                $self->fatal_error(
-                                   code  => $_,
-                                   error => "expected an argument. Did you mean '$method()' instead?",
-                                   pos   => pos($_) - 1,
-                                  );
-            }
-        }
-
-        {
-            # Method call
-            if (/\G\h*(?=\.\s*(?:$self->{method_name_re}|[(\$]))/ogc) {
-                my $methods = $self->parse_methods(code => $opt{code});
-                push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
-                redo;
-            }
-
-            # Method call on the next line (leading dot):
-            #
-            #   obj
-            #     .method1
-            #     .method2(...)
-            #
-            # A leading dot at the beginning of a statement is the implicit method
-            # call on the special variable `_`. When this variable doesn't exist,
-            # the dot continues the expression from the previous line.
-            if (/\G(?=(?:[ \t]*(?:#[^\r\n]*)?\R)+\s*\.(?![.0-9]))/
-                and not defined($self->find_var('_', $self->{class}))) {
-                $self->parse_whitespace(code => $opt{code});
-                redo;
-            }
-
-            # Operators used with the method-call syntax: `a .+ b`, or `a \.` followed by
-            # the operator on the next line. The operator binds tighter than any other operator.
-            if (/\G\h*(?:\\(?!\\)\s*)?(?=\.(?!\.)\s*(?:$self->{operators_re}))/ogc) {
-                my $methods = $self->parse_methods(code => $opt{code});
-                push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
-                redo;
-            }
-
-            # Code extended on a newline
-            if (/\G\h*\\(?!\\)/gc) {
-                $self->parse_whitespace(code => $opt{code});
-                redo;
-            }
-
-            # Object call
-            if (/\G\h*(?=\()/gc) {
-                my $arg = $self->parse_arg(code => $opt{code});
-
-                push @{$struct{$self->{class}}[-1]{call}},
-                  {
-                    method => 'call',
-                    (%{$arg} ? (arg => [$arg]) : ())
-                  };
-
-                redo;
-            }
-
-            # Do-while construct
-            if (ref($obj) eq 'Sidef::Types::Block::Do' and /\G\h*(while|until)\b/gc) {
-                my $kind = $1;
-                my $arg  = $self->parse_obj(code => $opt{code});
-                $arg = $self->_negate($arg) if $kind eq 'until';
-                push @{$struct{$self->{class}}[-1]{call}}, {keyword => 'while', arg => [$arg]};
-            }
-
-            # Parse array and hash fetchers ([...] and {...})
-            if (/\G\.\h*(?=[\[\{])/gc or 1) {
-                $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
-            }
-
-            # Postfix operators (e.g.: x++, x--, n!, n!!, x...)
-            if (defined(my $token = $self->_peek_operator(code => $opt{code}, postfix_only => 1))) {
-                $self->append_method(
-                                     array   => \@{$struct{$self->{class}}[-1]{call}},
-                                     method  => $token->{method},
-                                     op_type => $token->{op_type},
-                                    );
-                redo;
-            }
-        }
-    }
-    else {
-        return;
-    }
-
-    return (wantarray ? (\%struct, $wrap) : \%struct);
-}
+# ---------------------------------------------------------------------------
+# Statements
+# ---------------------------------------------------------------------------
 
 sub parse_script {
     my ($self, %opt) = @_;
@@ -4547,41 +5014,15 @@ sub parse_script {
             return \%struct;
         }
 
-        if (/\G\]/gc) {
+        # The end of an array `]`, of a block or a lookup `}`, or of an argument expression `)`
+        if (/\G([\]})])/gc) {
 
-            if (--$self->{right_brackets} < 0) {
+            my ($counter, $kind, $opening) = @{$CLOSING_DELIMITERS{$1}};
+
+            if (--$self->{$counter} < 0) {
                 $self->fatal_error(
-                                   error  => 'unbalanced right bracket',
-                                   reason => 'unexpected `]`: there is no matching `[` before it',
-                                   code   => $_,
-                                   pos    => pos($_) - 1,
-                                  );
-            }
-
-            return \%struct;
-        }
-
-        if (/\G\}/gc) {
-
-            if (--$self->{curly_brackets} < 0) {
-                $self->fatal_error(
-                                   error  => 'unbalanced curly bracket',
-                                   reason => 'unexpected `}`: there is no matching `{` before it',
-                                   code   => $_,
-                                   pos    => pos($_) - 1,
-                                  );
-            }
-
-            return \%struct;
-        }
-
-        # The end of an argument expression
-        if (/\G\)/gc) {
-
-            if (--$self->{parentheses} < 0) {
-                $self->fatal_error(
-                                   error  => 'unbalanced parenthesis',
-                                   reason => 'unexpected `)`: there is no matching `(` before it',
+                                   error  => "unbalanced $kind",
+                                   reason => "unexpected `$1`: there is no matching `$opening` before it",
                                    code   => $_,
                                    pos    => pos($_) - 1,
                                   );
@@ -4597,10 +5038,9 @@ sub parse_script {
                            pos   => (pos($_)),
                            error => (defined($token) ? "unexpected token `$token`" : "unexpected end of input"),
                           );
-
-        pos($_) += 1;
-        redo;
     }
 }
+
+sub Sidef::Parser::DirectoryGuard::DESTROY { $_[0]->() }
 
 1

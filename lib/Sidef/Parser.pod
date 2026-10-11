@@ -30,7 +30,7 @@ The parser handles:
 
 =item * Class and module declarations
 
-=item * Operators and expressions
+=item * Operators and expressions, with operator precedence (see L</OPERATOR PRECEDENCE>)
 
 =item * Control flow structures
 
@@ -106,7 +106,21 @@ Options:
 
 =item * C<multiline> - Allow multiline expressions
 
+=item * C<prec> - The minimum precedence of the operators that are consumed (see L</OPERATOR PRECEDENCE>)
+
 =back
+
+=head3 parse_operand
+
+    my ($expr, $is_prefix) = $parser->parse_operand(code => \$code, %options);
+
+Parses an operand: a term with its prefix operator or control-flow keyword, followed by its calls, indices and method calls. It doesn't consume any infix operators.
+
+=head3 parse_infix
+
+    my $expr = $parser->parse_infix(code => \$code, struct => $expr, prec => $prec);
+
+Parses the infix operators that follow an operand, using precedence climbing.
 
 =head3 parse_block
 
@@ -125,6 +139,10 @@ Options:
 =item * C<is_module> - Block is a module definition
 
 =item * C<prev_class> - Previous class context
+
+=item * C<init_code> - The parameters of the block are parsed from this string (a reference), instead of being parsed from the code
+
+=item * C<no_brace> - The opening curly bracket was already consumed (the position of the bracket)
 
 =back
 
@@ -307,6 +325,7 @@ Checks variable declarations for unused variables and generates warnings (except
         pos    => $position,
         line   => $line_number,
         var    => $var_name,
+        hint   => "A suggestion",
     );
 
 Throws a fatal parsing error with detailed context information including:
@@ -319,7 +338,9 @@ Throws a fatal parsing error with detailed context information including:
 
 =item * Error message and reason
 
-=item * Suggestions for similar variable names (if C<var> provided)
+=item * A hint (if C<hint> provided)
+
+=item * Suggestions for similar variable names, keywords and built-in classes (if C<var> provided)
 
 =back
 
@@ -414,6 +435,36 @@ Support for various number literal formats:
     1.23f       # Explicit float
     ¹²³         # Superscript (for exponents)
 
+=head1 OPERATOR PRECEDENCE
+
+The binary operators have the following precedence, from the highest to the lowest. The operators that are
+on the same line have the same precedence.
+
+    **                                  right
+    unary -  (its operand is parsed after the power)
+    *  /  //  %  %%  ÷  ...             left
+    +  -                                left
+    <<  >>                              left
+    ..  ^..  ..^                        left
+    a `method` b,  |>  |>>  |X>  |Z>,  »op»  ~Zop  ~Xop  ...       left (all the same level)
+    &                                   left
+    |  ^                                left
+    <  <=  >  >=                        chained: a < b < c is (a < b) && (b < c)
+    ==  !=  <=>  ~~  =~  !~             ==  and  != are chained too
+    &&                                  left
+    ||  \\                              left
+    :  (pair)                           left
+    ?:                                  right
+    =                                   right
+    +=  -=  *=  :=  ||=  ...            left
+    and                                 left
+    or                                  left
+    if  unless  while  until            statement modifiers
+    ->                                  applies on the whole expression
+
+The prefix operators (C<!>, C<~>, C<\>, C<*>, C<+>, C<@>, C<^>, C<√>) are applied on the next operand, so
+C<!a == b> is C<(!a) == b>. C<not> is a prefix operator with a very low precedence: C<not a == b> is C<not (a == b)>.
+
 =head1 REGULAR EXPRESSIONS
 
 The parser uses several compiled regular expressions for efficiency:
@@ -444,7 +495,9 @@ The parser maintains a hierarchical symbol table with:
 
 =item * C<vars> - Hash of arrays containing variable information per namespace
 
-=item * C<ref_vars_refs> - Referenced variables from outer scopes
+=item * C<ref_vars_refs> - The chain of the enclosing scopes (array-refs), starting with the nearest one
+
+=item * C<seen_names> - The names that were declared, by namespace (a lookup for finding quickly the names that don't exist)
 
 =item * C<class> - Current namespace/class context
 
