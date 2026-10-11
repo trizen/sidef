@@ -45,7 +45,7 @@ var monName = t.strftime("%B");
 
 for i in (1 .. mons[mon-1]) {
     printf(i == day ? "\e[7m%2d\e[0m " : "%2d ", i);
-    st+i %% 7 && ((i != mons[mon-1]) && print "\n");
+    st+i ->%% 7 && ((i != mons[mon-1]) && print "\n");
 }
 
 print "\n"
