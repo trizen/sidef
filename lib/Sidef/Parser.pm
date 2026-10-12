@@ -1061,6 +1061,7 @@ sub get_init_vars {
 
     my @vars;
     my %classes;
+    my @added_refs;
 
     while (   /\G(?<type>$self->{var_name_re}\h+$self->{var_name_re})\h*/goc
            || /\G([*:]?$self->{var_name_re})\h*/goc
@@ -1076,16 +1077,15 @@ sub get_init_vars {
                 my ($name, $class_name) = $self->get_name_and_class((split(' ', $declaration))[-1]);
 
                 ++$classes{$class_name};
-                $self->_unshift_var(
-                                    $class_name,
-                                    {
-                                     obj   => '',
-                                     name  => $name,
-                                     count => 0,
-                                     type  => $opt{type},
-                                     line  => $self->{line},
-                                    }
-                                   );
+                my $entry = {
+                             obj   => '',
+                             name  => $name,
+                             count => 0,
+                             type  => $opt{type},
+                             line  => $self->{line},
+                            };
+                $self->_unshift_var($class_name, $entry);
+                push @added_refs, $entry;
             }
 
             if (/\G<<?\h*/gc) {
@@ -1124,18 +1124,12 @@ sub get_init_vars {
         $self->parse_whitespace(code => $opt{code});
     }
 
+    my %to_remove = map { refaddr($_) => 1 } @added_refs;
+
     # Remove the newly added variables
     foreach my $class_name (keys %classes) {
-
-        my $scope     = $self->{vars}{$class_name};
-        my $remaining = $classes{$class_name};        # the number of entries that were added
-
-        for (my $i = 0 ; $remaining > 0 and $i <= $#{$scope} ; $i++) {
-            if (ref($scope->[$i]) eq 'HASH' and not ref($scope->[$i]{obj})) {
-                splice(@{$scope}, $i--, 1);
-                --$remaining;
-            }
-        }
+        my $scope = $self->{vars}{$class_name};
+        @{$scope} = grep { not exists $to_remove{refaddr($_)} } @{$scope};
     }
 
     $self->parse_whitespace(code => $opt{code});
