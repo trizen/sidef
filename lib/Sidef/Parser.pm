@@ -4145,11 +4145,11 @@ sub _parse_postfix {
         # A leading dot at the beginning of a statement is the implicit method
         # call on the special variable `_`. When this variable doesn't exist,
         # the dot continues the expression from the previous line.
-        if (/\G(?=(?:[ \t]*(?:#[^\r\n]*)?\R)+\s*\.(?![.0-9]))/
-            and not defined($self->find_var('_', $self->{class}))) {
-            $self->parse_whitespace(code => $opt{code});
-            redo;
-        }
+        # if (/\G(?=(?:[ \t]*(?:#[^\r\n]*)?\R)+\s*\.(?![.0-9]))/
+        #    and not defined($self->find_var('_', $self->{class}))) {
+        #    $self->parse_whitespace(code => $opt{code});
+        #    redo;
+        # }
 
         # Operators used with the method-call syntax: `a .+ b`, or `a \.` followed by
         # the operator on the next line. The operator binds tighter than any other operator.
@@ -4217,6 +4217,10 @@ sub parse_methods {
     my $arrow = $opt{arrow};
 
     {
+
+        # Parse escape character + whitespace
+        /\G\h*\\(?!\\)/gc and $self->parse_whitespace(code => $opt{code});
+
         # Method calls introduced by a dot (e.g.: `.name`, `.name(...)`, `.+(...)`).
         # The infix operators are handled by parse_infix().
         if ($arrow ? ($arrow = 0, 1) : /\G\.(?!\.)/gc) {    # a single dot (`...` and `..` are operators)
