@@ -96,6 +96,7 @@ package Sidef {
         my ($self, $code) = @_;
         local $Sidef::PARSER   = $self->{parser};
         local $Sidef::DEPARSER = $self->{Perl}{deparser};
+        utf8::upgrade($code);
         eval($code);
     }
 
