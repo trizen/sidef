@@ -898,7 +898,7 @@ say (2 ** 3 ** 2)    # 512 → 2 ** (3 ** 2)   (** is right-associative)
 | Multiplicative | `*` `/` `//` `%` `%%` `÷` ... | `//` is integer division |
 | Additive | `+` `-` | |
 | Shift | `<<` `>>` | |
-| Range | `..` `^..` `..^` `@` `@|` | `@1..5` is `@(1..5)` |
+| Range | `..` `^..` `..^` `@` `@\|` | `@1..5` is `@(1..5)` |
 | Word operators | ``a `method` b``, `\|>`, `\|>>`, `»op»`, `~Zop`, `~Xop` ... | chained from left to right |
 | Bitwise AND | `&` | |
 | Bitwise OR / XOR | `\|` `^` | |
