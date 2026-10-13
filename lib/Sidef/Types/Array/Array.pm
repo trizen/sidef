@@ -1292,15 +1292,8 @@ sub digits2num {
 
 sub cfrac2num {
     my ($self) = @_;
-
-    my $res = $self->[-1];
-    my $end = $#{$self};
-
-    for my $k (1 .. $end) {
-        $res = $res->inv->add($self->[$end - $k]);
-    }
-
-    $res;
+    @$self || return Sidef::Types::Number::Number::ZERO;
+    Sidef::Types::Number::Number::_cfrac2num($self);
 }
 
 *from_continued_fraction = \&cfrac2num;

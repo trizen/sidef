@@ -1151,11 +1151,11 @@ Compute C<k> terms of the simple continued-fraction expansion of C<n>.
 
 Can also be used to compute very good rational approximations to a given real number:
 
-    say Num.pi.cfrac(10).flip.reduce{|a,b| b + 1/a }.as_rat      # 4272943/1360120
+    say Num.pi.cfrac(10).cfrac2num.as_rat      #=> 1146408/364913
 
 When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
 
-Aliases: I<as_cfrac>
+Aliases: I<as_cfrac>, I<num2cfrac>
 
 =cut
 

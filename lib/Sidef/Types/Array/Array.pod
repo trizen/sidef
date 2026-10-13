@@ -2067,7 +2067,7 @@ Returns the population standard deviation — the square root of L</variance>.
 Converts a continued fraction expansion array to a rational number.
 
     var c = Num.pi.cfrac(10)    # [3, 7, 15, 1, 292, 1, 1, 1, 2, 1]
-    say c.cfrac2num.as_frac     #=> 4272943/1360120
+    say c.cfrac2num.as_rat      #=> 1146408/364913
 
 =cut
 

@@ -9041,7 +9041,6 @@ sub as_cfrac {
   Math_GMPq: {
         my @cfrac;
         my $q = Math::GMPq::Rmpq_init();
-
         Math::GMPq::Rmpq_set($q, $x);
 
         for (1 .. $n) {
@@ -9056,21 +9055,8 @@ sub as_cfrac {
     }
 
   Math_MPFR: {
-        my @cfrac;
-        my $f = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-
-        Math::MPFR::Rmpfr_set($f, $x, $ROUND);
-
-        for (1 .. $n) {
-            my $t = __floor__($f);
-            push @cfrac, bless \(_any2mpz($t) // $t);
-
-            Math::MPFR::Rmpfr_eq($f, $t, $p) && last;
-            Math::MPFR::Rmpfr_sub($f, $f, $t, $ROUND);
-            Math::MPFR::Rmpfr_ui_div($f, 1, $f, $ROUND);
-        }
-
-        return _array(\@cfrac);
+        $x = _any2mpq($x) // return _array();
+        goto Math_GMPq;
     }
 
   Math_MPC: {
@@ -9131,7 +9117,8 @@ sub as_cfrac {
     }
 }
 
-*cfrac = \&as_cfrac;
+*cfrac     = \&as_cfrac;
+*num2cfrac = \&as_cfrac;
 
 sub as_float {
     my ($x, $prec) = @_;
@@ -10295,6 +10282,22 @@ sub convergents {
     }
 
     _array(\@convergents);
+}
+
+sub _cfrac2num {
+    my ($arr) = @_;
+
+    my @cfrac = @$arr;
+
+    my ($n1, $n2) = (0, 1);
+    my ($d1, $d2) = (1, 0);
+
+    foreach my $z (map { _valid(\$_); $$_ } @cfrac) {
+        ($n1, $n2) = ($n2, __add__(__mul__($n2, $z), $n1));
+        ($d1, $d2) = ($d2, __add__(__mul__($d2, $z), $d1));
+    }
+
+    bless \__div__($n2, $d2);
 }
 
 sub farey {
