@@ -30886,8 +30886,48 @@ sub frobenius_number {
     return bless \$max_dist;
 }
 
+sub _partitions_from_values {
+    my ($n, $values, $strict) = @_;
+
+    $n = $$n;
+    __is_int__($n) || return _array();
+
+    my %seen;
+    my @sorted_allowed = grep { !$seen{$_}++ } sort { $a <=> $b } grep { __cmp__($_, 0) > 0 } grep { __is_int__($_) } map { _valid(\$_); $$_ } @$values;
+    my $max_idx        = $#sorted_allowed;
+
+    my @path;
+    my @results;
+
+    sub {
+        my ($rem, $idx) = @_;
+
+        if (__cmp__($rem, 0) == 0) {
+            push @results, _array([map { bless \$_ } @path]);
+            return;
+        }
+
+        foreach my $i ($idx .. $max_idx) {
+            my $val = $sorted_allowed[$i];
+            if (__cmp__($val, $rem) > 0) {
+                last;
+            }
+            push @path, $val;
+            __SUB__->(__sub__($rem, $val), ($strict ? ($i + 1) : $i));
+            pop @path;    # backtrack
+        }
+      }
+      ->($n, 0);
+
+    return _array(\@results);
+}
+
 sub partitions {
     my ($n, $max_value) = @_;
+
+    if (ref($max_value) eq 'Sidef::Types::Array::Array') {
+        return _partitions_from_values($n, $max_value);
+    }
 
     $n = _any2ui($$n) // return _array();
 
@@ -30925,7 +30965,13 @@ sub partitions {
 
 sub strict_partitions {
     my ($n, $max_value) = @_;
+
+    if (ref($max_value) eq 'Sidef::Types::Array::Array') {
+        return _partitions_from_values($n, $max_value, 1);
+    }
+
     $n = _any2ui($$n) // return _array();
+
     if (defined($max_value)) {
         ref($max_value) eq __PACKAGE__ or _valid(\$max_value);
         $max_value = _any2ui($$max_value) // return _array();
@@ -30933,8 +30979,10 @@ sub strict_partitions {
     else {
         $max_value = $n;
     }
+
     my @results;
     my @path;
+
     sub {
         my ($n, $max_part) = @_;
         if ($n == 0) {
@@ -30949,6 +30997,7 @@ sub strict_partitions {
         }
       }
       ->($n, $max_value);
+
     return _array(\@results);
 }
 
@@ -36862,11 +36911,9 @@ sub _partition_count_for_set {
 
     $n = _any2ui($$n) // return ZERO;
 
-    my @S = map { _any2ui($$_) // return ZERO } @{$set};
-    @S = sort { $a <=> $b } grep { $_ > 0 } @S;
-
     my %seen;
-    @S = grep { !$seen{$_}++ } @S;
+    my @S = map { _any2ui($$_) // return ZERO } @$set;
+    @S = grep { !$seen{$_}++ } sort { $a <=> $b } grep { $_ > 0 } @S;
 
     return ONE if $n == 0;
     return ZERO unless @S;

@@ -4155,6 +4155,7 @@ Aliases: I<partition_number>
 =head2 partitions
 
     partitions(n)
+    partitions(n, set)
     partitions(n, max_value)
 
 Return an array of arrays with the additive partitions of C<n>, such that their sum equals C<n>.
@@ -4165,22 +4166,29 @@ When the C<max_value> argument is provided, no value larger than C<max_value> is
 
     say partitions(4, 2)    #=> [[2, 2], [2, 1, 1], [1, 1, 1, 1]]
 
-It uses the "Mathematica" ordering of the partitions (graded reverse lexicographic ordering).
+By providing an array of allowed values as the second argument, you can limit partitions to only use those elements:
+
+    say partitions(42, [5,7,13])    #=> [[5, 5, 5, 5, 5, 5, 5, 7], [5, 5, 5, 7, 7, 13], [7, 7, 7, 7, 7, 7]]
 
 =cut
 
 =head2 strict_partitions
 
     strict_partitions(n)
+    strict_partitions(n, set)
     strict_partitions(n, max_value)
 
-Return an array of arrays with the additive B<strict> partitions of C<n> (partitions where all integers in a single partition are strictly unique/different), such that their sum equals C<n>.
+Return an array of arrays with the additive B<strict> partitions of C<n> (partitions where all integers in a single partition are strictly unique/different), such that their sum equals C<n>:
 
     say strict_partitions(6)       #=> [[6], [5, 1], [4, 2], [3, 2, 1]]
 
-When the C<max_value> argument is provided, no value larger than C<max_value> is used.
+When the C<max_value> argument is provided, no value larger than C<max_value> is used:
 
     say strict_partitions(12, 5)   #=> [[5, 4, 3], [5, 4, 2, 1]]
+
+By providing an array of allowed values as the second argument, you can limit partitions to only use those elements:
+
+    say strict_partitions(42, [3, 4, 6, 7, 9, 11, 13])   #=> [[3, 4, 6, 7, 9, 13], [3, 6, 9, 11, 13]]
 
 =cut
 
@@ -4189,11 +4197,11 @@ When the C<max_value> argument is provided, no value larger than C<max_value> is
     prime_partitions(n)
     prime_partitions(n, max_value)
 
-Returns all partitions of C<n> into prime parts, with each partition represented as an array of primes.
+Returns all partitions of C<n> into prime parts, with each partition represented as an array of primes:
 
     say 7.prime_partitions      #=> [[7], [5, 2], [3, 2, 2]]
 
-If C<max_value> is specified, no prime larger than C<max_value> is used. By default, C<max_value> is C<n>.
+If C<max_value> is specified, no prime larger than C<max_value> is used. By default, C<max_value> is C<n>:
 
     say 10.prime_partitions(5)  #=> [[5, 5], [5, 3, 2], [3, 3, 2, 2], [2, 2, 2, 2, 2]]
 
