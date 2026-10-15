@@ -4834,22 +4834,25 @@ sub _log2_ceil {
 # Returns (is_ge, value): is_ge=1 iff a^^h >= cap (value undef);
 # is_ge=0 iff a^^h < cap (value = exact Math::GMPz). Assumes a>=2, h>=0, cap>=1.
 sub _capped_tetration {
-    my ($a, $h, $cap) = @_;
+    my ($α, $h, $cap) = @_;
 
-    if (Math::GMPz::Rmpz_sgn($h) == 0) {    # a^^0 = 1
+    if (Math::GMPz::Rmpz_sgn($h) == 0) {
         return (Math::GMPz::Rmpz_cmp_ui($cap, 1) <= 0) ? (1, undef) : (0, Math::GMPz::Rmpz_init_set_ui(1));
     }
-    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {    # a^^1 = a
-        return (Math::GMPz::Rmpz_cmp($a, $cap) >= 0) ? (1, undef) : (0, Math::GMPz::Rmpz_init_set($a));
+    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {
+        return (Math::GMPz::Rmpz_cmp($α, $cap) >= 0) ? (1, undef) : (0, Math::GMPz::Rmpz_init_set($α));
     }
 
-    # h>=2: if base 'a' is already >= cap, the tetration will vastly
-    # exceed cap. Return immediately to prevent calculating huge numbers.
-    if (Math::GMPz::Rmpz_cmp($a, $cap) >= 0) {
+    # Tetration height saturation for a >= 2 (h >= 5 exceeds any practical cap)
+    if (Math::GMPz::Rmpz_cmp_ui($h, 5) >= 0) {
         return (1, undef);
     }
 
-    if (Math::GMPz::Rmpz_cmp_ui($cap, 4) <= 0) {    # a^^h >= 4 for a>=2, h>=2
+    if (Math::GMPz::Rmpz_cmp_ui($cap, 4) <= 0) {
+        return (1, undef);
+    }
+
+    if (Math::GMPz::Rmpz_cmp($α, $cap) >= 0) {
         return (1, undef);
     }
 
@@ -4859,52 +4862,77 @@ sub _capped_tetration {
     my $h_dec = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_sub_ui($h_dec, $h, 1);
 
-    my ($sub_ge, $sub_val) = _capped_tetration($a, $h_dec, $sub_cap);
+    my ($sub_ge, $sub_val) = _capped_tetration($α, $h_dec, $sub_cap);
     return (1, undef) if $sub_ge;
 
     my $val = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_pow_ui($val, $a, Math::GMPz::Rmpz_get_ui($sub_val));    # sub_val is small
+    Math::GMPz::Rmpz_pow_ui($val, $α, Math::GMPz::Rmpz_get_ui($sub_val));
+
     (Math::GMPz::Rmpz_cmp($val, $cap) >= 0) ? (1, undef) : (0, $val);
 }
 
 sub _tetration_mod {
-    my ($a, $h, $m) = @_;
+    my ($α, $h, $m) = @_;
+
+    # Cache for memoizing tetration_mod results across recursive branches
+    state %TETR_CACHE;
+
+    if (scalar(keys %TETR_CACHE) > 1e6) {
+        undef %TETR_CACHE;
+    }
 
     return $ZERO if Math::GMPz::Rmpz_cmp_ui($m, 1) == 0;
 
-    if (Math::GMPz::Rmpz_sgn($h) == 0) {                                     # a^^0 = 1
-                                                                             # m > 1 is guaranteed here, so 1 % m is always 1.
+    if (Math::GMPz::Rmpz_sgn($h) == 0) {
         return $ONE;
     }
-    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {                               # a^^1 = a
+    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mod($r, $a, $m);
+        Math::GMPz::Rmpz_mod($r, $α, $m);
         return $r;
+    }
+
+    # Memoization Lookup:
+    my $h_str = Math::GMPz::Rmpz_get_str($h, 16);
+    my $α_str = Math::GMPz::Rmpz_get_str($α, 16);
+    my $m_str = Math::GMPz::Rmpz_get_str($m, 16);
+
+    my $cache_key = "$α_str:$h_str:$m_str";
+    if (exists $TETR_CACHE{$cache_key}) {
+        return Math::GMPz::Rmpz_init_set_str($TETR_CACHE{$cache_key}, 16);
     }
 
     my $h_dec = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_sub_ui($h_dec, $h, 1);
 
-    # We fetch capping BEFORE recursion. If the exponent hasn't saturated,
-    # we completely bypass the expensive modulo recursion tree.
+    # 3. Preperiod Short-Circuiting (Capping & Euler Totient Reduction):
     my $T = Math::GMPz::Rmpz_init_set_ui(_log2_ceil($m));
-    my ($is_big, $exact_val) = _capped_tetration($a, $h_dec, $T);
+    my ($is_big, $exact_val) = _capped_tetration($α, $h_dec, $T);
 
     my $exponent = Math::GMPz::Rmpz_init();
     if ($is_big) {
-        my $phi_boxed = (bless \$m)->euler_phi;
+        my $phi_boxed = (bless \$m)->carmichael_lambda;
         my $phi_m     = _any2mpz($$phi_boxed);
 
-        my $exponent_mod_phi = _tetration_mod($a, $h_dec, $phi_m);
-        Math::GMPz::Rmpz_add($exponent, $exponent_mod_phi, $phi_m);
+        # Collapse early if phi chain hits 1
+        if (Math::GMPz::Rmpz_cmp_ui($phi_m, 1) == 0) {
+            Math::GMPz::Rmpz_set_ui($exponent, 1);
+        }
+        else {
+            my $exponent_mod_phi = __SUB__->($α, $h_dec, $phi_m);
+            Math::GMPz::Rmpz_add($exponent, $exponent_mod_phi, $phi_m);
+        }
     }
     else {
-        # Modulo phi(m) is mathematically invalid if b < log2(m) because T can be > phi(m).
         Math::GMPz::Rmpz_set($exponent, $exact_val);
     }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_powm($r, $a, $exponent, $m);
+    Math::GMPz::Rmpz_powm($r, $α, $exponent, $m);
+
+    # Store result in cache
+    $TETR_CACHE{$cache_key} = Math::GMPz::Rmpz_get_str($r, 16);
+
     return $r;
 }
 
@@ -4914,18 +4942,33 @@ sub tetration_mod {
     ref($y) eq __PACKAGE__    or _valid(\$y);
     ref($m_in) eq __PACKAGE__ or _valid(\$m_in);
 
-    my $a = _any2mpz($$x)    // goto &nan;
+    my $α = _any2mpz($$x)    // goto &nan;
     my $h = _any2mpz($$y)    // goto &nan;
     my $m = _any2mpz($$m_in) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($h) >= 0 or goto &nan;
     Math::GMPz::Rmpz_sgn($m) > 0  or goto &nan;
 
-    if (Math::GMPz::Rmpz_cmp_ui($a, 2) < 0) {
-        return ((bless \$a)->tetration(bless \$h)->mod(bless \$m));
+    if (Math::GMPz::Rmpz_sgn($α) == 0) {
+        my $is_zero_h = Math::GMPz::Rmpz_sgn($h) == 0;
+        my $is_even_h = (Math::GMPz::Rmpz_fdiv_ui($h, 2) == 0);
+        my $res       = ($is_zero_h || $is_even_h) ? 1 : 0;
+        my $r         = Math::GMPz::Rmpz_init_set_ui($res);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        return bless \$r;
     }
 
-    bless \_tetration_mod($a, $h, $m);
+    if (Math::GMPz::Rmpz_cmp_ui($α, 1) == 0) {
+        my $r = Math::GMPz::Rmpz_init_set_ui(1);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        return bless \$r;
+    }
+
+    if (Math::GMPz::Rmpz_cmp_ui($α, 2) < 0) {
+        return ((bless \$α)->tetration(bless \$h)->mod(bless \$m));
+    }
+
+    bless \_tetration_mod($α, $h, $m);
 }
 
 *tetrationmod = \&tetration_mod;
@@ -30893,7 +30936,7 @@ sub _partitions_from_values {
     __is_int__($n) || return _array();
 
     my %seen;
-    my @sorted_allowed = grep { !$seen{$_}++ } sort { $a <=> $b } grep { __cmp__($_, 0) > 0 } grep { __is_int__($_) } map { _valid(\$_); $$_ } @$values;
+    my @sorted_allowed = grep { !$seen{$_}++ } sort { $a <=> $b } grep { __is_int__($_) and __cmp__($_, 0) > 0 } map { _valid(\$_); $$_ } @$values;
     my $max_idx        = $#sorted_allowed;
 
     my @path;
