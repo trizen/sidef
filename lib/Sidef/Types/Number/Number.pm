@@ -10331,11 +10331,12 @@ sub _cfrac2num {
     my ($arr) = @_;
 
     my @cfrac = @$arr;
+    _valid(\(@cfrac));
 
     my ($n1, $n2) = (0, 1);
     my ($d1, $d2) = (1, 0);
 
-    foreach my $z (map { _valid(\$_); $$_ } @cfrac) {
+    foreach my $z (map { $$_ } @cfrac) {
         ($n1, $n2) = ($n2, __add__(__mul__($n2, $z), $n1));
         ($d1, $d2) = ($d2, __add__(__mul__($d2, $z), $d1));
     }
