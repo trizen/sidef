@@ -120,6 +120,8 @@ bb cc
 ddddd
 EOT
 
+assert_eq(t1, text.smart_wrap(6).join("\n"))
+
 say '-'*80;
 
 text = 'As shown in the above phases (or steps), the algorithm does many useless transformations';
@@ -135,6 +137,8 @@ many useless
 transformations
 EOT
 
+assert_eq(t2, text.smart_wrap(20).join("\n"))
+
 say '-'*80;
 
 text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
@@ -147,3 +151,5 @@ dolor sit amet,
 consectetur
 adipiscing elit.
 EOT
+
+assert_eq(t3, text.smart_wrap(20).join("\n"))
