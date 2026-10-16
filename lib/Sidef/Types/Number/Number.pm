@@ -4905,7 +4905,7 @@ sub _tetration_mod {
     my $h_dec = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_sub_ui($h_dec, $h, 1);
 
-    # 3. Preperiod Short-Circuiting (Capping & Euler Totient Reduction):
+    # Preperiod Short-Circuiting (Capping & Euler Totient Reduction):
     my $T = Math::GMPz::Rmpz_init_set_ui(_log2_ceil($m));
     my ($is_big, $exact_val) = _capped_tetration($α, $h_dec, $T);
 
@@ -4951,7 +4951,7 @@ sub tetration_mod {
 
     if (Math::GMPz::Rmpz_sgn($α) == 0) {
         my $is_zero_h = Math::GMPz::Rmpz_sgn($h) == 0;
-        my $is_even_h = (Math::GMPz::Rmpz_fdiv_ui($h, 2) == 0);
+        my $is_even_h = Math::GMPz::Rmpz_even_p($h);
         my $res       = ($is_zero_h || $is_even_h) ? 1 : 0;
         my $r         = Math::GMPz::Rmpz_init_set_ui($res);
         Math::GMPz::Rmpz_mod($r, $r, $m);
