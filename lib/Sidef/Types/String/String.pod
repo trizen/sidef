@@ -895,6 +895,21 @@ Example:
 
 =cut
 
+=head2 smart_wrap
+
+    str.smart_wrap(width=76)
+
+Returns a new string where words are wrapped to fit within the specified column C<width> (an integer), using a minimum-raggedness Dynamic Programming algorithm.
+
+If the C<width> argument is omitted, it defaults to C<76>. Any individual word whose length exceeds C<width> will be automatically split to fit the column constraints.
+
+Example:
+
+    say "The quick brown fox jumps over the lazy dog".smart_wrap(20)
+    #=> ["The quick brown", "fox jumps over", "the lazy dog"]
+
+=cut
+
 =head2 has
 
     str.has(substr, pos=0)

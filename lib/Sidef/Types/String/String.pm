@@ -295,22 +295,22 @@ sub swapcase {
 
 sub common_prefix {
     my ($self, $other) = @_;
-    my $s = $$self;
-    my $t = "$other";
+    my $s   = $$self;
+    my $t   = "$other";
     my $len = List::Util::min(CORE::length($s), CORE::length($t));
-    my $i = 0;
+    my $i   = 0;
     ++$i while $i < $len && CORE::substr($s, $i, 1) eq CORE::substr($t, $i, 1);
     $self->new(CORE::substr($s, 0, $i));
 }
 
 sub common_suffix {
     my ($self, $other) = @_;
-    my $s = $$self;
-    my $t = "$other";
-    my $ls = CORE::length($s);
-    my $lt = CORE::length($t);
+    my $s   = $$self;
+    my $t   = "$other";
+    my $ls  = CORE::length($s);
+    my $lt  = CORE::length($t);
     my $len = List::Util::min($ls, $lt);
-    my $i = 0;
+    my $i   = 0;
     ++$i while $i < $len && CORE::substr($s, $ls - $i - 1, 1) eq CORE::substr($t, $lt - $i - 1, 1);
     $i ? $self->new(CORE::substr($s, $ls - $i)) : $self->new('');
 }
@@ -339,6 +339,69 @@ sub wrap {
     CORE::push(@lines, bless \(my $l = $line)) if $line ne '';
 
     Sidef::Types::Array::Array->new(\@lines);
+}
+
+sub smart_wrap {
+    my ($self, $width) = @_;
+    $width = defined($width) ? CORE::int($width) : 76;
+    $width = 1 if $width < 1;
+
+    my @raw_words = CORE::split(' ', $$self);
+    return $self->new('') unless @raw_words;
+
+    # Handle words longer than width by splitting them
+    my @words;
+    foreach my $word (@raw_words) {
+        if (CORE::length($word) > $width) {
+            CORE::push(@words, CORE::unpack("(A$width)*", $word));
+        }
+        else {
+            CORE::push(@words, $word);
+        }
+    }
+
+    my $n      = scalar(@words);
+    my @dp     = (0) x ($n + 1);
+    my @parent = (0) x ($n + 1);
+    my @len    = map { CORE::length($_) } @words;
+
+    # Fill DP table from right to left (backwards)
+    for (my $i = $n - 1 ; $i >= 0 ; $i--) {
+        my $min_cost;
+        my $best_j   = $i;
+        my $line_len = $len[$i];
+
+        for (my $j = $i ; $j < $n ; $j++) {
+            if ($j > $i) {
+                $line_len += 1 + $len[$j];    # Add 1 for space between words
+            }
+
+            if ($line_len > $width) {
+                last;                         # Exceeds line width
+            }
+
+            my $cost = ($width - $line_len)**2 + $dp[$j + 1];
+
+            if (!defined($min_cost) || $cost < $min_cost) {
+                $min_cost = $cost;
+                $best_j   = $j;
+            }
+        }
+
+        $dp[$i]     = defined($min_cost) ? $min_cost : 0;
+        $parent[$i] = $best_j;
+    }
+
+    # Reconstruct optimal lines using parent pointers
+    my @lines;
+    my $curr = 0;
+    while ($curr < $n) {
+        my $next = $parent[$curr];
+        CORE::push(@lines, CORE::join(' ', @words[$curr .. $next]));
+        $curr = $next + 1;
+    }
+
+    Sidef::Types::Array::Array->new([map { bless \$_ } @lines]);
 }
 
 sub chop {
