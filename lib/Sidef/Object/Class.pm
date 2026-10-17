@@ -255,6 +255,11 @@ sub extend {
     my %seen = map { $_ => 1 } @$isa, $package;
     push @$isa, grep { !$seen{$_}++ } @parents;
 
+    mro::set_mro($package, 'c3');
+    if (not eval { mro::get_linear_isa($package); 1 }) {
+        mro::set_mro($package, 'dfs');
+    }
+
     return;
 }
 
