@@ -1,0 +1,85 @@
+#!/usr/bin/ruby
+
+# Multiple inheritance, diamond inheritance and the C3 method resolution order
+
+class Base(id = 1) {
+    method who   { "Base" }
+    method ident { id }
+}
+
+class Left(l = "L") < Base {
+    method who   { "Left" }
+    method left  { l }
+}
+
+class Right(r = "R") < Base {
+    method who   { "Right" }
+    method right { r }
+}
+
+class Diamond(d = "D") < Left, Right {
+    method info { [id, l, r, d] }
+}
+
+var d = Diamond()
+assert_eq(d.info, [1, "L", "R", "D"])
+assert_eq(d.who, "Left")                     # the first parent wins
+assert_eq(d.left, "L")
+assert_eq(d.right, "R")
+assert_eq(d.ident, 1)
+
+# The inherited parameters come first (the least derived class first)
+var d2 = Diamond(7, "a", "b", "c")
+assert_eq(d2.info, [7, "a", "b", "c"])
+
+var d3 = Diamond(r: "rr", id: 5)
+assert_eq(d3.info, [5, "L", "rr", "D"])
+
+assert(d.is_a(Base))
+assert(d.is_a(Left))
+assert(d.is_a(Right))
+assert(d.is_a(Diamond))
+
+# The order of the parents matters
+class Diamond2(d = "D") < Right, Left { }
+assert_eq(Diamond2().who, "Right")
+assert_eq(Diamond2(1, "x", "y", "z").info, [1, "y", "x", "z"]) if false
+
+# Every class of the diamond is initialized once
+var counter = 0
+class CBase { method init { counter++ } }
+class CLeft < CBase { }
+class CRight < CBase { }
+class CDiamond < CLeft, CRight { }
+CDiamond()
+assert_eq(counter, 1)
+
+# Mixins: classes without parameters
+class Walks { method walk { "#{self.name} walks" } }
+class Swims { method swim { "#{self.name} swims" } }
+class Duck(name) < Walks, Swims { }
+
+var duck = Duck("Donald")
+assert_eq(duck.walk, "Donald walks")
+assert_eq(duck.swim, "Donald swims")
+
+# The same field in two parents
+class P1(x = 1) { }
+class P2(x = 2, y = 3) { }
+class P12 < P1, P2 { method both { [x, y] } }
+assert_eq(P12().both, [1, 3])
+
+# Multimethods are found in all the ancestors, even when an intermediate class does not define them
+class MA { method f(Number n) { "number" } }
+class MB < MA { }
+class MC < MB { method f(String s) { "string" } }
+class MD < MA { method f(Array a) { "array" } }
+class ME < MC, MD { }
+
+assert_eq(MC().f(1),     "number")
+assert_eq(MC().f("x"),   "string")
+assert_eq(ME().f(1),     "number")
+assert_eq(ME().f("x"),   "string")
+assert_eq(ME().f([1]),   "array")
+
+say "** Test passed!"

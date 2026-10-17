@@ -1,0 +1,103 @@
+#!/usr/bin/ruby
+
+# Resolution of the fields of a class: parameters, attributes, overriding, redefinition and slurpy parameters
+
+# The most derived declaration of a field wins
+class A(x = 1, y = 2) {
+    has z = x + y
+    method sum { x + y + z }
+}
+
+class B(x = 10) < A {
+    method bx { x }                 # inherited fields are visible
+}
+
+class C < B {
+    has y = 100                     # an attribute overrides the inherited parameter
+}
+
+assert_eq(A().sum, 1 + 2 + 3)
+assert_eq(B().sum, 10 + 2 + 12)
+assert_eq(B(x: 5).bx, 5)
+assert_eq(B(x: 5, y: 7).sum, 5 + 7 + 12)
+
+# The inherited parameters come first, then the parameters of the class itself
+assert_eq(B(7, 5).bx, 5)
+assert_eq(B(7, 5).sum, 5 + 7 + 12)
+
+var c_obj = C(3)
+assert_eq(c_obj.y, 100)                 # `y` is not a parameter of the constructor anymore
+assert_eq(c_obj.x, 3)
+assert_eq(c_obj.z, 103)
+
+# Attributes are evaluated when the parameters are known
+class D(a, b = a * 2) {
+    has c = a + b
+    has (d, e) = (c + 1, c + 2)
+}
+
+var d = D(3)
+assert_eq([d.a, d.b, d.c, d.d, d.e], [3, 6, 9, 10, 11])
+assert_eq(D(1, 1).c, 2)
+
+# An accessor can be assigned
+d.a = 42
+assert_eq(d.a, 42)
+
+# A class that is redefined three times (it's the same class)
+class R(a = 1) { method one { "one" } }
+class R(b = 2) { method two { "two" } }
+class R(c = 3) { method three { "three" } }
+
+var r = R()
+assert_eq([r.a, r.b, r.c], [1, 2, 3])
+assert_eq([r.one, r.two, r.three], ["one", "two", "three"])
+assert_eq(R(10, 20, 30).c, 30)
+
+# Slurpy parameters
+class S(first, *rest) {
+    method total { first + rest.sum }
+}
+
+assert_eq(S(1).total, 1)
+assert_eq(S(1, 2, 3).total, 6)
+assert_eq(S(1, 2, 3).rest, [2, 3])
+
+class H(name, :opts) { }
+assert_eq(H("x", a => 1, b => 2).opts, Hash(a => 1, b => 2))
+
+class SD(*list = [1, 2]) { }
+assert_eq(SD().list, [[1, 2]])
+
+# Types of the parameters
+class T(Number n, String s = "none") { }
+assert_eq(T(1).s, "none")
+assert_eq(T(2, "x").n, 2)
+assert(try { T("x"); false } catch { true })
+
+# Struct
+struct Point { Number x, Number y = 5 }
+var p = Point(1)
+assert_eq([p.x, p.y], [1, 5])
+p.x = 10
+assert_eq(p.x, 10)
+assert_eq(Point(y: 3, x: 4).y, 3)
+
+# Class variables
+class V { }
+V!count = 5
+V!count += 1
+assert_eq(V!count, 6)
+
+# The `init` method
+class I(n) {
+    has doubled
+    method init { doubled = n * 2 }
+}
+assert_eq(I(21).doubled, 42)
+
+# Inheritance of `init`
+class I2(m) < I { }
+assert_eq(I2(4, 5).doubled, 8)
+
+say "** Test passed!"

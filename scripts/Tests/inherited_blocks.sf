@@ -22,12 +22,14 @@ assert_eq(Bar().a()(43), 43+42)
 var foo_obj = Foo()
 var bar_obj = Bar()
 
-assert_eq(bar_obj.a, foo_obj.a)
-assert_eq(bar_obj.b, foo_obj.b)
+# Each object has its own block (a closure), inherited by the subclass
+assert_eq(bar_obj.a()(1), foo_obj.a()(1))
+assert_eq(bar_obj.b()(1), foo_obj.b()(1))
 
-assert_eq(bar_obj.a_block, foo_obj.a)
-assert_eq(bar_obj.b_block, foo_obj.b)
-assert_eq(foo_obj.b_block, bar_obj.b)
+assert_eq(bar_obj.a_block()(1), foo_obj.a()(1))
+assert_eq(bar_obj.b_block()(1), foo_obj.b()(1))
+assert_eq(foo_obj.b_block()(1), bar_obj.b()(1))
+assert_eq(bar_obj.a, bar_obj.a)
 
 assert_eq(bar_obj.b_block()(1), 100)
 assert_eq(foo_obj.b_block()(1), 100)

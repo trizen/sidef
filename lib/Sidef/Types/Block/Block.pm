@@ -5,6 +5,7 @@ use 5.016;
 use parent qw(Sidef::Object::Object);
 
 use List::Util   qw();
+use mro          ();
 use Scalar::Util qw();
 use Sidef::Types::Number::Number;
 
@@ -148,52 +149,47 @@ sub retry {
     );
 }
 
-# Recursively walks the ISA hierarchy to discover additional method candidates
-# from parent classes, appending them (with their kids/fallback) to @$methods.
+# Walks the ancestors of the class (in the method resolution order) to discover additional
+# method candidates, appending them (with their kids/fallback) to @$methods.
+# For methods, the walk starts from the class of the receiver, which can be a subclass that
+# inherits from other classes (multiple inheritance), where more methods may be defined.
 sub _collect_inherited_methods {
-    my ($self, $methods) = @_;
+    my ($self, $methods, $receiver) = @_;
 
-    my $limit = 4096;
-    my %visited;
+    my $class = $self->{class};
+    my $name  = $self->{name};
 
-    sub {
-        my ($block) = @_;
+    if (    defined($receiver)
+        and Scalar::Util::blessed($receiver)
+        and UNIVERSAL::isa($receiver, $class)) {
+        $class = ref($receiver);
+    }
 
-        my $name = $block->{name};
-        my @isa  = do {
+    my %seen = map { Scalar::Util::refaddr($_) => 1 } @$methods;
+
+    foreach my $ancestor (@{mro::get_linear_isa($class)}) {
+
+        substr($ancestor, 0, 14) eq 'Sidef::Runtime' or next;
+
+        my $method = do {
             no strict 'refs';
-            @{$block->{class} . '::ISA'};
+            ${$ancestor . '::__SIDEF_CLASS_METHODS__'}{$name};
         };
 
-        foreach my $class (@isa) {
-            next if $visited{$class}++;
-            substr($class, 0, 14) eq 'Sidef::Runtime' or next;
+        defined($method) or next;
 
-            my $method = do {
-                no strict 'refs';
-                ${$class . '::__SIDEF_CLASS_METHODS__'}{$name};
-            };
-
-            defined($method) or next;
-
-            push @$methods, $method;
-            push @$methods, @{$method->{kids}}  if exists $method->{kids};
-            push @$methods, $method->{fallback} if exists $method->{fallback};
-
-            if (--$limit == 0) {
-                die "[ERROR] Too deep or cyclic class inheritance!";
-            }
-
-            __SUB__->($method);
+        foreach my $candidate ($method, (exists($method->{kids}) ? @{$method->{kids}} : ()), (exists($method->{fallback}) ? $method->{fallback} : ())) {
+            push(@$methods, $candidate) if !$seen{Scalar::Util::refaddr($candidate)}++;
         }
-      }
-      ->($self);
+    }
+
+    return;
 }
 
 # Builds the full list of candidate methods: self, kids, fallback, and any
 # candidates found by walking the class inheritance hierarchy.
 sub _collect_candidate_methods {
-    my ($self) = @_;
+    my ($self, $receiver) = @_;
 
     my @methods = ($self);
 
@@ -206,7 +202,7 @@ sub _collect_candidate_methods {
     }
 
     if (defined $self->{class} and defined $self->{name}) {
-        $self->_collect_inherited_methods(\@methods);
+        $self->_collect_inherited_methods(\@methods, $receiver);
     }
 
     return @methods;
@@ -347,7 +343,7 @@ sub _resolve_args {
 sub _multiple_dispatch {
     my ($self, @args) = @_;
 
-    my @methods = $self->_collect_candidate_methods;
+    my @methods = $self->_collect_candidate_methods($self->{type} eq 'method' ? $args[0] : undef);
 
     foreach my $method (@methods) {
 

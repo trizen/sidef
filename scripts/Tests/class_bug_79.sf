@@ -1,0 +1,27 @@
+#!/usr/bin/sidef
+
+# Inherited arrays of callables are buggy (fixed)
+# https://github.com/trizen/sidef/issues/79
+
+class Top {
+  method init {
+    say "Top: #{__METHOD_NAME__}"
+  }
+}
+
+class Next < Top {
+  has Array array = [
+    { say "asd" },
+    { say "different" }
+  ]
+  method start  {
+    say "Next: #{__METHOD_NAME__}"
+    self.array.each{ .say }
+    self.array.each{ .run }
+  }
+}
+
+class Bottom < Next { }
+
+Bottom().start
+

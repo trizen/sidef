@@ -16,6 +16,8 @@ lib/Sidef/Module/Func.pm
 lib/Sidef/Module/Func.pod
 lib/Sidef/Module/OO.pm
 lib/Sidef/Module/OO.pod
+lib/Sidef/Object/Class.pm
+lib/Sidef/Object/Class.pod
 lib/Sidef/Object/Convert.pm
 lib/Sidef/Object/Convert.pod
 lib/Sidef/Object/Enumerator.pm
@@ -773,11 +775,14 @@ scripts/Tests/chebyshev_factorization_method.sf
 scripts/Tests/chebyshev_polynomials.sf
 scripts/Tests/class_attr_inheritance.sf
 scripts/Tests/class_attributes.sf
+scripts/Tests/class_bug_79.sf
 scripts/Tests/class_field_inheritance.sf
+scripts/Tests/class_fields.sf
 scripts/Tests/class_global_variables.sf
 scripts/Tests/class_has_variables_with_prefix_methods.sf
 scripts/Tests/class_inheritance.sf
 scripts/Tests/class_inside_module.sf
+scripts/Tests/class_multiple_inheritance.sf
 scripts/Tests/class_redefinition.sf
 scripts/Tests/class_slurpy_attributes.sf
 scripts/Tests/class_var_inheritance.sf
@@ -1177,6 +1182,7 @@ t/accumulator_factory_oo.t
 t/ackermann_function.t
 t/bernoulli_numbers_rec.t
 t/best_shuffle.t
+t/class_features.t
 t/currying.t
 t/eval.t
 t/factors_of_a_mersenne.t

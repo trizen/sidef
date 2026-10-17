@@ -1157,6 +1157,7 @@ sub parse_init_vars {
     my $end_delim = $self->parse_delim(%opt);
 
     my @var_objs;
+    my @scoped;
     my %seen_params;
     while (   /\G(?<type>$self->{var_name_re})\h+($self->{var_name_re})\h*/goc
            || /\G([*:]?)($self->{var_name_re})\h*/goc
@@ -1247,6 +1248,19 @@ sub parse_init_vars {
                                );
         }
 
+        # The parameters of a class or of a struct are visible in the default values of the next parameters
+        elsif ($opt{scoped} and $var_name ne '') {
+            my $entry = {
+                         obj   => $obj,
+                         name  => $var_name,
+                         count => 1,
+                         type  => $opt{type},
+                         line  => $self->{line},
+                        };
+            $self->_unshift_var($class_name, $entry);
+            push @scoped, [$class_name, $entry];
+        }
+
         if ($var_name eq '') {
             $obj->{name} = '__ANON__' . refaddr($obj);
         }
@@ -1276,6 +1290,12 @@ sub parse_init_vars {
                                 error => "can't find the closing delimiter: `$end_delim`",
                                )
          );
+
+    # The parameters are not visible after the declaration
+    foreach my $item (@scoped) {
+        my ($class_name, $entry) = @{$item};
+        @{$self->{vars}{$class_name}} = grep { refaddr($_) != refaddr($entry) } @{$self->{vars}{$class_name}};
+    }
 
     return \@var_objs;
 }
@@ -2442,7 +2462,7 @@ sub _parse_variable_access {
 
     # Class instance variables
     if (ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
-        and defined(my $var = (first { $_->{name} eq $name } (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})))) {
+        and defined(my $var = first { $_->{name} eq $name } $self->_class_fields($self->{current_class}))) {
         my $result = $self->_parse_class_instance_variable($var, $name, $class, code => $opt{code});
         return $result if defined($result);
     }
@@ -2470,6 +2490,25 @@ sub _parse_variable_access {
                        var   => ($class . '::' . $name),
                        error => "variable <$class\::$name> is not declared in the current scope",
                       );
+}
+
+# The fields (parameters and attributes) of a class, including the inherited ones.
+# The fields of the class itself come first, then the ones of its parents, from left to right.
+sub _class_fields {
+    my ($self, $class, $seen) = @_;
+
+    $seen //= {};
+    $seen->{refaddr($class)}++ and return;
+
+    my @fields = (@{$class->{vars} // []}, map { @{$_->{vars}} } @{$class->{attributes} // []});
+
+    foreach my $parent (@{$class->{inherit} // []}) {
+        if (ref($parent) eq 'Sidef::Variable::ClassInit' and not ref($parent->{name})) {
+            push @fields, $self->_class_fields($parent, $seen);
+        }
+    }
+
+    return @fields;
 }
 
 # A class variable that is used inside the class: it's the same as `self.name` inside a method.
@@ -2753,6 +2792,7 @@ sub _parse_struct {
                                       code    => $opt{code},
                                       type    => 'var',
                                       private => 1,
+                                      scoped  => 1,
                                      );
 
     $struct->{vars} = $vars;
@@ -3036,6 +3076,7 @@ sub _parse_class_definition {
                              code         => $opt{code},
                              params       => 1,
                              private      => 1,
+                             scoped       => 1,
                              type         => 'has',
                              ignore_delim => {
                                               '{' => 1,
