@@ -54,7 +54,8 @@ my %REGISTRY;    # key => declaration
 
 sub _error {
     my ($decl, $message) = @_;
-    die "[ERROR] class `$decl->{name}`: $message\n";
+    my $name = (ref($decl) && exists $decl->{name}) ? $decl->{name} : 'unknown';
+    die "[ERROR] class `$name`: $message\n";
 }
 
 # Returns the declaration with the given key
@@ -113,13 +114,14 @@ sub linearize {
 
         my $candidate;
         foreach my $seq (@seqs) {
-            my $head = $seq->[0];
+            my $head      = $seq->[0];
+            my $head_addr = refaddr($head);
 
             # a good head does not appear in the tail of any other sequence
             if (
                 not grep {
                     my $s = $_;
-                    grep { $_ == $head } @{$s}[1 .. $#$s]
+                    grep { refaddr($_) == $head_addr } @{$s}[1 .. $#$s]
                 } @seqs
               ) {
                 $candidate = $head;
@@ -131,8 +133,9 @@ sub linearize {
           or _error($self, "inconsistent class hierarchy (can't linearize the parent classes)");
 
         push @mro, $candidate;
+        my $candidate_addr = refaddr($candidate);
         foreach my $seq (@seqs) {
-            shift(@$seq) if $seq->[0] == $candidate;
+            shift(@$seq) if refaddr($seq->[0]) == $candidate_addr;
         }
     }
 
@@ -168,9 +171,10 @@ sub _resolve {
 
     my @params;
     foreach my $decl (@order) {
+        my $decl_addr = refaddr($decl);
         foreach my $param (@{$decl->{params}}) {
             my $name = $param->{name};
-            if ($owner{$name}[0] == $decl and $owner{$name}[1] eq 'param') {
+            if (refaddr($owner{$name}[0]) == $decl_addr and $owner{$name}[1] eq 'param') {
                 push @params, $param;
             }
         }
