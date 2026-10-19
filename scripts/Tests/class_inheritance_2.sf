@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+class Animal(name, sound) {
+    method speak { say "#{name} says #{sound}!" }
+}
+
+class Dog(color="red") < Animal {
+    method fetch { say "#{name} fetches the #{color} ball!" }
+}
+
+var d = Dog("Rex", "woof", "blue")
+d.speak    #=> Rex says woof!
+d.fetch    #=> Rex fetches the ball!
+
+var d2 = Dog(sound: "bark", name: :Pluto)
+
+assert_eq(d2.name, "Pluto")
+assert_eq(d2.color, "red")
+assert_eq(d2.sound, "bark")
+
+d2.speak
+d2.fetch
