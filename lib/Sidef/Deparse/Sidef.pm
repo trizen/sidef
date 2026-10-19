@@ -276,12 +276,6 @@ sub _escape {
 
 sub _dump_string {
     my ($self, $str) = @_;
-
-    # Inside of "#{...}" is not possible to use double quotes
-    if ($self->{_in_interp} and $str !~ /[\x00-\x1f\x7f]/) {
-        return q{'} . ($str =~ s{([\\'])}{\\$1}gr) . q{'};
-    }
-
     return '"' . $self->_escape($str) . '"';
 }
 
@@ -1161,12 +1155,6 @@ sub _interpolated {
                 local $self->{_in_interp} = 1;
                 join('; ', $self->_stmts($arg->{block}{code} // {}));
             };
-
-            # The code can't contain double quotes and new lines
-            if ($code =~ /["\n]/) {
-                $self->{_seen} = \%saved;
-                return;
-            }
 
             $string .= '#{' . $code . '}';
         }

@@ -1,0 +1,61 @@
+#!/usr/bin/ruby
+
+# Tests for the delimiters used inside the interpolation blocks of a string:
+#
+#   "foo #{"bar".uc}"
+#
+# Run with:  sidef interpolated_strings.sf
+
+# Basic usage: the delimiter of the string, inside the interpolation block
+assert_eq("foo #{"bar".uc}", "foo BAR")
+assert_eq("foo #{"bar".uc} baz", "foo BAR baz")
+assert_eq("#{"a"}#{"b"}", "ab")
+
+# The old syntax (escaped quotes inside the block) still works
+assert_eq("foo #{\"bar\".uc}", "foo BAR")
+assert_eq("foo #{\"bar\".uc} baz", "foo BAR baz")
+
+# Escaped quotes in the string itself are not affected
+assert_eq("plain \"esc\" text", 'plain "esc" text')
+assert_eq("say \"#{"hi".uc}\"", 'say "HI"')
+
+# Escaped quotes inside the nested string are kept for the nested string
+assert_eq("a #{"b\"c"} d", 'a b"c d')
+
+# Brackets and delimiters inside the nested strings are skipped
+assert_eq("a #{"}".len} b", "a 1 b")
+assert_eq("a #{"{[(".len} b", "a 3 b")
+
+# Single quotes, and apostrophes inside the nested strings
+assert_eq("x #{'it' + "'s"}", "x it's")
+assert_eq("x #{'a' + 'b'}", "x ab")
+
+# Nested interpolation, in the nested strings
+assert_eq("a #{"b #{"c".uc} d"} e", "a b C d e")
+assert_eq("a #{"b #{"c #{"d".uc} e"} f"} g", "a b c D e f g")
+
+# Hash lookups with a string key, inside the block
+var h = Hash(k => 42)
+assert_eq("v=#{h{"k"}}", "v=42")
+assert_eq("v=#{h{"k"} + 1}", "v=43")
+
+# A hash sign that is not an interpolation
+assert_eq("a # b #{1+1}", "a # b 2")
+assert_eq("a # {b}", "a # {b}")
+
+# Other string delimiters
+assert_eq(%Q|a #{"x".uc} b|, "a X b")
+assert_eq(%Q!a #{"x".uc} b!, "a X b")
+assert_eq(%Q|a #{ 5 | 3 } b|, "a 7 b")    # the delimiter, as an operator
+
+# Paired delimiters
+assert_eq(%Q(foo #{")".len} bar), "foo 1 bar")
+assert_eq(%Q[foo #{"]".len} bar], "foo 1 bar")
+assert_eq(%Q{a #{ [1,2,3].map { "<#{_}>" }.join(",") } b}, "a <1>,<2>,<3> b")
+assert_eq(“foo #{"bar".uc}”, "foo BAR")
+
+# The single-quoted strings are not interpolated, so nothing changes for them
+assert_eq('a #{ ' + 'b }', 'a #{ b }')
+assert_eq('it\'s #{x}'.len, 9)
+
+say "All tests passed."

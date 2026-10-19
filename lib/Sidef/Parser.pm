@@ -391,6 +391,56 @@ my $VAR_NAME_RE     = qr/[^\W\d]\w*+(?>::[^\W\d]\w*)*/;
 my $METHOD_NAME_RE  = qr/[^\W\d]\w*+!?/;
 my $VAR_INIT_SEP_RE = qr/\G\h*(?:=>|[=:])\h*/;
 
+# The code of an interpolation block: #{ ... }
+# It can contain balanced brackets, and nested strings ("...", '...', `...`) which
+# can use the same delimiter as the string that contains the block. The nested
+# double-quoted strings can have interpolation blocks too.
+my $INTERPOLATION_RE = qr{
+    (?(DEFINE)
+        (?<sf_interp> \# \{ (?&sf_code) \} )
+        (?<sf_code>
+            (?>
+                [^"'`\\\{\}\(\)\[\]\#]++
+              | \\ .
+              | (?&sf_dq)
+              | (?&sf_sq)
+              | (?&sf_bt)
+              | \{ (?&sf_code) \}
+              | \( (?&sf_code) \)
+              | \[ (?&sf_code) \]
+              | \#
+            )*+
+        )
+        (?<sf_dq> " (?> [^\\"\#]++ | \\ . | \# (?!\{) | (?&sf_interp) )*+ " )
+        (?<sf_sq> ' (?> [^\\']++ | \\ . )*+ ' )
+        (?<sf_bt> ` (?> [^\\`]++ | \\ . )*+ ` )
+    )
+}xs;
+
+# Unescapes the delimiters (\" => ") in the code of an interpolation block,
+# but not inside the nested strings (they are parsed again later).
+sub _unescape_block {
+    my ($block, $delims) = @_;
+
+    return $block =~ s{
+        $INTERPOLATION_RE
+        (?<str> (?&sf_dq) | (?&sf_sq) | (?&sf_bt) )
+      | \\ (?: (?<esc> [$delims] ) | . )
+    }{ $+{esc} // $+{str} // $& }gexsr;
+}
+
+# Unescapes the delimiters (\" => ") in the content of a string that has interpolation blocks.
+# $delims is a quotemeta'd list of delimiter characters.
+sub _unescape_interpolated {
+    my ($string, $delims) = @_;
+
+    return $string =~ s{
+        $INTERPOLATION_RE
+        (?<block> \# \{ (?&sf_code) \} )
+      | \\ (?: (?<esc> [$delims] ) | . )
+    }{ $+{esc} // (defined($+{block}) ? _unescape_block($+{block}, $delims) : $&) }gexsr;
+}
+
 # Operators (the longest prefix first), including the hyper-operators and the method-like operators
 my $OPERATORS_RE = do {
     local $" = q{|};
@@ -952,6 +1002,9 @@ sub backtrack_whitespace {
 }
 
 # Parses a string that starts with any delimiter (including the paired ones) and returns its content.
+#
+# With `interpolate => 1`, the `#{...}` blocks are skipped as a whole, so they can contain
+# the delimiter of the string (inside nested strings, or as a plain character).
 sub get_quoted_string {
     my ($self, %opt) = @_;
 
@@ -967,16 +1020,18 @@ sub get_quoted_string {
         }
     }
     else {
+        my $pos = pos($_) // 0;
         $self->fatal_error(
                            error => qq{can't find the beginning of a string quote delimiter},
                            code  => $_,
-                           pos   => pos($_),
+                           pos   => $pos,
                           );
     }
 
-    my $orig_pos   = pos($_);
-    my $beg_delim  = quotemeta $delim;
-    my $pair_delim = exists($self->{delim_pairs}{$delim}) ? $self->{delim_pairs}{$delim} : ();
+    my $orig_pos    = pos($_);
+    my $beg_delim   = quotemeta $delim;
+    my $pair_delim  = exists($self->{delim_pairs}{$delim}) ? $self->{delim_pairs}{$delim} : ();
+    my $interpolate = $opt{interpolate};
 
     my $string = '';
     if (defined $pair_delim) {
@@ -984,11 +1039,57 @@ sub get_quoted_string {
         my $end_delim = quotemeta $pair_delim;
         my $re_delim  = $beg_delim . $end_delim;
 
-        if (m{\G(?<main>$beg_delim((?>[^\\$re_delim]*+(?>\\.[^\\$re_delim]*|(?&main)){0,}){0,})$end_delim)}sgc) {
+        if (
+            $interpolate
+            and m{\G
+                $INTERPOLATION_RE
+                (?<main> $beg_delim
+                    (?<content>
+                        (?>
+                            [^\\$re_delim\#]++
+                          | \\ .
+                          | \# (?!\{)
+                          | (?&sf_interp)
+                          | (?&main)
+                        )*+
+                    )
+                $end_delim )
+            }xsgc
+          ) {
+            my $content = $+{content};
+            $string = (
+                       index($content, '#{') == -1
+                       ? $content =~ s/\\([$re_delim])/$1/gr
+                       : _unescape_interpolated($content, $re_delim)
+                      );
+        }
+        elsif (m{\G(?<main>$beg_delim((?>[^\\$re_delim]*+(?>\\.[^\\$re_delim]*|(?&main)){0,}){0,})$end_delim)}sgc) {
             $string = $2 =~ s/\\([$re_delim])/$1/gr;
         }
     }
-
+    elsif (
+        $interpolate
+        and m{\G
+            $INTERPOLATION_RE
+            $beg_delim
+            (?<content>
+                (?>
+                    [^\\$beg_delim\#]++
+                  | \\ .
+                  | \# (?!\{)
+                  | (?&sf_interp)
+                )*+
+            )
+            (?= $beg_delim )
+        }xsgc
+      ) {
+        my $content = $+{content};
+        $string = (
+                   index($content, '#{') == -1
+                   ? $content =~ s/\\([$beg_delim])/$1/gr
+                   : _unescape_interpolated($content, $beg_delim)
+                  );
+    }
     elsif (m{\G$beg_delim((?>[^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*){0,}){0,})}sgc) {
         $string = $1 =~ s/\\([$beg_delim])/$1/gr;
     }
@@ -1877,7 +1978,7 @@ sub _parse_quote_operator {
     my ($double_quoted, $method, $package) = @{$opt{info}};
 
     pos($_) -= 1;
-    my ($string, $pos) = $self->get_quoted_string(code => $opt{code});
+    my ($string, $pos) = $self->get_quoted_string(code => $opt{code}, interpolate => $double_quoted);
 
     # Special case for array-like objects (bytes and chars)
     my @array_like;
