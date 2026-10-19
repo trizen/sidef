@@ -860,7 +860,7 @@ sub _h_for_each {
 sub _h_cfor {
     my ($self, $obj) = @_;
 
-    my $parts = join('; ', map { join(', ', $self->_stmts($_)) } @{$obj->{expr}});
+    my $parts = join('; ', map { $_ eq '' ? '()' : $_ } map { join(', ', $self->_stmts($_)) } @{$obj->{expr}});
 
     return ("for ($parts) " . $self->_body($obj->{block}), P_ATOM);
 }
