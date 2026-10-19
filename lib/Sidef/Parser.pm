@@ -4778,8 +4778,20 @@ sub _peek_operator {
 # Returns the precedence and the associativity of an infix operator
 sub _infix_info {
     my ($self, $token) = @_;
+    return infix_precedence(@{$token}{qw(method op_type)});
+}
 
-    my ($method, $op_type) = @{$token}{qw(method op_type)};
+# Returns (precedence, associativity) of an infix operator or method-like operator.
+#
+# This is a plain function (not a method), which is also used by Sidef::Deparse::Sidef,
+# in order to generate code that uses the same precedence rules as the parser.
+#
+#   $method  the operator, as it appears in the AST (e.g.: '+', '..', 'add')
+#   $op_type the type of the operator: 'op' (default) or the name of a hyper-operator
+sub infix_precedence {
+    my ($method, $op_type) = @_;
+
+    $op_type //= 'op';
 
     # The hyper-operators (e.g.: »+», ~Z*, ~X+) have the same precedence as the pipe
     # operators (|>, |>>, |X>, |Z>) and the method-like operators (a `method` b).
@@ -4804,6 +4816,18 @@ sub _infix_info {
     }
 
     return @{$info};
+}
+
+# Returns the precedence of a keyword operator: if, unless, while, until, and, or
+sub keyword_precedence {
+    my ($keyword) = @_;
+    return $KEYWORD_PREC{$keyword};
+}
+
+# Returns true when the name is the name of a built-in class (String, Array, Number, etc.)
+sub is_built_in_class {
+    my ($name) = @_;
+    return exists $BUILT_IN_CLASSES{$name};
 }
 
 # Parses an arrow call (the arrow was consumed): `-> method(...)`

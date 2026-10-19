@@ -781,6 +781,7 @@ scripts/Tests/class_fields.sf
 scripts/Tests/class_global_variables.sf
 scripts/Tests/class_has_variables_with_prefix_methods.sf
 scripts/Tests/class_inheritance.sf
+scripts/Tests/class_inheritance_2.sf
 scripts/Tests/class_inside_module.sf
 scripts/Tests/class_multiple_inheritance.sf
 scripts/Tests/class_redefinition.sf
@@ -1184,6 +1185,7 @@ t/bernoulli_numbers_rec.t
 t/best_shuffle.t
 t/class_features.t
 t/currying.t
+t/deparse_sidef.t
 t/eval.t
 t/factors_of_a_mersenne.t
 t/fast_fourier_transform.t
