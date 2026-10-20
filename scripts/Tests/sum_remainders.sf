@@ -37,12 +37,12 @@ func my_sum_remainders(n, v) {     # sub-linear formula
 }
 
 assert_eq(
-    {|n| sum_remainders(n,   n.prime) }.map(1..20)        #=> A099726
+    {|n| sum_remainders(n,   n.prime) }.map(1..20),        #=> A099726
     %n[0, 1, 3, 5, 7, 7, 14, 18, 28, 30, 31, 26, 38, 45, 63, 71, 93, 75, 96, 115]
 )
 
 assert_eq(
-    {|n| sum_remainders(n-1, n.sigma) }.map(1..20)        #=> A340976
+    {|n| sum_remainders(n-1, n.sigma) }.map(1..20),        #=> A340976
     %n[0, 0, 0, 2, 2, 2, 7, 8, 18, 11, 16, 27, 30, 30, 40, 47, 46, 75, 60, 72],
 )
 
