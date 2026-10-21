@@ -114,12 +114,11 @@ use constant {
 
     SMALL_INTS_SIZE => $#SMALL_INTS,
 
-    PARI_GP_MIN            => 45,     # in decimal digits
-    YAFU_MIN               => 49,     # in decimal digits
+    YAFU_MIN               => 80,     # in decimal digits
     FACTORDB_MIN           => 65,     # in decimal digits
     SPECIAL_FACTORS_MIN    => 36,     # in decimal digits (must be greater than SMALL_NUMBER_MAX_BITS)
-    SMALL_NUMBER_MAX_BITS  => 110,    # in bits (numbers that can be factorized fast)
-    MEDIUM_NUMBER_MAX_BITS => 150,    # in bits (numbers that can be factorized moderately fast)
+    SMALL_NUMBER_MAX_BITS  => 128,    # in bits (numbers that can be factorized fast)
+    MEDIUM_NUMBER_MAX_BITS => 160,    # in bits (numbers that can be factorized moderately fast)
 
     # Check if we have a recent enough version of Math::Prime::Util (>= 0.75)
     HAS_NEW_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::sopfr)) // 0,
@@ -1227,7 +1226,7 @@ sub _factor_special {
 
     my @special_factors;
     my $composite_factors = 0;
-    my $limit             = (CORE::length($n) <= YAFU_MIN) ? ZERO : ();
+    my $limit             = (CORE::length($n) < FACTORDB_MIN) ? ZERO : ();
 
     foreach my $p (@{_set_int($n)->special_factors($limit)}) {
         if (_is_prob_prime($$p)) {
@@ -1451,7 +1450,7 @@ sub _factor_generic {
     }
 
     # 4. PARI Strategy
-    if ($len >= PARI_GP_MIN and $USE_PARI_GP) {
+    if (0 and $USE_PARI_GP) {
         my @pari = _factor_pari($n);
         if (@pari) {
             say STDERR "PARI/GP: Success!" if $VERBOSE;
@@ -24579,7 +24578,7 @@ sub _process_special_factors {
 
     # Check for sufficiently large composite factors
     if ($j <= 8 && @composite_factors) {
-        my $min_size = ($j == 8) ? FACTORDB_MIN : YAFU_MIN;
+        my $min_size = FACTORDB_MIN;
         if (Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > $min_size) {
             return {count => $count, remainder => $remainder, continue => 1};
         }
