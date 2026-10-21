@@ -1,0 +1,132 @@
+#!/usr/bin/ruby
+
+# MD5 Message-Digest Algorithm in Pure Sidef
+
+func my_md5(msg) {
+
+    # 1. Convert message to an array of byte values (ASCII/Unicode code points)
+    var bytes = msg.bytes
+    var orig_len = bytes.len
+
+    # 2. Padding the message
+    # Append bit '1' (represented as byte 0x80)
+    bytes << 0x80
+
+    # Append padding bytes '0' until length is congruent to 56 mod 64 (448 mod 512 bits)
+    while ((bytes.len % 64) != 56) {
+        bytes << 0
+    }
+
+    # Append original message length in bits as a 64-bit little-endian integer
+    var bit_len = orig_len * 8
+    ^8 -> each {|i|
+        bytes << ((bit_len >> (8 * i)) & 0xFF)
+    }
+
+    # 3. Initialize MD buffer (32-bit standard registers)
+    var A = 0x67452301
+    var B = 0xefcdab89
+    var C = 0x98badcfe
+    var D = 0x10325476
+
+    # 4. Define per-round shift amounts (s) and table constants (K)
+    var s = [
+        [7, 12, 17, 22],
+        [5,  9, 14, 20],
+        [4, 11, 16, 23],
+        [6, 10, 15, 21],
+    ].map { _*4 }.flat
+
+    # K[i] = floor(abs(sin(i + 1)) * 2^32)
+    var K = []
+    ^64 -> each {|i|
+        K << (abs(sin(i + 1)) * 2**32).int & 0xFFFFFFFF
+    }
+
+    # Helper function for 32-bit left rotation
+    func rotl(x, n) {
+        ((x << n) | (x >> (32 - n))) & 0xFFFFFFFF
+    }
+
+    # 5. Process message in 64-byte (512-bit) chunks
+    ^bytes.len `by` 64 -> each {|chunk_idx|
+        var M = []
+        ^16 -> each {|j|
+            var idx = chunk_idx + (j * 4)
+            var word = bytes[idx] | (bytes[idx+1] << 8) | (bytes[idx+2] << 16) | (bytes[idx+3] << 24)
+            M << word
+        }
+
+        var a = A
+        var b = B
+        var c = C
+        var d = D
+
+        ^64 -> each {|i|
+            var f = 0
+            var g = 0
+
+            if (i < 16) {
+                f = (b & c) | ((~b & 0xFFFFFFFF) & d)
+                g = i
+            } elsif (i < 32) {
+                f = (d & b) | ((~d & 0xFFFFFFFF) & c)
+                g = (5 * i + 1) % 16
+            } elsif (i < 48) {
+                f = b ^ c ^ d
+                g = (3 * i + 5) % 16
+            } else {
+                f = c ^ (b | (~d & 0xFFFFFFFF))
+                g = (7 * i) % 16
+            }
+
+            f = (f & 0xFFFFFFFF)
+            var temp = d
+            d = c
+            c = b
+            b = (b + rotl((a + f + K[i] + M[g]) & 0xFFFFFFFF, s[i])) & 0xFFFFFFFF
+            a = temp
+        }
+
+        A = (A + a) & 0xFFFFFFFF
+        B = (B + b) & 0xFFFFFFFF
+        C = (C + c) & 0xFFFFFFFF
+        D = (D + d) & 0xFFFFFFFF
+    }
+
+    # 6. Produce final hash output as 32 lowercase hexadecimal characters (little-endian byte ordering)
+    var digest_words = [A, B, C, D]
+    var hex_str = ""
+
+    digest_words.each {|word|
+        ^4 -> each {|i|
+            var byte = (word >> (8 * i)) & 0xFF
+            hex_str += sprintf("%02x", byte)
+        }
+    }
+
+    return hex_str
+}
+
+var tests = [
+    ['d41d8cd98f00b204e9800998ecf8427e', ''],
+    ['0cc175b9c0f1b6a831c399e269772661', 'a'],
+    ['900150983cd24fb0d6963f7d28e17f72', 'abc'],
+    ['f96b697d7cb7938d525a2f31aaf161d0', 'message digest'],
+    ['c3fcd3d76192e4007dfb496cca67e13b', 'abcdefghijklmnopqrstuvwxyz'],
+    ['d174ab98d277d9f5a5611c2c9f419d9f', 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'],
+    ['57edf4a22be3c955ac49da2e2107b67a', '12345678901234567890123456789012345678901234567890123456789012345678901234567890'],
+]
+
+for expected,msg in (tests) {
+    var hash = my_md5(msg)
+    say "#{hash} : #{msg}"
+
+    if (hash != expected) {
+        say "\tHowever, that is incorrect (expected: #{expected})"
+    }
+}
+
+with (irand(512, 2048).random_string) {|s|
+    assert_eq(my_md5(s), s.md5)
+}

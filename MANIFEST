@@ -933,6 +933,8 @@ scripts/Tests/matrix_class.sf
 scripts/Tests/matrix_determinant.sf
 scripts/Tests/matrix_multiplication.sf
 scripts/Tests/matrix_operations.sf
+scripts/Tests/md5-procedural.sf
+scripts/Tests/md5.sf
 scripts/Tests/median.sf
 scripts/Tests/merge_sort.sf
 scripts/Tests/merge_sort_2.sf
@@ -1072,6 +1074,7 @@ scripts/Tests/set_consolidation.sf
 scripts/Tests/set_operations.sf
 scripts/Tests/sets_1.sf
 scripts/Tests/sets_2.sf
+scripts/Tests/sha256.sf
 scripts/Tests/sidef_executor.sf
 scripts/Tests/sidef_keywords.sf
 scripts/Tests/sierpinski_alphabet.sf

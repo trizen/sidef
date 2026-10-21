@@ -1,0 +1,102 @@
+#!/usr/bin/ruby
+
+# SHA-256 Message-Digest Algorithm in Pure Sidef
+
+func my_sha256(msg) {
+    # 1. Byte Array & Padding
+    var bytes = msg.bytes
+    var orig_len = bytes.len
+
+    bytes << 0x80
+    while ((bytes.len % 64) != 56) {
+        bytes << 0
+    }
+
+    # Append 64-bit big-endian original bit length
+    var bit_len = orig_len * 8
+    for i in (7 `downto` 0) {
+        bytes << ((bit_len >> (8 * i)) & 0xFF)
+    }
+
+    # 2. Initial Hash State Vector (H)
+    var H = [
+        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+        0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+    ]
+
+    # 3. Pre-compute Round Constants K
+    var K = (0..63).map {|i|
+        var p = (i + 1).prime
+        var frac = cbrt(p) - cbrt(p).int
+        (frac * 2**32).int & 0xFFFFFFFF
+    }
+
+    # 32-bit helper closures
+    func mask(x)    { x & 0xFFFFFFFF }
+    func rotr(x, n) { mask((x >> n) | (x << (32 - n))) }
+
+    # 4. Main Processing Loop
+    for chunk in (0 ..^ bytes.len `by` 64) {
+        # Prepare message schedule W (64 words)
+        var W = []
+
+        for j in (0..15) {
+            var idx = chunk + (j * 4)
+            var word = (bytes[idx] << 24) | (bytes[idx+1] << 16) | (bytes[idx+2] << 8) | bytes[idx+3]
+            W << mask(word)
+        }
+
+        for i in (16..63) {
+            var s0 = rotr(W[i-15], 7) ^ rotr(W[i-15], 18) ^ (W[i-15] >> 3)
+            var s1 = rotr(W[i-2], 17) ^ rotr(W[i-2], 19) ^ (W[i-2] >> 10)
+            W << mask(W[i-16] + s0 + W[i-7] + s1)
+        }
+
+        # Working state variables (a through h)
+        var (a, b, c, d, e, f, g, h) = H...
+
+        # 64 Compression Rounds
+        for i in (0..63) {
+
+            var s1  = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)
+            var ch  = (e & f) ^ (mask(~e) & g)
+            var t1  = mask(h + s1 + ch + K[i] + W[i])
+            var s0  = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)
+            var maj = (a & b) ^ (a & c) ^ (b & c)
+            var t2  = mask(s0 + maj)
+
+            (h, g, f, e, d, c, b, a) = (g, f, e, mask(d + t1), c, b, a, mask(t1 + t2))
+        }
+
+        # Add compressed chunk back to hash state
+        var round_vars = [a, b, c, d, e, f, g, h]
+        H = (0..7).map {|i| mask(H[i] + round_vars[i]) }
+    }
+
+    # 5. Hexadecimal Formatting Output
+    return H.map {|val| sprintf("%08x", val) }.join
+}
+
+var tests = [
+    '',
+    'a',
+    'abc',
+    'message digest',
+    'abcdefghijklmnopqrstuvwxyz',
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+    '12345678901234567890123456789012345678901234567890123456789012345678901234567890'
+]
+
+for msg in (tests) {
+    var expected = msg.sha256
+    var hash = my_sha256(msg)
+    say "#{hash} : #{msg}"
+
+    if (hash != expected) {
+        say "\tHowever, that is incorrect (expected: #{expected})"
+    }
+}
+
+with (irand(512, 2048).random_string) {|s|
+    assert_eq(my_sha256(s), s.sha256)
+}
