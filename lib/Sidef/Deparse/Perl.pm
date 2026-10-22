@@ -235,6 +235,7 @@ my %NODE_HANDLERS = (
     'Sidef::Meta::Error'         => '_node_error',
     'Sidef::Meta::Warning'       => '_node_warning',
     'Sidef::Meta::Unimplemented' => '_node_unimplemented',
+    'Sidef::Meta::History'       => '_node_history',
     'Sidef::Eval::Eval'          => '_node_eval',
     'Sidef::Parser'              => '_node_parser',
                     );
@@ -259,6 +260,11 @@ sub new {
     $self->{declared}      = {};    # the functions, blocks and classes that have been emitted
     $self->{cache}         = {};    # the cache of the constants
     $self->{counters}      = {};    # the counters for the names of the constants
+
+    # The persistent mode (interactive mode): the deparser is used for more than one program, and
+    # the top-level declarations are package variables, which are visible in the next programs.
+    $self->{persistent_decls} = [];    # the `our` declarations, which are repeated in every program
+    $self->{persistent_seen}  = {};
 
     $self->{header} .= $self->_default_header;
     return $self;
@@ -314,6 +320,12 @@ HEADER
 # Adds a line to the preamble (once)
 sub _prelude {
     my ($self, $line) = @_;
+
+    # A variable of the preamble must be visible in the next programs
+    if ($self->{persistent} and $line =~ s/\Amy\s+([\$\@%]\w+)\s*=/$1 =/) {
+        $self->_persist("our $1;");
+    }
+
     if (not $self->{preamble_seen}{$line}++) {
         push @{$self->{preamble}}, $line;
     }
@@ -330,15 +342,43 @@ sub load_mod {
 # Declares something in the nearest scope: it will be emitted at the beginning of that scope.
 sub _hoist {
     my ($self, $code) = @_;
-    push @{$self->{frames}[-1]{declarations}}, $code;
+
+    my $frame = $self->{frames}[-1];
+
+    # The top-level declarations of the persistent mode are package variables
+    if ($frame->{persistent} and $code =~ s/\Amy\b/our/) {
+        $self->_persist($code);
+        return;
+    }
+
+    push @{$frame->{declarations}}, $code;
+    return;
+}
+
+# Registers a declaration that is repeated at the beginning of every program (persistent mode)
+sub _persist {
+    my ($self, $code) = @_;
+    push @{$self->{persistent_decls}}, $code if not $self->{persistent_seen}{$code}++;
+    return;
+}
+
+# The state of the deparser, which can be restored when a program has failed
+sub checkpoint {
+    my ($self) = @_;
+    return {declared => {map { ($_ => {%{$self->{declared}{$_}}}) } keys %{$self->{declared}}}};
+}
+
+sub rollback {
+    my ($self, $checkpoint) = @_;
+    $self->{declared} = $checkpoint->{declared};
     return;
 }
 
 # Runs a callback in a new scope. Returns the hoisted declarations, followed by what the callback returns.
 sub _with_scope {
-    my ($self, $callback) = @_;
+    my ($self, $callback, %frame) = @_;
 
-    push @{$self->{frames}}, {declarations => []};
+    push @{$self->{frames}}, {declarations => [], %frame};
 
     my @result = eval { $callback->() };
     my $error  = $@;
@@ -366,7 +406,10 @@ sub _id {
 # Returns true the first time it's called for an object
 sub _first_time {
     my ($self, $obj, $what) = @_;
-    return !$self->{declared}{$what // ''}{refaddr($obj)}++;
+    my $key = refaddr($obj);
+    exists($self->{declared}{$what // ''}{$key}) and return 0;
+    $self->{declared}{$what // ''}{$key} = $obj;    # the object is kept alive, which keeps its address unique
+    return 1;
 }
 
 # The name of a variable, without the sigil
@@ -1561,6 +1604,16 @@ sub _node_data {
 
 sub _node_parser { '$Sidef::PARSER' }
 
+# A value from the history of the interactive mode: #1
+sub _node_history {
+    my ($self, $obj) = @_;
+
+    my $index = $obj->{index};
+    my $count = scalar(@{$Sidef::HISTORY[$index] // []});
+
+    return ($count == 1 ? "\$Sidef::HISTORY[$index][0]" : "(\@{\$Sidef::HISTORY[$index]})");
+}
+
 sub _node_prefix_method {
     my ($self, $obj) = @_;
     return 'do{my($self,@args)=' . $self->deparse_args($obj->{expr}) . ';$self->' . $obj->{name} . '(@args)}';
@@ -2086,9 +2139,20 @@ sub deparse_script {
 sub _program {
     my ($self, $ast, %opt) = @_;
 
-    my ($declarations, @statements) = $self->_with_scope(sub { $self->deparse_script($ast) });
+    my $persistent = ($self->{persistent} and $opt{header});
 
-    my $code = $self->{before} . join('', @{$self->{preamble}}) . $declarations . join($self->{between}, @statements) . $self->{after};
+    my ($declarations, @statements) = $self->_with_scope(sub { $self->deparse_script($ast) }, persistent => $persistent);
+
+    my $code =
+        $self->{before}
+      . ($persistent ? join('', @{$self->{persistent_decls}}) : '')
+      . join('', @{$self->{preamble}})
+      . $declarations
+      . join($self->{between}, @statements)
+      . $self->{after};
+
+    # The preamble is executed only once (the duplicates are ignored by `_prelude`)
+    $self->{preamble} = [] if $persistent;
 
     return ($opt{header} ? ($code =~ s/^\s*/$self->{header}/r) : $code);
 }

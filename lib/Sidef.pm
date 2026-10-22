@@ -10,6 +10,7 @@ package Sidef {
 
     our %INCLUDED;           # will keep track of included modules
     our %EVALS;              # will contain info required for eval()
+    our @HISTORY;            # the results of the evaluated lines (interactive mode): #1, #2, ...
 
     use constant {
                   UPDATE_SEC   => 5 * 60 * 60,         # 5 hours
@@ -104,14 +105,17 @@ package Sidef {
         my ($self) = @_;
 
         $self->{sidef_config_dir} //= $ENV{SIDEF_CONFIG_DIR}
+          || (
+                ($^O eq 'MSWin32' and ($ENV{APPDATA} || $ENV{LOCALAPPDATA})) ? File::Spec->catdir(($ENV{APPDATA} || $ENV{LOCALAPPDATA}), 'sidef')
+              : ()
+             )
           || File::Spec->catdir(
                                 $ENV{XDG_CONFIG_DIR}
                                   || (
                                          $ENV{HOME}
                                       || $ENV{LOGDIR}
                                       || (
-                                          $^O eq 'MSWin32'
-                                          ? '\Local Settings\Application Data'
+                                          $^O eq 'MSWin32' ? '\Local Settings\Application Data'
                                           : eval { ((getpwuid($<))[7] || `echo -n ~`) }
                                          )
                                       || File::Spec->curdir()
@@ -349,6 +353,52 @@ package Sidef {
                                                 environment_name => $self->{environment_name} // '',);
 
         scalar $self->{$lang}{deparser}->deparse($ast);
+    }
+
+    # Compiles the AST of a line of the interactive mode (REPL) into Perl code.
+    #
+    # Unlike compile_code(), the deparser is kept between the lines, and all the top-level
+    # declarations are stored in the package of the session. This allows the next lines to reuse
+    # the functions and the classes that were defined before.
+    sub compile_interactive {
+        my ($self, $ast) = @_;
+
+        state $instances = 0;
+        $self->{environment_name} //= 'Sidef::Runtime::REPL' . ++$instances;
+
+        my $deparser = (
+            $self->{Perl}{deparser} //= do {
+                require Sidef::Deparse::Perl;
+                Sidef::Deparse::Perl->new(
+                                          opt              => $self->{opt},
+                                          environment_name => $self->{environment_name},
+                                          persistent       => 1,
+                                         );
+            }
+        );
+
+        my $checkpoint = $deparser->checkpoint;
+        my $code       = eval { $deparser->deparse($ast) };
+
+        if ($@) {
+            my $error = $@;
+            $deparser->rollback($checkpoint);
+            die $error;
+        }
+
+        $self->{checkpoint} = $checkpoint;
+        return "package $self->{environment_name} {$code}\n";
+    }
+
+    # Forgets what the last line has declared (called when the evaluation of the line has failed)
+    sub rollback_interactive {
+        my ($self) = @_;
+
+        if (my $checkpoint = delete $self->{checkpoint}) {
+            $self->{Perl}{deparser}->rollback($checkpoint);
+        }
+
+        return;
     }
 
     #

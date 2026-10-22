@@ -659,7 +659,103 @@ sub fatal_error {
         $error .= $self->_similar_names($opt{var});
     }
 
+    # In the interactive mode (REPL), the errors carry a flag that tells whether the code
+    # is incomplete (the parser reached the end of the input), which allows reading more lines.
+    if ($self->{interactive}) {
+        die bless({message => $error, incomplete => ($opt{incomplete} ? 1 : 0)}, 'Sidef::Parser::Error');
+    }
+
     die $error;
+}
+
+# Returns true when only whitespace and comments are left in the code, after the current position.
+# It is used for deciding if a parsing error is caused by an incomplete input (interactive mode only).
+sub _at_eof {
+    my ($self, $code) = @_;
+
+    $self->{interactive} or return 0;
+
+    local *_ = $code;
+    return (/\G(?:\s|#[^\n]*)*\z/ ? 1 : 0);
+}
+
+# The state of the parser (the declared names), which can be restored after a failed parse.
+# Used by the interactive mode, where a syntax error must not leave the parser in a broken state.
+sub snapshot {
+    my ($self) = @_;
+
+    my %snapshot = (
+                    line  => $self->{line},
+                    class => $self->{class},
+                    EOT   => [@{$self->{EOT}}],
+                   );
+
+    foreach my $key (qw(vars ref_vars_refs)) {
+        foreach my $class (keys %{$self->{$key}}) {
+            my $scope = $self->{$key}{$class};
+            $snapshot{$key}{$class} = [$scope, [@{$scope}]];
+        }
+    }
+
+    return \%snapshot;
+}
+
+sub restore {
+    my ($self, $snapshot) = @_;
+
+    $self->{line}  = $snapshot->{line};
+    $self->{class} = $snapshot->{class};
+    $self->{EOT}   = [@{$snapshot->{EOT}}];
+
+    foreach my $key (qw(vars ref_vars_refs)) {
+
+        my $table = $self->{$key};
+
+        # Namespaces that were created by the failed code
+        foreach my $class (keys %{$table}) {
+            exists($snapshot->{$key}{$class}) or delete $table->{$class};
+        }
+
+        foreach my $class (keys %{$snapshot->{$key}}) {
+            my ($scope, $items) = @{$snapshot->{$key}{$class}};
+            @{$scope} = @{$items};
+            $table->{$class} = $scope;
+        }
+    }
+
+    return $self;
+}
+
+# Top-level declarations of the interactive mode are global variables, because the lexical
+# variables don't survive between the lines that are evaluated separately.
+sub _repl_toplevel {
+    my ($self) = @_;
+    return (    $self->{repl_globals}
+            and not $self->{block_depth}
+            and not $self->{parentheses}
+            and not $self->{right_brackets}
+            and not exists($self->{current_class}));
+}
+
+# Values from the history of the interactive mode: #1, #2, #-1, etc.
+sub _parse_history_ref {
+    my ($self, $index, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $size = scalar(@Sidef::HISTORY);
+    my $pos  = ($index < 0 ? $size + $index : $index - 1);
+
+    if ($pos < 0 or $pos >= $size) {
+        $self->fatal_error(
+                           code   => $_,
+                           pos    => pos($_) - length($index) - 1,
+                           error  => "invalid reference to the value #$index",
+                           reason => ($size ? "the history has $size value" . ($size == 1 ? '' : 's') : "the history is empty"),
+                          );
+    }
+
+    return bless({index => $pos}, 'Sidef::Meta::History');
 }
 
 # Returns the source line of an error, the position of the pointer in this line (starting at 0)
@@ -785,6 +881,8 @@ sub find_var {
 sub check_declarations {
     my ($self, $hash_ref) = @_;
 
+    return if ($self->{interactive} or $self->{eval_mode});
+
     foreach my $class (grep { $_ eq 'main' } keys %{$hash_ref}) {
 
         my $array_ref = $hash_ref->{$class};
@@ -834,6 +932,7 @@ sub parse_whitespace {
     my ($self, %opt) = @_;
 
     my $found_space = -1;
+    my $newline     = 0;
     local *_ = $opt{code};
     {
         ++$found_space;
@@ -854,6 +953,7 @@ sub parse_whitespace {
             # Generic line
             if (/\G\R/gc) {
                 ++$self->{line};
+                $newline = 1;
 
                 # Here-documents
                 while (@{$self->{EOT}}) {
@@ -874,6 +974,14 @@ sub parse_whitespace {
         # https://www.fileformat.info/info/unicode/char/200b/index.htm
         if (/\G\x{200B}+/gc) {
             redo;
+        }
+
+        # A value from the history of the interactive mode (`#1`) is not a comment, when it is
+        # in the position of an operand, or when it starts a line (history_refs: 1 = statement, 2 = operand)
+        if (    $opt{history_refs}
+            and /\G#-?[1-9][0-9]*\b/
+            and ($opt{history_refs} == 2 or $newline or (pos($_) // 0) == 0)) {
+            return ($found_space > 0 ? 1 : ());
         }
 
         # Embedded comments (https://docs.raku.org/language/syntax#Multi-line_/_embedded_comments)
@@ -928,10 +1036,11 @@ sub _read_heredoc {
         /\G\R/gc
           ? ++$self->{line}
           : $self->fatal_error(
-                               error => "can't find string terminator <<$name>> anywhere before end-of-file",
-                               code  => $_,
-                               pos   => $eot->{pos},
-                               line  => $eot->{line},
+                               incomplete => 1,
+                               error      => "can't find string terminator <<$name>> anywhere before end-of-file",
+                               code       => $_,
+                               pos        => $eot->{pos},
+                               line       => $eot->{line},
                               );
     }
 
@@ -966,10 +1075,11 @@ sub _skip_c_comment {
               /\G\R/gc
               ? $self->{line}++
               : $self->fatal_error(
-                                   error => "can't find the end of the multi-line comment",
-                                   code  => $_,
-                                   pos   => $comment_pos,
-                                   line  => $comment_line,
+                                   incomplete => 1,
+                                   error      => "can't find the end of the multi-line comment",
+                                   code       => $_,
+                                   pos        => $comment_pos,
+                                   line       => $comment_line,
                                   )
              );
     }
@@ -1022,9 +1132,10 @@ sub get_quoted_string {
     else {
         my $pos = pos($_) // 0;
         $self->fatal_error(
-                           error => qq{can't find the beginning of a string quote delimiter},
-                           code  => $_,
-                           pos   => $pos,
+                           incomplete => $self->_at_eof($opt{code}),
+                           error      => qq{can't find the beginning of a string quote delimiter},
+                           code       => $_,
+                           pos        => $pos,
                           );
     }
 
@@ -1096,9 +1207,10 @@ sub get_quoted_string {
 
     (defined($pair_delim) ? /\G(?<=\Q$pair_delim\E)/ : /\G$beg_delim/gc)
       || $self->fatal_error(
-                            error => sprintf(qq{can't find the quoted string terminator <<%s>>}, $pair_delim // $delim),
-                            code  => $_,
-                            pos   => $orig_pos,
+                            incomplete => 1,
+                            error      => sprintf(qq{can't find the quoted string terminator <<%s>>}, $pair_delim // $delim),
+                            code       => $_,
+                            pos        => $orig_pos,
                            );
 
     $self->{line} += $string =~ s/\R\K//g if not $opt{no_count_line};
@@ -1239,9 +1351,10 @@ sub get_init_vars {
       && (
           /\G\h*\Q$end_delim\E/gc
           || $self->fatal_error(
-                                code  => $_,
-                                pos   => pos($_),
-                                error => "can't find the closing delimiter: `$end_delim`",
+                                code       => $_,
+                                pos        => pos($_),
+                                incomplete => $self->_at_eof($opt{code}),
+                                error      => "can't find the closing delimiter: `$end_delim`",
                                )
          );
 
@@ -1386,9 +1499,10 @@ sub parse_init_vars {
       && (
           /\G\h*\Q$end_delim\E/gc
           || $self->fatal_error(
-                                code  => $_,
-                                pos   => pos($_),
-                                error => "can't find the closing delimiter: `$end_delim`",
+                                code       => $_,
+                                pos        => pos($_),
+                                incomplete => $self->_at_eof($opt{code}),
+                                error      => "can't find the closing delimiter: `$end_delim`",
                                )
          );
 
@@ -1499,11 +1613,12 @@ sub parse_arg {
 
         $self->{parentheses}
           && $self->fatal_error(
-                                code   => $_,
-                                pos    => $p - 1,
-                                error  => "unbalanced parenthesis",
-                                reason => "the `(` opened here has no matching `)`",
-                                line   => $line,
+                                code       => $_,
+                                pos        => $p - 1,
+                                error      => "unbalanced parenthesis",
+                                incomplete => $self->_at_eof($opt{code}),
+                                reason     => "the `(` opened here has no matching `)`",
+                                line       => $line,
                                );
 
         return $obj;
@@ -1528,11 +1643,12 @@ sub parse_array {
 
         $self->{right_brackets}
           && $self->fatal_error(
-                                code   => $_,
-                                pos    => $p - 1,
-                                error  => "unbalanced right bracket",
-                                reason => "the `[` opened here has no matching `]`",
-                                line   => $line,
+                                code       => $_,
+                                pos        => $p - 1,
+                                error      => "unbalanced right bracket",
+                                incomplete => $self->_at_eof($opt{code}),
+                                reason     => "the `[` opened here has no matching `]`",
+                                line       => $line,
                                );
 
         return $obj;
@@ -1557,11 +1673,12 @@ sub parse_lookup {
 
         $self->{curly_brackets}
           && $self->fatal_error(
-                                code   => $_,
-                                pos    => $p - 1,
-                                error  => "unbalanced curly bracket",
-                                reason => "the `{` opened here has no matching `}`",
-                                line   => $line,
+                                code       => $_,
+                                pos        => $p - 1,
+                                error      => "unbalanced curly bracket",
+                                incomplete => $self->_at_eof($opt{code}),
+                                reason     => "the `{` opened here has no matching `}`",
+                                line       => $line,
                                );
 
         return $obj;
@@ -1587,6 +1704,9 @@ sub parse_block {
         local $self->{curly_brackets} = 1;
         local $self->{no_pipe_op}     = 0;
         local $self->{no_pair_op}     = 0;
+
+        # The depth of the nested blocks (used by the interactive mode to find the top-level declarations)
+        local $self->{block_depth} = ($self->{block_depth} // 0) + 1;
 
         my $class_name = $self->{class};
 
@@ -1632,11 +1752,12 @@ sub parse_block {
 
         $self->{curly_brackets}
           && $self->fatal_error(
-                                code   => $_,
-                                pos    => $p - 1,
-                                error  => "unbalanced curly bracket",
-                                reason => "the `{` opened here has no matching `}`",
-                                line   => $line,
+                                code       => $_,
+                                pos        => $p - 1,
+                                error      => "unbalanced curly bracket",
+                                incomplete => $self->_at_eof($opt{code}),
+                                reason     => "the `{` opened here has no matching `}`",
+                                line       => $line,
                                );
 
         if ($has_vars) {
@@ -1662,11 +1783,16 @@ sub parse_expr {
 
     local *_ = $opt{code};
     {
-        $self->parse_whitespace(code => $opt{code});
+        $self->parse_whitespace(code => $opt{code}, history_refs => ($self->{interactive} ? 2 : 0));
 
         # End of an expression, or end of the script
         if (/\G;/gc || /\G\z/) {
             return;
+        }
+
+        # A value from the history of the interactive mode: #1, #-1
+        if ($self->{interactive} and /\G#(-?[1-9][0-9]*)\b/gc) {
+            return $self->_parse_history_ref($1, code => $opt{code});
         }
 
         # Fast paths for the most common tokens (decimal numbers and plain identifiers),
@@ -1721,7 +1847,9 @@ sub parse_expr {
 
         # Declaration of variables (global and lexical)
         if (/\G(var|global|del)\b\h*/gc) {
-            return $self->_parse_variable_declaration(code => $opt{code}, match => $1);
+            my $type = $1;
+            $type = 'global' if ($type eq 'var' and $self->_repl_toplevel);
+            return $self->_parse_variable_declaration(code => $opt{code}, match => $type);
         }
 
         # "has" class attributes
@@ -1731,6 +1859,9 @@ sub parse_expr {
 
         # Declaration of constants and static variables
         if (/\G(define|const|static)\b\h*/gc) {
+            if ($self->_repl_toplevel) {
+                return $self->_parse_variable_declaration(code => $opt{code}, match => 'global');
+            }
             return $self->_parse_constant_declaration(code => $opt{code}, match => $1);
         }
 
@@ -2403,9 +2534,10 @@ sub _parse_not {
     my $arg = $self->parse_obj(code => $opt{code}, prec => PREC_NOT);
 
     $arg // $self->fatal_error(
-                               code  => $_,
-                               pos   => pos($_),
-                               error => "expected an expression after `not`",
+                               code       => $_,
+                               pos        => pos($_),
+                               incomplete => $self->_at_eof($opt{code}),
+                               error      => "expected an expression after `not`",
                               );
 
     return $self->_negate($arg);
@@ -2733,9 +2865,10 @@ sub _parse_variable_declaration {
         my $args = $self->parse_obj(code => $opt{code}, multiline => 1);
 
         $args // $self->fatal_error(
-                                    code  => $_,
-                                    pos   => pos($_),
-                                    error => "expected an expression after variable declaration",
+                                    code       => $_,
+                                    pos        => pos($_),
+                                    incomplete => $self->_at_eof($opt{code}),
+                                    error      => "expected an expression after variable declaration",
                                    );
 
         $init_obj->{args} = $args;
@@ -2767,9 +2900,10 @@ sub _parse_class_attributes {
     if (/\G\h*=\h*/gc) {
         $args = $self->parse_obj(code => $opt{code}, multiline => 1);
         $args // $self->fatal_error(
-                                    code  => $_,
-                                    pos   => pos($_) - 2,
-                                    error => qq{expected an expression after "=" in `has` declaration},
+                                    code       => $_,
+                                    pos        => pos($_) - 2,
+                                    incomplete => $self->_at_eof($opt{code}),
+                                    error      => qq{expected an expression after "=" in `has` declaration},
                                    );
     }
 
@@ -2834,9 +2968,10 @@ sub _parse_constant_declaration {
         my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
 
         $obj // $self->fatal_error(
-                                   code  => $_,
-                                   pos   => pos($_) - 2,
-                                   error => qq{expected an expression after $type "$var->{name}"},
+                                   code       => $_,
+                                   pos        => pos($_) - 2,
+                                   incomplete => $self->_at_eof($opt{code}),
+                                   error      => qq{expected an expression after $type "$var->{name}"},
                                   );
 
         $var->{value} = $obj;
@@ -3192,10 +3327,11 @@ sub _parse_class_definition {
 
     /\G\h*(?=\{)/gc
       || $self->fatal_error(
-                            error  => "invalid class declaration",
-                            reason => "expected: class $name(...){...}",
-                            code   => $_,
-                            pos    => pos($_)
+                            error      => "invalid class declaration",
+                            incomplete => $self->_at_eof($opt{code}),
+                            reason     => "expected: class $name(...){...}",
+                            code       => $_,
+                            pos        => pos($_)
                            );
 
     local $self->{class_name}    = (defined($built_in_obj) ? ref($built_in_obj) : $obj->{name});
@@ -3291,10 +3427,11 @@ sub _parse_function_definition {
     my $brace_pos;
     (/\G\h*(?=\{)/gc and ($brace_pos = pos($_)) and /\G\{\h*/gc)
       || $self->fatal_error(
-                            error  => "invalid `$type` declaration",
-                            reason => "expected: $type $name(...){...}",
-                            code   => $_,
-                            pos    => pos($_)
+                            error      => "invalid `$type` declaration",
+                            incomplete => $self->_at_eof($opt{code}),
+                            reason     => "expected: $type $name(...){...}",
+                            code       => $_,
+                            pos        => pos($_)
                            );
 
     local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $has_kids ? $parent : $obj;
@@ -3413,9 +3550,10 @@ sub _parse_given {
                  /\G\h*(?=\{)/gc
                  ? $self->parse_block(code => $opt{code}, topic_var => 1)
                  : $self->fatal_error(
-                                      error => "expected a block after `given(expr)`",
-                                      code  => $_,
-                                      pos   => pos($_),
+                                      incomplete => $self->_at_eof($opt{code}),
+                                      error      => "expected a block after `given(expr)`",
+                                      code       => $_,
+                                      pos        => pos($_),
                                      )
                 );
 
@@ -3443,9 +3581,10 @@ sub _parse_when {
                  /\G\h*(?=\{)/gc
                  ? $self->parse_block(code => $opt{code}, with_vars => 1)
                  : $self->fatal_error(
-                                      error => "expected a block after `when(expr)`",
-                                      code  => $_,
-                                      pos   => pos($_),
+                                      incomplete => $self->_at_eof($opt{code}),
+                                      error      => "expected a block after `when(expr)`",
+                                      code       => $_,
+                                      pos        => pos($_),
                                      )
                 );
 
@@ -3471,9 +3610,10 @@ sub _parse_case {
                  /\G\h*(?=\{)/gc
                  ? $self->parse_block(code => $opt{code}, with_vars => 1)
                  : $self->fatal_error(
-                                      error => "expected a block after `case(expr)`",
-                                      code  => $_,
-                                      pos   => pos($_),
+                                      incomplete => $self->_at_eof($opt{code}),
+                                      error      => "expected a block after `case(expr)`",
+                                      code       => $_,
+                                      pos        => pos($_),
                                      )
                 );
 
@@ -3973,9 +4113,10 @@ sub _parse_prefix_expression {
 
     defined($arg)
       || $self->fatal_error(
-                            code  => $_,
-                            error => "expected an argument. Did you mean '$method()' instead?",
-                            pos   => pos($_) - 1,
+                            code       => $_,
+                            error      => "expected an argument. Did you mean '$method()' instead?",
+                            incomplete => 0,
+                            pos        => pos($_) - 1,
                            );
 
     my $ref = ref($obj);
@@ -4119,10 +4260,11 @@ sub _parse_for_in_loop {
                  /\G\h*(?=\{)/gc
                  ? $self->parse_block(code => $opt{code})
                  : $self->fatal_error(
-                                      error  => "invalid declaration of the `for` loop",
-                                      reason => "expected a block after the loop expression: for x in expr { ... }",
-                                      code   => $_,
-                                      pos    => pos($_),
+                                      error      => "invalid declaration of the `for` loop",
+                                      incomplete => $self->_at_eof($opt{code}),
+                                      reason     => "expected a block after the loop expression: for x in expr { ... }",
+                                      code       => $_,
+                                      pos        => pos($_),
                                      )
                 );
 
@@ -4249,10 +4391,11 @@ sub _parse_control_block {
 
     /\G\h*(?=\{)/gc
       || $self->fatal_error(
-                            code   => $_,
-                            pos    => pos($_) - 1,
-                            error  => $error,
-                            reason => $reason,
+                            code       => $_,
+                            pos        => pos($_) - 1,
+                            incomplete => $self->_at_eof($opt{code}),
+                            error      => $error,
+                            reason     => $reason,
                            );
 
     return $self->parse_block(code => $opt{code}, %{$opt{block_opts} // {}});
@@ -4384,9 +4527,10 @@ sub parse_methods {
                     }
                     else {
                         $self->fatal_error(
-                                           code  => $_,
-                                           pos   => $orig_pos,
-                                           error => "operator `$method` requires a right-side operand",
+                                           code       => $_,
+                                           pos        => $orig_pos,
+                                           incomplete => $self->_at_eof($opt{code}),
+                                           error      => "operator `$method` requires a right-side operand",
                                           );
                     }
                 }
@@ -4665,9 +4809,10 @@ sub parse_infix {
             my $arg = $self->parse_obj(code => $opt{code}, prec => $prec + 1);
 
             $arg // $self->fatal_error(
-                                       code  => $_,
-                                       pos   => $token->{start},
-                                       error => "keyword `$name` requires a right-side expression",
+                                       code       => $_,
+                                       pos        => $token->{start},
+                                       incomplete => $self->_at_eof($opt{code}),
+                                       error      => "keyword `$name` requires a right-side expression",
                                       );
 
             if ($wrap) {
@@ -4726,9 +4871,10 @@ sub parse_infix {
                                   );
 
         $arg // $self->fatal_error(
-                                   code  => $_,
-                                   pos   => $token->{start},
-                                   error => "operator `$method` requires a right-side operand",
+                                   code       => $_,
+                                   pos        => $token->{start},
+                                   incomplete => $self->_at_eof($opt{code}),
+                                   error      => "operator `$method` requires a right-side operand",
                                   );
 
         # The result of a prefix operator is a new operand
@@ -4971,20 +5117,22 @@ sub _parse_ternary {
     };
 
     $true // $self->fatal_error(
-                                code   => $_,
-                                pos    => pos($_),
-                                error  => "invalid usage of the ternary operator",
-                                reason => "expected an expression after '?'",
+                                code       => $_,
+                                pos        => pos($_),
+                                error      => "invalid usage of the ternary operator",
+                                incomplete => $self->_at_eof($opt{code}),
+                                reason     => "expected an expression after '?'",
                                );
 
     $self->parse_whitespace(code => $opt{code});
 
     /\G:/gc
       || $self->fatal_error(
-                            code   => $_,
-                            pos    => pos($_),
-                            error  => "invalid usage of the ternary operator",
-                            reason => "expected ':'",
+                            code       => $_,
+                            pos        => pos($_),
+                            error      => "invalid usage of the ternary operator",
+                            incomplete => $self->_at_eof($opt{code}),
+                            reason     => "expected ':'",
                            );
 
     $self->parse_whitespace(code => $opt{code});
@@ -4992,10 +5140,11 @@ sub _parse_ternary {
     my $false = $self->parse_obj(code => $opt{code}, multiline => 1, prec => PREC_TERNARY);
 
     $false // $self->fatal_error(
-                                 code   => $_,
-                                 pos    => pos($_),
-                                 error  => "invalid usage of the ternary operator",
-                                 reason => "expected an expression after ':'",
+                                 code       => $_,
+                                 pos        => pos($_),
+                                 error      => "invalid usage of the ternary operator",
+                                 incomplete => $self->_at_eof($opt{code}),
+                                 reason     => "expected an expression after ':'",
                                 );
 
     my $node = bless(
@@ -5136,7 +5285,7 @@ sub parse_script {
     my %struct;
     local *_ = $opt{code};
   MAIN: {
-        $self->parse_whitespace(code => $opt{code});
+        $self->parse_whitespace(code => $opt{code}, history_refs => ($self->{interactive} ? 1 : 0));
 
         if (/\G\@:([^\W\d]\w*+)/gc) {
             push @{$struct{$self->{class}}}, {self => bless({name => $1}, 'Sidef::Variable::Label')};
@@ -5174,6 +5323,19 @@ sub parse_script {
         # We are at the end of the script.
         # We make some checks, and return the \%struct hash ref.
         if (/\G\z/) {
+
+            # A here-document that was not terminated
+            if (@{$self->{EOT}}) {
+                my $eot = $self->{EOT}[0];
+                $self->fatal_error(
+                                   error      => "can't find string terminator <<$eot->{name}>> anywhere before end-of-file",
+                                   code       => $_,
+                                   pos        => $eot->{pos},
+                                   line       => $eot->{line},
+                                   incomplete => 1,
+                                  );
+            }
+
             $self->check_declarations($self->{ref_vars});
             return \%struct;
         }
@@ -5206,5 +5368,15 @@ sub parse_script {
 }
 
 sub Sidef::Parser::DirectoryGuard::DESTROY { $_[0]->() }
+
+# The exception thrown by the parser in the interactive mode. It stringifies to the error message.
+{
+
+    package Sidef::Parser::Error;
+    use overload
+      '""'     => sub { $_[0]{message} },
+      'bool'   => sub { 1 },
+      fallback => 1;
+}
 
 1

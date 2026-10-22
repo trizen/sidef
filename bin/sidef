@@ -425,282 +425,663 @@ HELP
     }
 }
 
-sub create_completion_tree {
-    scalar {
-            table       => {},
-            special_key => "\0",
-           };
+#
+## Interactive mode (REPL)
+#
+## The REPL reads one or more lines until the parser reports that the code is complete (like the
+## Julia REPL), evaluates it, and prints the result as `#N = value`. The values can be reused with
+## `#N` (or `#-1` for the last value). The declarations of the top-level (var, define, const, static)
+## are global variables, which is done by the parser (see `repl_globals`), and the functions and the
+## classes are kept by a persistent deparser (see `Sidef::compile_interactive`).
+#
+
+sub decode_input {
+    my ($line) = @_;
+    defined($line) or return;
+    utf8::is_utf8($line) and return $line;    # already decoded (e.g.: by the :utf8 layer of STDIN)
+    require Encode;
+    return Encode::decode_utf8($line);
 }
 
-sub add_tree_entry {
-    my ($tree, $key, $value) = @_;
+# The documentation of the objects (used by `help` and by `?expression`)
+sub show_documentation {
+    my (@refs) = @_;
 
-    my $ref = $tree->{table};
+    require File::Spec;
 
-    foreach my $item (@$key) {
-        $ref = $ref->{$item} //= {};
-        undef $ref->{$tree->{special_key}}{$value};
-    }
-
-    $tree;
-}
-
-sub search_tree {
-    my ($tree, $prefix) = @_;
-
-    my $ref = $tree->{table};
-
-    foreach my $item (@$prefix) {
-        if (exists $ref->{$item}) {
-            $ref = $ref->{$item};
+    foreach my $ref (@refs) {
+        $ref eq '' && do { warn "Not an object!\n"; next };
+        my $name = $ref =~ s{::}{/}gr;
+        my $pod;
+        foreach my $dir (@INC) {
+            if (-e (my $f = File::Spec->catfile($dir, $name . '.pod'))) {
+                $pod = $f;
+                last;
+            }
+        }
+        if (defined($pod)) {
+            system 'perldoc', $pod;
+            $? && system 'man', $ref;
         }
         else {
-            return;
+            system 'man', $ref;
+            $? && system 'perldoc', $ref;
         }
     }
 
-    sort keys %{$ref->{$tree->{special_key}} // {}};
-}
-
-sub add_class_methods_to_completion {
-    my ($tree) = @_;
-
-    my $modules_count = scalar(keys %INC);
-
-    state %seen;
-    state $included_modules = $modules_count - 1;
-
-    if ($modules_count == $included_modules) {
-        return 1;
-    }
-
-    foreach my $module (keys %INC) {
-
-        next if $seen{$module}++;
-
-        my $class = $module =~ s{\.pm\z}{}r =~ s{\W+}{::}gr;
-        $class =~ /^Sidef::Types::/ or next;
-
-        foreach my $method_name (keys %{(eval { $class->methods }) // {}}) {
-            add_tree_entry($tree, [split(//, $method_name)], $method_name);
-        }
-    }
-
-    $included_modules = $modules_count;
-    return 1;
-}
-
-sub add_words_to_completion {
-    my ($tree, $string) = @_;
-
-    while ($string =~ /(\w+)/g) {
-        my $word = $1;
-        if (length($word) <= 50) {
-            add_tree_entry($tree, [split(//, $word)], $word);
-        }
-    }
-
-    return 1;
+    return;
 }
 
 sub code_interactive {
+    my $repl = Sidef::REPL->new(opt => \%args, name => $name, version => $version);
+    $repl->run;
+    return;
+}
 
-    require Encode;
-    require File::Spec;
-    require Term::ReadLine;
+package Sidef::REPL {
 
-    my $term = ($Sidef::Term::ReadLine //= Term::ReadLine->new("$name $version -- interactive mode"));
+    use utf8;
+    use 5.016;
+    use mro ();
 
-    my $sidef;
-    my $init_sidef = sub {
-        $sidef = Sidef->new(
-                            name       => '-i',
-                            opt        => {i           => 1, %args},
-                            parser_opt => {interactive => 1},
-                           );
-        $sidef->execute_code('');    # warm-up
-    };
+    use constant {
+                  PROMPT              => '> ',
+                  CONTINUATION_PROMPT => '  ',
+                  INDENT              => 4,
+                  MAX_HISTORY         => 2000,
+                 };
 
-    $init_sidef->();
+    # Words that are replaced with Unicode symbols, after pressing Tab: \alpha<Tab> => α
+    sub _latex {
+        state $table = {
+            split(
+                ' ', qq{
+        alpha α beta β gamma γ delta δ epsilon ε zeta ζ eta η theta θ iota ι kappa κ lambda λ mu μ
+        nu ν xi ξ omicron ο pi π rho ρ sigma σ tau τ upsilon υ phi φ chi χ psi ψ omega ω
+        Gamma Γ Delta Δ Theta Θ Lambda Λ Xi Ξ Pi Π Sigma Σ Phi Φ Psi Ψ Omega Ω
+        le ≤ leq ≤ ge ≥ geq ≥ ne ≠ neq ≠ equiv ≡ approx ≈ in ∈ notin ∉ ni ∋ subset ⊂ supset ⊃
+        subseteq ⊆ supseteq ⊇ cup ∪ cap ∩ setminus ∖ emptyset ∅ infty ∞ sqrt √ pm ± mp ∓
+        times × div ÷ cdot ⋅ circ ∘ sum ∑ prod ∏ partial ∂ nabla ∇ forall ∀ exists ∃ neg ¬
+        land ∧ lor ∨ oplus ⊕ otimes ⊗ to → rightarrow → leftarrow ← Rightarrow ⇒ Leftarrow ⇐
+        leftrightarrow ↔ ldots … cdots ⋯ degree ° propto ∝ angle ∠ int ∫ mid ∣ nmid ∤ star ⋆
+        xor ⊻ ell ℓ hbar ℏ aleph ℵ
+    }
+                 )
+        };
+    }
 
-    my ($copy_array, $copy_hash);
+    sub _commands {
+        state $table = {map { $_ => 1 } qw(help reset quit exit q copyright license)};
+    }
 
-    $copy_array = sub {
-        my ($array) = @_;
+    sub new {
+        my ($class, %opt) = @_;
 
-        my @copy;
-        foreach my $item (@$array) {
-            if (ref($item) eq 'ARRAY') {
-                push @copy, __SUB__->($item);
-            }
-            elsif (ref($item) eq 'HASH') {
-                push @copy, $copy_hash->($item);
-            }
-            else {
-                push @copy, $item;
-            }
-        }
+        my $self = bless {
+                          opt         => ($opt{opt} // {}),
+                          name        => $opt{name},
+                          version     => $opt{version},
+                          valid_lines => [],
+                          elapsed     => 0,
+                          pending     => '',
+                         }, $class;
 
-        \@copy;
-    };
+        $self->{deparse_only} = (defined($self->{opt}{r}) or defined($self->{opt}{R}));
+        $self->{tty}          = (-t STDIN) ? 1 : 0;
 
-    $copy_hash = sub {
-        my ($hash) = @_;
+        return $self;
+    }
 
-        my %copy;
-        foreach my $key (keys %$hash) {
-            my $value = $hash->{$key};
+    #
+    ## The session
+    #
 
-            if (ref($value) eq 'ARRAY') {
-                $copy{$key} = $copy_array->($value);
-            }
-            elsif (ref($value) eq 'HASH') {
-                $copy{$key} = __SUB__->($value);
-            }
-            else {
-                $copy{$key} = $value;
-            }
-        }
+    sub init_sidef {
+        my ($self) = @_;
 
-        \%copy;
-    };
+        @Sidef::HISTORY = ();
+        $self->{valid_lines} = [];
 
-    require Time::HiRes;
+        my $sidef = Sidef->new(
+                               name       => '-i',
+                               opt        => {i => 1, %{$self->{opt}}},
+                               parser_opt => {
+                                              interactive  => 1,
+                                              repl_globals => ($self->{deparse_only} ? 0 : 1),
+                                             },
+                              );
 
-    print <<"EOT" if 0;
-            **   **         ****   *           *********   *********
-          * * ** * *        ****   **          ** ** **    ** ** **
-           **   **          ****   ***         *********   *  *  *
-  **        **        **    ****   *  *        ******      ******
-* * *     * * *     * * *   ****   ** **       ** **       ** **
- **        **        **     ****   ******      ******      *  *
-       **   **              ****   *  *  *     *********   ***
-     * * ** * *             ****   ** ** **    ** ** **    **
-      **   **               ****   *********   *********   *
-EOT
+        $self->{sidef} = $sidef;
 
-    print <<"EOT";
-Sidef $version, running on \u$^O, using Perl $^V.
+        # Warm-up: loads the modules that are always required
+        eval {
+            my $ast = $sidef->parse_code('');
+            $self->{deparse_only} or $sidef->execute_perl($sidef->compile_interactive($ast));
+        };
+
+        return $sidef;
+    }
+
+    sub run {
+        my ($self) = @_;
+
+        $self->init_sidef;
+        $self->init_terminal;
+
+        print <<"EOT";
+Sidef $self->{version}, running on \u$^O, using Perl $^V.
 Type "help", "copyright" or "license" for more information.
 EOT
 
-    my $valid_lines = '';
-    my ($vars, $ref_vars_refs);
-
-    my $completion_tree;
-    my $history_support = $term->can('ReadHistory') && $term->can('Attribs');
-    my $history_file    = File::Spec->catfile($sidef->get_sidef_config_dir(), 'sidef_history.txt');
-
-    if ($history_support) {
-
-        if (not -e $history_file) {
-            open my $fh, '>', $history_file;
+        if (@ARGV) {
+            my $file = shift(@ARGV);
+            $self->load_file($file);
         }
 
-        $completion_tree = create_completion_tree();
+        while (defined(my $input = $self->read_input)) {
+            $self->process($input);
+        }
 
-        my $attr = $term->Attribs;
+        return;
+    }
 
-        $attr->{basic_quote_characters} = q{};
+    #
+    ## The terminal
+    #
 
-        add_class_methods_to_completion($completion_tree);
+    sub init_terminal {
+        my ($self) = @_;
 
-        my @results;
-        $attr->{completion_entry_function} = sub {
-            my ($prefix, $state) = @_;
+        $| = 1;    # the output must be in sync with the output of the terminal library
 
-            my $root = '';
-            if ($prefix !~ /^\w+\z/ and $prefix =~ /^(.*)\b(\w+)\z/) {
-                $root   = $1;
-                $prefix = $2;
+        require Encode;
+        require Scalar::Util;
+        require Term::ReadLine;
+        require Time::HiRes;
+        require File::Spec;
+
+        my $name = "Sidef $self->{version} -- interactive mode";
+
+        # The standard handles are given explicitly, which keeps the layers of STDIN and STDOUT (encoding)
+        my $term = ($Sidef::Term::ReadLine //= Term::ReadLine->new($name, \*STDIN, \*STDOUT));
+
+        $self->{term} = $term;
+        $self->{impl} = eval { $term->ReadLine } // '';
+        $self->{gnu}  = ($self->{impl} eq 'Term::ReadLine::Gnu');
+
+        # Windows: use the encoding of the console (the default one is UTF-8)
+        if ($^O eq 'MSWin32') {
+            eval {
+                require Win32;
+                my $in  = Win32::GetConsoleCP();
+                my $out = Win32::GetConsoleOutputCP();
+                if ($in and $in != 65001) {
+                    binmode(STDIN, ":raw:crlf:encoding(cp$in)");
+                }
+                if ($out and $out != 65001) {
+                    binmode(STDOUT, ":raw:crlf:encoding(cp$out)");
+                    binmode(STDERR, ":raw:crlf:encoding(cp$out)");
+                }
+            };
+            eval { $term->ornaments(0) };    # no terminal capabilities
+        }
+
+        # The history entries are added by the REPL, after the code is complete (a multi-line input is one entry)
+        eval { $term->MinLine(undef) };
+
+        $self->{attr} = eval { $term->Attribs } || {};
+
+        $self->init_history;
+        $self->init_completion;
+
+        return $term;
+    }
+
+    # The history file has one entry per line (the new lines of multi-line entries are stored as "\r")
+    sub init_history {
+        my ($self) = @_;
+
+        my $term = $self->{term};
+
+        $self->{history_file} = eval { File::Spec->catfile($self->{sidef}->get_sidef_config_dir, 'sidef_history.txt') };
+        $self->{history_file} // return;
+
+        if (-f $self->{history_file}) {
+            if (open(my $fh, '<:utf8', $self->{history_file})) {
+                my @lines = grep { /\S/ } map { chomp; $_ } <$fh>;
+                close $fh;
+                splice(@lines, 0, @lines - MAX_HISTORY) if @lines > MAX_HISTORY;
+
+                if ($term->can('addhistory')) {
+                    my $encode = $self->{gnu};
+                    foreach my $line (@lines) {
+                        $term->addhistory($encode ? Encode::encode_utf8($line) : $line);
+                    }
+                }
+            }
+        }
+
+        return 1;
+    }
+
+    sub add_history {
+        my ($self, $code) = @_;
+
+        $code =~ /\S/ or return;
+
+        my $entry = $code =~ s/\R/\r/gr;
+
+        return if (defined($self->{last_entry}) and $self->{last_entry} eq $entry);
+        $self->{last_entry} = $entry;
+
+        my $term = $self->{term};
+
+        if ($term->can('addhistory')) {
+            $term->addhistory($self->{gnu} ? Encode::encode_utf8($entry) : $entry);
+        }
+
+        if (defined($self->{history_file}) and open(my $fh, '>>:utf8', $self->{history_file})) {
+            print $fh $entry, "\n";
+            close $fh;
+        }
+
+        return 1;
+    }
+
+    # Reads a line from the loaded file, or from the terminal. Returns undef at the end of the input.
+    sub read_line {
+        my ($self, $prompt, $preput, $first) = @_;
+
+        # The lines of a file loaded with `# load`
+        while (defined(my $fh = $self->{fh})) {
+
+            if (defined(my $line = <$fh>)) {
+                $line =~ s/\R\z//;
+
+                # The rest of the file is the content of DATA
+                if ($first and $line =~ /^\s*__(?:END|DATA)__\s*\z/) {
+                    $line .= "\n" . do { local $/; <$fh> };
+                }
+
+                return $line;
             }
 
-            if ($state == 0) {
-                @results = search_tree($completion_tree, [split(//, $prefix)]);
-            }
+            close $fh;
+            $self->{fh} = undef;
+        }
 
-            @results || return undef;
-            $root . shift(@results);
+        my $term = $self->{term};
+
+        $self->{interrupted} = 0;
+
+        my $line = do {
+            local $SIG{INT} = sub { $self->{interrupted} = 1 };
+            $self->{gnu} && defined($preput) && length($preput)
+              ? $term->readline($prompt, $preput)
+              : $term->readline($prompt);
         };
 
-        $term->ReadHistory($history_file);
+        if ($self->{interrupted}) {    # Ctrl-C: the pending input is discarded
+            print "\n";
+            return "\0INTERRUPT";
+        }
+
+        return ::decode_input($line);
     }
 
-    my $tΔ = 0;
+    #
+    ## Reading the input
+    #
 
-    my @values;
-    my $FH = undef;
+    # Scans a piece of code: returns (the depth of the open brackets, the open quote or undef).
+    # The strings and the comments are skipped.
+    sub scan {
+        my ($code) = @_;
 
-    if (@ARGV) {
-        my $file = shift(@ARGV);
-        open $FH, '<:utf8', $file
-          or die "Can't open file <<$file>> for reading: $!\n";
+        my $depth = 0;
+        my $quote;
+
+        pos($code) = 0;
+
+        while (pos($code) < length($code)) {
+
+            if (defined $quote) {
+                $code =~ /\G(?:[^\\\Q$quote\E]++|\\.)/gcs and next;
+                $code =~ /\G\Q$quote\E/gc                 and do { undef $quote; next };
+                last;
+            }
+
+            $code =~ /\G#[^\n]*/gc    and next;
+            $code =~ /\G([\[\{\(])/gc and do { ++$depth;               next };
+            $code =~ /\G([\]\}\)])/gc and do { --$depth if $depth > 0; next };
+            $code =~ /\G(["'`])/gc    and do { $quote = $1;            next };
+            $code =~ /\G(?:\\.|[^\[\]\{\}\(\)"'`#\\]++|.)/gcs;
+        }
+
+        return ($depth, $quote);
     }
 
-  MAINLOOP: {
-        my $line = '';
+    # Is the name of a REPL command, which is not a declared variable?
+    sub is_command {
+        my ($self, $word) = @_;
+
+        exists(_commands()->{$word}) or return 0;
+
+        my $parser = $self->{sidef}{parser};
+        return (defined($parser) and defined($parser->find_var($word, 'main'))) ? 0 : 1;
+    }
+
+    # Reads the next input: returns a hash-ref (`{code => ...}` or `{command => ...}`),
+    # an empty hash-ref for an empty input, or undef at the end of the input.
+    sub read_input {
+        my ($self) = @_;
+
+        my $buffer = '';
+        my $lines  = 0;
+
+        $self->{pending} = '';
 
       LINE: {
 
-            if (defined($FH) and !eof($FH)) {
-                chomp(my $curr_line = <$FH>);
-                if ($line eq '' and $curr_line =~ /^\s*__(?:END|DATA)__\s*\z/) {
-                    $curr_line .= "\n" . do { local $/; <$FH> };
-                }
-                if ($history_support and $curr_line ne '' and $line eq '') {
-                    $term->addhistory($curr_line =~ s/\R/\r/gr);
-                }
-                $line .= $curr_line;
-            }
-            else {
-                $line .= Encode::decode_utf8($term->readline($line eq '' ? '> ' : '  ') // return);
+            my $indent = '';
+            if ($lines and $self->{gnu} and ($ENV{SIDEF_REPL_INDENT} // 1)) {
+                my ($depth) = scan($buffer);
+                $indent = ' ' x (INDENT * $depth);
             }
 
-            if ($line eq 'help') {
-                help_interactive($term);
-                redo MAINLOOP;
+            my $line = $self->read_line(($lines ? CONTINUATION_PROMPT : PROMPT), $indent, !$lines);
+
+            if (not defined $line) {
+
+                if ($buffer eq '') {
+                    print "\n" if $self->{tty};
+                    return;
+                }
+
+                # Ctrl-D inside an incomplete input: discard it (when reading from a pipe, report the error)
+                if ($self->{tty}) {
+                    print "\n";
+                    return {};
+                }
+
+                my (undef, $error) = $self->parse($buffer);
+                return {code => $buffer, error => ($error // "unexpected end of input\n")};
             }
-            elsif ($line eq '##') {
-                say "  ***   last result computed in $tΔ seconds";
-                redo MAINLOOP;
+
+            if ($line eq "\0INTERRUPT") {
+                return {};
             }
-            elsif ($line =~ /^#+\h*load\h+(.+)/) {
-                my $file = unpack('A*', $1);
-                open $FH, '<:utf8', $file or do {
-                    warn "Can't open file <<$file>> for reading: $!\n";
-                    redo MAINLOOP;
-                };
-                redo MAINLOOP;
+
+            # History entries with several lines
+            $line =~ s/\r\n?/\n/g;
+
+            $buffer .= ($lines ? "\n" : '') . $line;
+            ++$lines;
+            $self->{pending} = $buffer;
+
+            if ($buffer !~ /\S/) {
+                return {} if $lines == 1;
+                redo LINE;
             }
-            elsif ($line =~ /^#+\h*exec\h+(.+)/) {
-                my $file = unpack('A*', $1);
-                $init_sidef->();
-                open my $fh, '<:utf8', $file or do {
-                    warn "Can't open file <<$file>> for reading: $!\n";
-                    redo MAINLOOP;
-                };
-                $line = do { local $/; <$fh> };
-                close $fh;
+
+            # REPL commands
+            if ($lines == 1) {
+                if (defined(my $command = $self->parse_command($buffer))) {
+                    return $command;
+                }
             }
-            elsif ($line =~ /^#+\h*save\h+(.+)/) {
-                my $file = unpack('A*', $1);
-                open my $fh, '>:utf8', $file or do {
-                    warn "Can't open file <<$file>> for writing: $!\n";
-                    redo MAINLOOP;
-                };
-                print $fh $valid_lines;
-                close $fh;
-                say "** Created file: $file";
+
+            # An explicit continuation of the line
+            if ($buffer =~ /(?<!\\)\\\h*\z/) {
+                redo LINE;
             }
-            elsif ($line eq 'copyright') {
-                print <<'EOT';
+
+            # The parser decides if the code is complete
+            my ($ast, $error, $snapshot) = $self->parse($buffer);
+
+            if (defined $error) {
+
+                if (ref($error) and $error->{incomplete}) {
+                    redo LINE;
+                }
+
+                return {error => $error, code => $buffer};
+            }
+
+            return {code => $buffer, ast => $ast, snapshot => $snapshot};
+        }
+    }
+
+    sub parse_command {
+        my ($self, $text) = @_;
+
+        my $line = $text =~ s/^\s+|\s+\z//gr;
+
+        if ($self->is_command($line)) {
+            return {command => $line eq 'q' || $line eq 'exit' ? 'quit' : $line};
+        }
+
+        if ($line eq '##') {
+            return {command => 'time'};
+        }
+
+        if ($line =~ /^#+\h*(load|exec|save)\h+(.+)/) {
+            return {command => $1, argument => unpack('A*', $2)};
+        }
+
+        if ($line =~ /^\?\s*(.*)/s) {
+            return {command => 'doc', argument => $1};
+        }
+
+        return;
+    }
+
+    # Parses the code. On error, the state of the parser is restored.
+    # Returns: (AST, error, snapshot of the parser from before the parsing)
+    sub parse {
+        my ($self, $code) = @_;
+
+        my $sidef  = $self->{sidef};
+        my $parser = $sidef->{parser};
+
+        my $snapshot = $parser->snapshot;
+        $parser->{line} = 1;
+
+        my $ast = eval { $sidef->parse_code($code) };
+
+        if ($@) {
+            my $error = $@;
+            $parser->restore($snapshot);
+            return (undef, $error);
+        }
+
+        return ($ast, undef, $snapshot);
+    }
+
+    #
+    ## Evaluating the input
+    #
+
+    sub process {
+        my ($self, $input) = @_;
+
+        if (exists $input->{command}) {
+            return $self->run_command($input);
+        }
+
+        exists($input->{code}) or return;
+
+        my $code = $input->{code};
+
+        $self->add_history($code);
+
+        if (exists $input->{error}) {
+            warn "$input->{error}";
+            return;
+        }
+
+        $self->evaluate($code, $input->{ast}, $input->{snapshot});
+    }
+
+    sub evaluate {
+        my ($self, $code, $ast, $snapshot) = @_;
+
+        my $sidef = $self->{sidef};
+
+        %{$ast} or return;    # only whitespace and comments
+
+        # Deparse only
+        if ($self->{deparse_only}) {
+            my $lang     = $self->{opt}{r} ? 'Sidef' : ($self->{opt}{R} || 'Sidef');
+            my $deparsed = eval { $sidef->compile_ast($ast, $lang) };
+            if ($@) {
+                $sidef->{parser}->restore($snapshot);
+                warn $@;
+                return;
+            }
+            push @{$self->{valid_lines}}, $code;
+            ::output($deparsed);
+            return;
+        }
+
+        my $perl = eval { $sidef->compile_interactive($ast) };
+
+        if ($@) {
+            my $error = $@;
+            $sidef->{parser}->restore($snapshot);
+            warn "[ERROR] Can't compile the code: $error";
+            return;
+        }
+
+        push @{$self->{valid_lines}}, $code;
+
+        my $t0 = eval { [Time::HiRes::gettimeofday()] };
+
+        my @results = do {
+            local $SIG{INT} = sub { die "Interrupted\n" };
+            $sidef->execute_perl($perl);
+        };
+
+        my $error = $@;
+
+        $self->{elapsed} = eval { Time::HiRes::tv_interval($t0) } // 0;
+
+        if ($error) {
+            $sidef->rollback_interactive;
+            print STDERR (ref($error) ? "$error" : $error);
+            return;
+        }
+
+        @results or return;
+
+        push @Sidef::HISTORY, \@results;
+
+        # A trailing semicolon hides the result (as in Julia)
+        $code =~ /;\s*\z/ and return;
+
+        my @dump = map { $self->dump_value($_) } @results;
+        my $dump = (@dump > 1 ? '(' . join(', ', @dump) . ')' : $dump[0]);
+
+        say "#" . scalar(@Sidef::HISTORY) . " = $dump";
+
+        return 1;
+    }
+
+    sub dump_value {
+        my ($self, $value) = @_;
+
+        my $str = eval { ref($value) ? (UNIVERSAL::can($value, 'dump') ? $value->dump : "$value") : ($value // 'nil'); };
+
+        defined($str) or return '<error: ' . (split(/\n/, "$@"))[0] . '>';
+
+        # Floating-point numbers
+        if (    ref($value) eq 'Sidef::Types::Number::Number'
+            and ref($$value) eq 'Math::MPFR'
+            and Math::MPFR::Rmpfr_number_p($$value)) {
+            $str .= 'f';
+        }
+
+        return $str;
+    }
+
+    #
+    ## The REPL commands
+    #
+
+    sub run_command {
+        my ($self, $input) = @_;
+
+        my $command  = $input->{command};
+        my $argument = $input->{argument};
+
+        if ($command eq 'quit') {
+            exit 0;
+        }
+
+        if ($command eq 'help') {
+            ::help_interactive($self->{term});
+            return;
+        }
+
+        if ($command eq 'doc') {
+            return $self->show_help($argument);
+        }
+
+        if ($command eq 'reset') {
+            $self->init_sidef;
+            return;
+        }
+
+        if ($command eq 'time') {
+            say "  ***   last result computed in $self->{elapsed} seconds";
+            return;
+        }
+
+        if ($command eq 'load') {
+            $self->load_file($argument);
+            return;
+        }
+
+        if ($command eq 'exec') {
+            open(my $fh, '<:utf8', $argument) or do {
+                warn "Can't open file <<$argument>> for reading: $!\n";
+                return;
+            };
+            my $content = do { local $/; <$fh> };
+            close $fh;
+
+            my ($ast, $error, $snapshot) = $self->parse($content);
+
+            if (defined $error) {
+                warn "$error";
+                return;
+            }
+
+            $self->evaluate($content, $ast, $snapshot);
+            return;
+        }
+
+        if ($command eq 'save') {
+            open(my $fh, '>:utf8', $argument) or do {
+                warn "Can't open file <<$argument>> for writing: $!\n";
+                return;
+            };
+            print $fh map { "$_\n" } @{$self->{valid_lines}};
+            close $fh;
+            say "** Created file: $argument";
+            return;
+        }
+
+        if ($command eq 'copyright') {
+            print <<'EOT';
 Copyright © 2013-2026 Daniel Șuteu, Ioana Fălcușan
 All Rights Reserved.
 EOT
-                redo MAINLOOP;
-            }
-            elsif ($line eq 'license') {
-                print <<'EOT';
+            return;
+        }
+
+        if ($command eq 'license') {
+            print <<'EOT';
 
 This program is free software; you can redistribute it
 and/or modify it under the terms of the Artistic License (2.0).
@@ -715,127 +1096,341 @@ For more information, see:
     https://www.perlfoundation.org/artistic-license-20.html
 
 EOT
-                redo MAINLOOP;
-            }
+            return;
         }
 
-        # Replace top-level variables and constants with globals
-        if (not defined($args{r}) and not defined($args{R})) {
-            $line =~ s/^\h*(?:var|define|const|static)\b/global/;
+        return;
+    }
+
+    sub load_file {
+        my ($self, $file) = @_;
+
+        open(my $fh, '<:utf8', $file) or do {
+            warn "Can't open file <<$file>> for reading: $!\n";
+            return;
+        };
+
+        $self->{fh} = $fh;
+        return 1;
+    }
+
+    # `?expression` shows the documentation of the class of the values of the expression
+    sub show_help {
+        my ($self, $expr) = @_;
+
+        if ($expr !~ /\S/) {
+            ::help_interactive($self->{term});
+            return;
         }
 
-        $vars          = $copy_hash->($sidef->{parser}{vars});
-        $ref_vars_refs = $copy_hash->($sidef->{parser}{ref_vars_refs});
+        my $sidef = $self->{sidef};
 
-        $line =~ s{#(-?[1-9][0-9]*)\b}{(abs($1) <= scalar(@values)) ? ('(' . $values[($1 < 0) ? $1 : $1-1]->{value} . ')') : "#$1"}ge;
+        my ($ast, $error, $snapshot) = $self->parse($expr);
 
-        # Last character was '\': read the next line
-        if ($line =~ /\\\s*\z/) {
-            $line .= "\n";
-            goto LINE;
+        if (defined $error) {
+            warn "$error";
+            return;
         }
 
-        my $ccode = eval { $sidef->compile_code($line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
+        my $perl = eval { $sidef->compile_interactive($ast) };
 
         if ($@) {
+            $sidef->{parser}->restore($snapshot);
+            warn $@;
+            return;
+        }
 
-            # Valid keywords for 'exit'
-            if ($line eq 'q' or $line eq 'exit' or $line eq 'quit') {
-                return;
-            }
+        my @refs = map { ref($_) } $sidef->execute_perl($perl);
 
-            # Reset the parser
-            if ($line eq 'reset') {
-                $init_sidef->();
-                undef $vars;
-                undef $ref_vars_refs;
-                @values = ();
-                redo;
-            }
+        if ($@) {
+            $sidef->rollback_interactive;
+            print STDERR $@;
+            return;
+        }
 
-            # Restore parser variables
-            if (defined($vars) and defined($ref_vars_refs)) {
-                %{$sidef->{parser}{vars}}          = %$vars;
-                %{$sidef->{parser}{ref_vars_refs}} = %$ref_vars_refs;
-            }
+        ::show_documentation(@refs);
+        return;
+    }
 
-            # Give up if the previous line is blank,
-            # or when it's impossible to recover from an error
-            if (
-                   $@ =~ /is not declared in the current scope/i
-                or $@ =~ /invalid \S+ declaration/i
-                or $@ =~ /attempt to (?:use|call|delete) /i
-                or $@ =~ /not declared in the current scope/i
-                or $@ =~ /expected a block after/i
-                or $@ =~ /unexpected end-of-statement/i
-                or (
-                      $@    =~ /unbalanced|string terminator|delimiter/
-                    ? $line =~ /\R\R\z/
-                    : $line =~ /\R\z/
-                   )
-              ) {
-                warn $@;
-                redo;
-            }
+    #
+    ## Auto-completion
+    #
 
-            $line .= "\n";
-            goto LINE;
+    sub init_completion {
+        my ($self) = @_;
+
+        my $term = $self->{term};
+        my $attr = $self->{attr};
+
+        (Scalar::Util::reftype($attr) // '') eq 'HASH' or return;
+
+        # The characters that end a word
+        $attr->{completer_word_break_characters} = qq{ \t\n"'`\@\$><=;|&{}()[]+*%^~!,?.};
+        $attr->{basic_quote_characters}          = q{};
+        $attr->{completer_quote_characters}      = q{};
+        $attr->{completion_append_character}     = q{};
+
+        if ($self->{gnu}) {
+
+            # Ctrl-C: makes the call of readline() return, when the signal was received
+            $attr->{event_hook} = sub {
+                if ($self->{interrupted}) {
+                    $attr->{line_buffer} = '';
+                    $attr->{done}        = 1;
+                }
+                return 0;
+            };
+
+            $attr->{attempted_completion_function} = sub {
+                my ($text, $line, $start, $end) = @_;
+
+                my $result = eval { $self->complete(Encode::decode_utf8($text), Encode::decode_utf8(substr($line, 0, $start))) };
+
+                # An error in the completion must never break the session
+                $@ and return ($attr->{attempted_completion_over} = 1, ());
+
+                defined($result) or return;    # file names
+
+                if (not @{$result}) {
+                    $attr->{attempted_completion_over} = 1;
+                    return;
+                }
+
+                my @list = map { Encode::encode_utf8($_) } @{$result};
+
+                return $term->completion_matches($text, sub { my ($t, $state) = @_; $list[$state] });
+            };
         }
         else {
-            $valid_lines .= "$line\n";    # store valid lines
+            $attr->{completion_function} = sub {
+                my ($text, $line, $start) = @_;
+                my $result = eval { $self->complete($text, substr($line, 0, $start)) };
+                return (ref($result) ? @{$result} : ());
+            };
         }
 
-        if ($history_support) {
-            if ($line =~ /\R/) {
-                $term->addhistory($line =~ s/\R/\r/gr);
-            }
-            $term->append_history(1, $history_file);
+        return 1;
+    }
+
+    # The methods of a class, including the inherited ones
+    sub class_methods {
+        my ($class) = @_;
+
+        my %seen;
+
+        # The types are loaded on demand
+        if (index($class, 'Sidef::') == 0) {
+            eval { require($class =~ s{::}{/}gr . '.pm') };
         }
 
-        if (defined($args{r}) or defined($args{R})) {
-            output($ccode);
-        }
-        elsif ($line =~ /\S/ and not $line =~ /^\s*#.*$/) {
+        no strict 'refs';
 
-            my $t0 = eval { [Time::HiRes::gettimeofday()] };
-
-            my @results = $sidef->execute_perl($ccode);
-
-            if ($@) {
-                print $@;
-            }
-            elsif ($history_support) {
-                add_words_to_completion($completion_tree, $line);
-            }
-
-            $tΔ = eval { Time::HiRes::tv_interval($t0) };
-
-            # use overload;
-            # overload::StrVal($_) ? "$_" : $_->dump;
-
-            my $dump = join(
-                ', ',
-                map {
-                        (ref($_) ? UNIVERSAL::can($_, 'dump') ? $_->dump : $_ : ($_ // 'nil'))
-                      . ((ref($_) eq 'Sidef::Types::Number::Number' and ref($$_) eq 'Math::MPFR' and Math::MPFR::Rmpfr_number_p($$_)) ? 'f' : '')
-                  } @results
-            );
-
-            $dump = "($dump)" if @results > 1;
-
-            push @values,
-              {
-                type  => ((scalar(@results) == 1) ? 'scalar' : 'list'),
-                value => $dump,
-              };
-
-            say "#" . scalar(@values) . " = $dump";
-
-            if ($history_support) {
-                add_class_methods_to_completion($completion_tree);
+        foreach my $pkg (@{mro::get_linear_isa($class)}) {
+            foreach my $name (keys %{$pkg . '::'}) {
+                $name =~ /\A[^\W\d]\w*\z/ or next;
+                $name =~ /\A_|\A[A-Z0-9]+\z|\A(?:BEGIN|END|DESTROY|AUTOLOAD|import|unimport|isa|can|DOES|VERSION)\z/ and next;
+                defined(&{$pkg . '::' . $name}) or next;
+                $seen{$name} = 1;
             }
         }
-        redo;
+
+        return keys %seen;
+    }
+
+    # The methods of all the loaded types
+    sub all_methods {
+        my ($self) = @_;
+
+        my $count = scalar(keys %INC);
+
+        if (($self->{all_methods_count} // -1) != $count) {
+
+            my %seen;
+            foreach my $module (keys %INC) {
+                $module =~ /\ASidef\/Types\/.*\.pm\z/ or next;
+                my $class = $module =~ s{\.pm\z}{}r =~ s{/}{::}gr;
+                @seen{class_methods($class)} = ();
+            }
+
+            $self->{all_methods}       = [keys %seen];
+            $self->{all_methods_count} = $count;
+        }
+
+        return @{$self->{all_methods}};
+    }
+
+    # The methods that can be called on the expression that precedes a dot
+    sub receiver_methods {
+        my ($self, $receiver) = @_;
+
+        $receiver =~ s/\s+\z//;
+
+        my $parser = $self->{sidef}{parser};
+        my $class;
+
+        if ($receiver =~ /(?<![.\w:])([^\W\d]\w*(?:::[^\W\d]\w*)*)\z/) {
+            my $name = $1;
+
+            if (defined(my $var = $parser->find_var($name =~ /^(.*)::(.*)$/ ? ($2, $1) : ($name, 'main')))) {
+
+                if ($var->{type} eq 'global') {
+                    my $value = eval { no strict 'refs'; ${$var->{obj}{class} . '::' . $var->{obj}{name}} };
+                    $class = ref($value) if ref($value);
+                }
+                elsif ($var->{type} eq 'func' or $var->{type} eq 'method') {
+                    $class = 'Sidef::Types::Block::Block';
+                }
+            }
+            elsif (exists $parser->{built_in_classes}{$name}) {
+                my $code = $name;
+                my $obj  = eval { $parser->parse_expr(code => \$code) };
+                if (ref($obj) and not $@) {
+                    $class = ref($obj) =~ s/\ASidef::DataTypes::/Sidef::Types::/r;
+                    eval { require($class =~ s{::}{/}gr . '.pm') };
+                }
+            }
+        }
+        elsif ($receiver =~ /["'`]\z/) {
+            $class = 'Sidef::Types::String::String';
+        }
+        elsif ($receiver =~ /(?<![\w.])\d[\d_]*(?:\.\d+)?\z/) {
+            $class = 'Sidef::Types::Number::Number';
+        }
+        elsif ($receiver =~ /\]\z/) {
+            $class = 'Sidef::Types::Array::Array';
+        }
+
+        if (defined($class) and $class !~ /\A(?:Sidef::Variable|Sidef::Meta)::/) {
+            my @methods = class_methods($class);
+            return @methods if @methods;
+        }
+
+        return $self->all_methods;
+    }
+
+    # The names that are visible in the current scope
+    sub declared_names {
+        my ($self, $namespace) = @_;
+
+        my $parser = $self->{sidef}{parser};
+
+        my %seen;
+        my @scopes = ($parser->{vars}{$namespace} // [], @{$parser->{ref_vars_refs}{$namespace} // []});
+
+        foreach my $scope (@scopes) {
+            foreach my $entry (@{$scope}) {
+                ref($entry) eq 'HASH' or next;
+                my $name = $entry->{name} // next;
+                length($name) and $name !~ /\A__ANON__/ and $seen{$name} = 1;
+            }
+        }
+
+        return keys %seen;
+    }
+
+    sub file_candidates {
+        my ($prefix) = @_;
+
+        my ($dir, $base) = $prefix =~ m{\A(.*/)?([^/]*)\z}s;
+        $dir //= '';
+
+        opendir(my $dh, ($dir eq '' ? '.' : $dir)) or return;
+
+        my @files;
+        foreach my $file (readdir($dh)) {
+            next if ($file eq '.' or $file eq '..');
+            next if index($file, $base) != 0;
+            next if (substr($file, 0, 1) eq '.' and substr($base, 0, 1) ne '.');
+            my $path = $dir . $file;
+            push @files, $path . (-d $path ? '/' : '');
+        }
+
+        closedir($dh);
+        return sort @files;
+    }
+
+    # Returns an array-ref with the possible completions of $text (a list of words that start with $text),
+    # or undef to let the terminal complete a file name.
+    # $before is the text of the line that precedes $text.
+    sub complete {
+        my ($self, $text, $before) = @_;
+
+        my $context = $self->{pending} . (length($self->{pending}) ? "\n" : '') . $before;
+
+        my ($depth, $quote) = scan($context);
+
+        # Inside a string: file names
+        if (defined $quote) {
+
+            # The content of the string, until the cursor (approximately)
+            my $content = $context           =~ s/\A.*\Q$quote\E//sr;
+            my $prefix  = ($content . $text) =~ s/\A.*\n//sr;
+
+            my @files = file_candidates($prefix) or return [];
+
+            # The completions replace $text only
+            my $keep = length($prefix) - length($text);
+            return [map { substr($_, $keep) } grep { length($_) >= $keep } @files];
+        }
+
+        # The word at the end of $text
+        my ($root, $word);
+
+        if ($text =~ /\A(.*?)(\\[A-Za-z0-9^_]*)\z/s) {
+            ($root, $word) = ($1, $2);
+        }
+        else {
+            ($text =~ /\A(.*?)([\w:]*)\z/s);
+            ($root, $word) = ($1, $2);
+        }
+
+        my $left = $before . $root;
+
+        my @candidates;
+
+        if (substr($word, 0, 1) eq '\\') {
+            my $name = substr($word, 1);
+
+            if (exists _latex()->{$name}) {
+                return [$root . _latex()->{$name}];
+            }
+
+            @candidates = map { "\\$_" } keys %{_latex()};
+        }
+        elsif ($left =~ /\.\.\z/) {
+            return [];
+        }
+        elsif ($left =~ /\.\h*\z/) {
+            @candidates = $self->receiver_methods(substr($left, 0, rindex($left, '.')));
+        }
+        elsif ($left =~ /::\z/ and $word !~ /::/) {
+            @candidates = $self->all_methods;
+        }
+        elsif ($left =~ /\b(?:var|global|const|define|static|func|class|method|enum|struct|subset|module|has|del)\h+\z/) {
+            return [];
+        }
+        elsif ($word =~ /\A(.+)::([^:]*)\z/) {
+            my $namespace = $1;
+            @candidates = map { "${namespace}::$_" } $self->declared_names($namespace);
+        }
+        else {
+            my $parser = $self->{sidef}{parser};
+
+            @candidates = ($self->declared_names('main'), grep { index($_, '__') != 0 } keys %{$parser->{special_words}});
+
+            # The functional style: name(...)
+            length($word) and push @candidates, $self->all_methods;
+
+            # REPL commands, at the beginning of the line
+            if ($left =~ /\A\s*\z/ and not length($self->{pending})) {
+                push @candidates, keys %{_commands()};
+            }
+        }
+
+        my %seen;
+        my @result = sort grep { !$seen{$_}++ and index($_, $word) == 0 } @candidates;
+
+        return [map { $root . $_ } @result];
     }
 }
 
@@ -1048,6 +1643,7 @@ Special REPL commands:
 
      ##                - show execution time of last command
      #n                - refer to nth output value (e.g., #1, #-1)
+     ?expr             - show the documentation of the value of expr
      # load file.sf    - load and execute file line by line
      # exec file.sf    - execute entire file
      # save file.sf    - save REPL session to file
@@ -1473,6 +2069,8 @@ Or explicitly with the C<-i> option:
 =item * B<Persistent Variables>
 
 All variables, functions, and classes defined in the REPL persist throughout the session.
+The declarations from the top-level (C<var>, C<define>, C<const>, C<static>) are turned into global variables by the parser,
+which makes them visible in the next lines. The declarations inside blocks remain lexical.
 
     > var x = 42
     #1 = 42
@@ -1495,7 +2093,12 @@ Every expression result is stored and can be referenced using C<#n> notation, wh
 
 =item * B<Multiline Input>
 
-End lines with backslash (C<\>) to continue on the next line, or the REPL will automatically continue incomplete expressions. The prompt changes from C<E<gt>> to C<  > to indicate continuation mode.
+Like in the Julia REPL, the line is evaluated as soon as the code is complete. When the parser reaches the end of the input
+inside a block, a bracket, a string, a here-document, or after an operator, the REPL reads the next line
+(the prompt changes from C<E<gt>> to C<  >), indented by the current depth of the brackets.
+A line that ends with a backslash (C<\>) is also continued on the next line.
+Press Ctrl-C to discard the incomplete input. A trailing semicolon hides the result, and a syntax error that is not caused
+by an incomplete input is reported immediately.
 
     > func factorial(n) {
         n == 0 ? 1 : n*factorial(n-1)
@@ -1505,11 +2108,18 @@ End lines with backslash (C<\>) to continue on the next line, or the REPL will a
 
 =item * B<Tab Completion>
 
-Press Tab to complete variable/function names, show available methods on objects, and navigate command history.
+Press Tab to complete the names that are visible in the current scope, the keywords, the built-in classes and the REPL commands.
+After a dot, the methods of the value of the variable (or of the class, or of the literal) are completed.
+Inside a string, file names are completed. LaTeX-like names are replaced with Unicode symbols (C<\pi> becomes C<π>,
+C<\le> becomes C<≤>). The completion requires L<Term::ReadLine::Gnu>.
+
+On Windows, when only the stub of L<Term::ReadLine> is available, the REPL works without completion and line editing
+(the editing and the history of the console are used).
 
 =item * B<Command History>
 
-Use Up/Down arrow keys to navigate previous commands. History persists between sessions (saved to C<~/.sidef/sidef_history.txt>).
+Use Up/Down arrow keys to navigate previous commands. A multi-line input is a single entry of the history.
+History persists between sessions (saved to C<sidef_history.txt>, in the configuration directory of Sidef).
 
 =back
 
@@ -1534,7 +2144,7 @@ Load and execute a Sidef file line by line in the REPL. Each line is executed as
 
 =item B<# exec> I<filename>
 
-Execute an entire Sidef file in the current REPL session. Unlike C<# load>, this executes the file as a complete unit, but within the REPL environment where variables persist.
+Execute an entire Sidef file in the current REPL session. Unlike C<# load>, this executes the file as a complete unit, but within the REPL environment, where the variables persist.
 
     > # exec script.sf
 
