@@ -3,6 +3,7 @@
 # SHA-256 Message-Digest Algorithm in Pure Sidef
 
 func my_sha256(msg) {
+
     # 1. Byte Array & Padding
     var bytes = msg.bytes
     var orig_len = bytes.len

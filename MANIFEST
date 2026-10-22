@@ -757,6 +757,8 @@ scripts/Tests/binary_search_recursive.sf
 scripts/Tests/binomialmod.sf
 scripts/Tests/binomialmod_2.sf
 scripts/Tests/bitonic_sorter.sf
+scripts/Tests/blake2b-v2.sf
+scripts/Tests/blake2b.sf
 scripts/Tests/block_identities.sf
 scripts/Tests/block_return.sf
 scripts/Tests/box_the_compass.sf
@@ -933,7 +935,7 @@ scripts/Tests/matrix_class.sf
 scripts/Tests/matrix_determinant.sf
 scripts/Tests/matrix_multiplication.sf
 scripts/Tests/matrix_operations.sf
-scripts/Tests/md5-procedural.sf
+scripts/Tests/md5-v2.sf
 scripts/Tests/md5.sf
 scripts/Tests/median.sf
 scripts/Tests/merge_sort.sf
@@ -1074,6 +1076,7 @@ scripts/Tests/set_consolidation.sf
 scripts/Tests/set_operations.sf
 scripts/Tests/sets_1.sf
 scripts/Tests/sets_2.sf
+scripts/Tests/sha256-v2.sf
 scripts/Tests/sha256.sf
 scripts/Tests/sidef_executor.sf
 scripts/Tests/sidef_keywords.sf

@@ -1,0 +1,152 @@
+#!/usr/bin/ruby
+
+# SHA-256 Message-Digest Algorithm in Pure Sidef
+
+func u32(x) { x & 0xffffffff }
+
+func rotr(x, n) {
+    u32((x >> n) | (x << (32 - n)))
+}
+
+func Ch(x, y, z) {
+    (x & y) ^ (u32(~x) & z)
+}
+
+func Maj(x, y, z) {
+    (x & y) ^ (x & z) ^ (y & z)
+}
+
+func Σ0(x) {
+    rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22)
+}
+
+func Σ1(x) {
+    rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25)
+}
+
+func σ0(x) {
+    rotr(x, 7) ^ rotr(x, 18) ^ (x >> 3)
+}
+
+func σ1(x) {
+    rotr(x, 17) ^ rotr(x, 19) ^ (x >> 10)
+}
+
+func my_sha256(msg) {
+
+    var K = 64.range.map {|i|
+        var p = (i + 1).prime
+        var frac = cbrt(p) - icbrt(p)
+        (frac * (1<<32)).int & 0xFFFFFFFF
+    }
+
+    var H = [
+        0x6a09e667,
+        0xbb67ae85,
+        0x3c6ef372,
+        0xa54ff53a,
+        0x510e527f,
+        0x9b05688c,
+        0x1f83d9ab,
+        0x5be0cd19
+    ]
+
+    var bytes = msg.bytes
+    var bitlen = bytes.len * 8
+
+    bytes << 0x80
+
+    while (bytes.len % 64 != 56) {
+        bytes << 0
+    }
+
+    bytes.append(
+        (8 ^.. 0).map {
+            (bitlen >> (_ * 8)) & 0xff
+        }...
+    )
+
+    bytes.slices(64).each { |chunk|
+
+        var W = chunk.slices(4).map { |w|
+              (w[0] << 24) \
+            | (w[1] << 16) \
+            | (w[2] <<  8) \
+            |  w[3]
+        }
+
+        for i in (16 .. 63) {
+
+            W << u32(
+                W[i-16] \
+              + σ0(W[i-15]) \
+              + W[i-7] \
+              + σ1(W[i-2])
+            )
+        }
+
+        var (a,b,c,d,e,f,g,h) = H...
+
+        for i in (0 .. 63) {
+
+            var T1 = u32(
+                h \
+                + Σ1(e) \
+                + Ch(e,f,g) \
+                + K[i] \
+                + W[i]
+            )
+
+            var T2 = u32(
+                Σ0(a) \
+                + Maj(a,b,c)
+            )
+
+            (a,b,c,d,e,f,g,h) = (
+                u32(T1 + T2),
+                a,
+                b,
+                c,
+                u32(d + T1),
+                e,
+                f,
+                g
+            )
+        }
+
+        H[0] = u32(H[0] + a)
+        H[1] = u32(H[1] + b)
+        H[2] = u32(H[2] + c)
+        H[3] = u32(H[3] + d)
+        H[4] = u32(H[4] + e)
+        H[5] = u32(H[5] + f)
+        H[6] = u32(H[6] + g)
+        H[7] = u32(H[7] + h)
+    }
+
+    H.map { "%08x" % _ }.join
+}
+
+var tests = [
+    '',
+    'a',
+    'abc',
+    'message digest',
+    'abcdefghijklmnopqrstuvwxyz',
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+    '12345678901234567890123456789012345678901234567890123456789012345678901234567890'
+]
+
+for msg in (tests) {
+    var expected = msg.sha256
+    var hash = my_sha256(msg)
+    say "#{hash} : #{msg}"
+
+    if (hash != expected) {
+        say "\tHowever, that is incorrect (expected: #{expected})"
+    }
+}
+
+with (irand(512, 2048).random_string) {|s|
+    assert_eq(my_sha256(s), s.sha256)
+}
