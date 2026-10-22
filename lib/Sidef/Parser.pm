@@ -976,11 +976,8 @@ sub parse_whitespace {
             redo;
         }
 
-        # A value from the history of the interactive mode (`#1`) is not a comment, when it is
-        # in the position of an operand, or when it starts a line (history_refs: 1 = statement, 2 = operand)
-        if (    $opt{history_refs}
-            and /\G#-?[1-9][0-9]*\b/
-            and ($opt{history_refs} == 2 or $newline or (pos($_) // 0) == 0)) {
+        # History variables (#1, #2)
+        if ($opt{history_refs} and /\G#-?[1-9][0-9]*\b/) {
             return ($found_space > 0 ? 1 : ());
         }
 
