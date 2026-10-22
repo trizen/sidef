@@ -2160,7 +2160,7 @@ sub _program {
 # Deparses the AST of a program
 sub deparse {
     my ($self, $ast) = @_;
-    return $self->_program($ast, header => 1);
+    return $self->_program($ast, header => 1) . "\n";
 }
 
 # Deparses a piece of code at run-time (see `eval`), in the context of the program that is running

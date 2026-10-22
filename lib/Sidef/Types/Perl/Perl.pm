@@ -14,11 +14,6 @@ use overload q{""} => sub {
 
 sub new {
     my (undef, $code) = @_;
-
-    if (ref($_[0]) eq __PACKAGE__) {
-        return $_[0]->eval;
-    }
-
     bless \(my $o = "$code"), __PACKAGE__;
 }
 
