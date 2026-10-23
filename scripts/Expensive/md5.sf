@@ -24,7 +24,7 @@ class MD5(String msg) {
         [6, 10, 15, 21] * 4,
     ].flat
 
-    const T = 64.of {|i| floor(abs(sin(i+1)) * 1<<32) }
+    const T = 64.of {|i| floor(abs(sin(i+1)) * (1<<32)) }
 
     const K = [
         ^16 -> map {|n|    n           },
@@ -61,7 +61,7 @@ class MD5(String msg) {
     func md5_block(Array H, Array X) {
         var (A, B, C, D) = H...
 
-        for i in ^64 {
+        64.times {|i|
             (A, B, C, D) = (D,
                 block(B, srble(
                     block(
@@ -105,7 +105,7 @@ var tests = [
     ['57edf4a22be3c955ac49da2e2107b67a', '12345678901234567890123456789012345678901234567890123456789012345678901234567890'],
 ]
 
-for md5,msg in tests {
+for md5,msg in (tests) {
     var hash = MD5(msg).md5_hex
     say "#{hash} : #{msg}"
 

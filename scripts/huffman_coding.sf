@@ -12,7 +12,7 @@ func walk(n, s, h) {
 
 func make_tree(text) {
     var letters = Hash.new;
-    text.each { |c| letters{c} \\= 0 ++ };
+    text.each { |c| letters{c} := 0 ++ };
     var nodes = letters.keys.map { |l|
             Hash.new('a' => l, 'freq' => letters{l})
     };

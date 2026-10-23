@@ -21,8 +21,8 @@ class Array {
 
     var img = gd.new(width * scale, self.len * scale)
 
-    for i in ^self {
-      for j in RangeNum(i*scale, i*scale + scale) {
+    for i in (^self) {
+      for j in (RangeNum(i*scale, i*scale + scale)) {
         img.moveTo(0, j)
         for line in (self[i].scan(/(\s+|\S+)/)) {
           img.fgcolor(line.contains(/\S/) ? fgcolor : bgcolor)

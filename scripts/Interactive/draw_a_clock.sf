@@ -24,7 +24,7 @@ func indices {
 
 loop {
     print "\e[H\e[J"
-    for i in ^chars {
+    for i in (^chars) {
       print position(x + i, y)
       print [chars[i][indices()]].join(' ')
     }

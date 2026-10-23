@@ -8,7 +8,7 @@ func combos(sides, n) {
     n || return [1]
     var ret = ([0] * (n*sides.max + 1))
     combos(sides, n-1).each_kv { |i,v|
-        v && for s in sides { ret[i + s] += v }
+        v && for s in (sides) { ret[i + s] += v }
     }
     return ret
 }

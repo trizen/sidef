@@ -14,7 +14,7 @@ func closest_pair_simple(arr) {
     arr.clone!
     while (arr) {
         var p = arr.pop
-        for l in arr {
+        for l in (arr) {
             var t = dist_squared(p, l)
             if (t < d) {
                 (a, b, d) = (p, l, t)
@@ -36,7 +36,7 @@ func closest_pair_real(rx, ry) {
     var yR = []
     var yL = []
 
-    for item in ry {
+    for item in (ry) {
         (item[0] <= xm ? yR : yL) << item
     }
 

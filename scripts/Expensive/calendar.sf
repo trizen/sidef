@@ -20,7 +20,7 @@ func fmt_month (year, month) {
     str += (week_day-1 `of` "  " -> join(" "))
 
     var last_day = dt.last_day_of_month(year => year, month => month).day
-    for day (date.day .. last_day) {
+    for day in (date.day .. last_day) {
         date = dt.new(year => year, month => month, day => day)
         str += " " if (week_day ~~ (2..7))
         if (week_day == 8) {
@@ -39,9 +39,9 @@ func fmt_year (year) {
     var month_strs = 12.of {|i| fmt_month(year, i+1).lines }
 
     var str = (' '*30 + year + "\n")
-    for month (0..11 `by` months_per_col) {
+    for month in (0..11 `by` months_per_col) {
         while (month_strs[month]) {
-            for i (1..months_per_col) {
+            for i in (1..months_per_col) {
                 month_strs[month + i - 1] || next
                 str += month_strs[month + i - 1].shift
                 str += ' '*3

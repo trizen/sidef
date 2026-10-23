@@ -12,6 +12,6 @@ func factors(n) {
   }.sort.uniq
 }
  
-for n [53, 64, 32766] {
+for n in ([53, 64, 32766]) {
     say "factors(#{n}): #{factors(n)}"
 }

@@ -8,7 +8,7 @@ func cuboid(nx, ny, nz) {
   var area = []
   var line = func(n, sx, sy, c) {
     var(dx, dy) = dirs{c}...;
-    for i (0..n) {
+    for i in (0..n) {
       var (xi, yi) = (sx + i*dx, sy + i*dy)
       area[yi] \\= [" "]*(x+y+1)
       area[yi][xi] = (area[yi][xi] == " " ? c : '+')

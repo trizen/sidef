@@ -11,8 +11,8 @@ func path(n) is cached {
     n || return []
     while (n !~ p) {
         lvl[0] = gather {
-            for x in lvl[0] {
-                for y in path(x) {
+            for x in (lvl[0]) {
+                for y in (path(x)) {
                     break if (x+y ~~ p)
                     y = x+y
                     p{y} = x
@@ -27,7 +27,7 @@ func path(n) is cached {
 func tree_pow(x, n) {
     var r = Hash(0 => 1, 1 => x)
     var p = 0
-    for i in path(n) {
+    for i in (path(n)) {
         r{i} = (r{i-p} * r{p})
         p = i
     }
@@ -39,6 +39,6 @@ func show_pow(x, n) {
     print(fmt % (n, path(n), x, n, tree_pow(x, n)))
 }
 
-for x in ^9 { show_pow(2, x) }
+for x in (^9) { show_pow(2, x) }
 show_pow(1.1, 81)
 show_pow(3, 191)

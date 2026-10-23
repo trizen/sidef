@@ -19,7 +19,7 @@ var words = ['1', '0']
  
 say ('%3s %10s %15s  %s' % <N Length Entropy Fibword>...)
  
-for i in ^words {
+for i in (^words) {
     var word = words[i]
     say ('%3i %10i %15.12f  %s' % (i+1,
                                    word.len,

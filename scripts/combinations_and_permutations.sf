@@ -24,24 +24,24 @@ func C_approx(n, k) {
 }
  
 say "=> Exact results:"
-for n (1..12) {
+for n in (1..12) {
     var p = n//3
     say "P(#{n}, #{p}) = #{P(n, p)}"
 }
 
-for n (10..60 `by` 10) {
+for n in (10..60 `by` 10) {
     var p = n//3
     say "C(#{n}, #{p}) = #{C(n, p)}"
 }
 
 say '';
 say "=> Floating point approximations:"
-for n ([5, 50, 500, 1000, 5000, 15000]) {
+for n in ([5, 50, 500, 1000, 5000, 15000]) {
     var p = n//3
     say "P(#{n}, #{p}) = #{P_approx(n, p)}"
 }
 
-for n (100..1000 `by` 100) {
+for n in (100..1000 `by` 100) {
     var p = n//3
     say "C(#{n}, #{p}) = #{C_approx(n, p)}"
 }

@@ -16,7 +16,7 @@ define(
     TAU = Num.tau,
 )
 
-for y=(^height), x=(^width) {
+for y in (^height), x in (^width) {
     var vector    = (center - x - y.i)
     var magnitude = (2*vector.abs / width)
     var direction = ((PI + atan2(vector.real, vector.imag)) / TAU)

@@ -501,26 +501,6 @@ sub _cond {
     '(' . join(', ', ref($expr) eq 'HASH' ? $self->_stmts($expr) : (($self->_any($expr))[0])) . ')';
 }
 
-# The expression of a `for x in EXPR {...}` loop, which is parenthesized only when it's necessary
-sub _loop_expr {
-    my ($self, $expr) = @_;
-
-    my @statements = $self->_statements($expr);
-
-    if (@statements == 1) {
-        my ($code, $prec) = $self->_any($expr);
-
-        # `(...)` is parsed alone, and `x.method {...}` would be parsed as a call with a block
-        if ($prec >= P_ATOM and $code !~ /^\(/ and $code !~ /\n/ and $code !~ /\}\z/ and not _ends_bare($code)) {
-            return $code;
-        }
-
-        return "($code)";
-    }
-
-    return $self->_cond($expr);
-}
-
 # =========================================================================
 # Blocks
 # =========================================================================
@@ -833,7 +813,7 @@ sub _h_for_in {
     my @loops;
     foreach my $loop (@{$obj->{loops}}) {
         my $vars = join(', ', map { ($_->{slurpy} ? ($_->{array} ? '*' : ':') : '') . $self->_qualified($_->{class}, $_->{name}) } @{$loop->{vars}});
-        push @loops, "$vars in " . $self->_loop_expr($loop->{expr});
+        push @loops, "$vars in " . $self->_cond($loop->{expr});
     }
 
     return ('for ' . join(', ', @loops) . ' ' . $self->_body($obj->{block}), P_ATOM);

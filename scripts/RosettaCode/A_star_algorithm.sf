@@ -19,7 +19,7 @@ class AStarGraph {
 
     method get_vertex_neighbours(pos) {
         gather {
-            for dx, dy in [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]] {
+            for dx, dy in ([[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]) {
                 var x2 = (pos[0] + dx)
                 var y2 = (pos[1] + dy)
                 (x2<0 || x2>7 || y2<0 || y2>7) && next
@@ -50,7 +50,7 @@ func AStarSearch(start, end, graph) {
         var current = nil
         var currentFscore = Inf
 
-        for pos in openVertices {
+        for pos in (openVertices) {
             if (F{pos} < currentFscore) {
                 currentFscore = F{pos}
                 current = pos

@@ -68,7 +68,7 @@ class MD5(String msg) {
     func md5_block(Array H, Array X) {
         var (A, B, C, D) = H...
 
-        for i in ^64 {
+        for i in (^64) {
             (A, B, C, D) = (D,
                 block(B, srble(
                     block(
@@ -113,7 +113,7 @@ var tests = [
 ]
 
 var a = []
-for md5,msg in tests {
+for md5,msg in (tests) {
     var hash = MD5(msg).md5_hex
 
     a << hash

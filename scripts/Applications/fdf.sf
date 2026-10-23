@@ -45,7 +45,7 @@ find_duplicate_files(collect, Num(ARGV.shift), ARGV...)
 
 for k,v in (duplicates.sort_by { |k| -k.to_i }) {
     say "=> Size: #{k}\n#{'~'*80}"
-    for files in v {
+    for files in (v) {
         say "#{files.sort.join(%Q[\n])}\n#{'-'*80}"
     }
 }

@@ -25,7 +25,7 @@ class MT19937(seed, prec = 32) {
         index = n
         mt[0] = seed
 
-        for i in ^(n-1) {
+        for (^(n-1)) { |i|
             mt[i+1] =(f * (mt[i] ^ (mt[i] >> prec)) + i+1)
         }
     }
@@ -49,7 +49,7 @@ class MT19937(seed, prec = 32) {
     }
 
     method twist {
-        for i in ^n {
+        for i in (^n) {
             var x = (mt[i] + mt[(i+1) % n])
             var xA = (x >> 1)
             if ((x % 2) != 0) {

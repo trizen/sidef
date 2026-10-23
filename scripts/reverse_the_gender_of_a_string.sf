@@ -38,8 +38,8 @@ func gen_pluralize(m, f) {
  
 var dict = Hash()
  
-for m,f in m2f {
-    for x,y in gen_pluralize(m, f).map{.map{.lc}} {
+for m,f in (m2f) {
+    for x,y in (gen_pluralize(m, f).map{.map{.lc}}) {
         if (x ~~ dict) {
             dict{y} = x
         } else {
@@ -56,7 +56,7 @@ func copy_case(orig, repl) {
  
     var uc = 0
     var min = [a, b].map{.len}.min
-    for i in ^min {
+    for i in (^min) {
         if (a[i] ~~ /^[[:upper:]]/) {
             b[i].uc!
             ++uc

@@ -14,7 +14,7 @@ var universe = h.of { w.of { 1.rand < 0.1 } }
 
 func iterate {
     var new = h.of { w.of(nil) }
-    for i=rh, j=rw {
+    for i in (rh), j in (rw) {
         var neighbor = 0
         for y,x in (dirs.map {|dir| dir »+« [i, j] }) {
             universe[y % h][x % w] && ++neighbor

@@ -27,7 +27,7 @@ func read_score(guess) {
 func score_correct(a, b, bulls, cows) {
     var (exact, loose) = (0, 0);
 
-    for i in ^4 {
+    4.times {|i|
         a[i] == b[i] ? ++exact
                      : (a[i]~~b && ++loose)
     }

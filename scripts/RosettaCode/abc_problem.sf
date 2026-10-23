@@ -12,7 +12,7 @@ func can_make_word(word, blocks) {
         var char = word.shift
         var candidates = blocks.keys.grep { |k| 0 <= k.index(char) }
 
-        for candidate in candidates {
+        candidates.each{|candidate|
             blocks{candidate} <= 0 && next;
             local blocks{candidate} = (blocks{candidate} - 1);
             return true if (word.is_empty || __FUNC__(word, blocks));

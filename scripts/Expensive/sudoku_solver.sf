@@ -16,7 +16,7 @@ func check(i, j) is cached {
 }
 
 func solve(grid) {
-    for i in ^grid {
+    for i in (^grid) {
         grid[i] && next
         var t = [grid[^grid->grep{|j| check(i, j) }]].freq
 
@@ -30,7 +30,7 @@ func solve(grid) {
         return nil
     }
 
-    for i in ^grid {
+    for i in (^grid) {
         print "#{grid[i]} "
         print " "  if (3  -> divides(i+1))
         print "\n" if (9  -> divides(i+1))

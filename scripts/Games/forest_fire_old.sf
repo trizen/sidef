@@ -27,7 +27,7 @@ var range_w = w.range
 
 func iterate {
     var new_forest = h.of{ w.of(0) }
-    for i = range_h, j = range_w {
+    for i in (range_h), j in (range_w) {
         given (new_forest[i][j] = forest[i][j]) {
           when (Tree) {
             1.rand < burn_prob && (new_forest[i][j] = Heating; next)

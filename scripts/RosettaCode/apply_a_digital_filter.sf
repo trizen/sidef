@@ -6,10 +6,10 @@
 
 func TDF_II_filter(signal, a, b) {
     var out = [0]*signal
-    for i in ^signal {
+    for i in (^signal) {
         var this = 0
-        for j in ^b { i-j >= 0 && (this += b[j]*signal[i-j]) }
-        for j in ^a { i-j >= 0 && (this -= a[j]*   out[i-j]) }
+        for j in (^b) { i-j >= 0 && (this += b[j]*signal[i-j]) }
+        for j in (^a) { i-j >= 0 && (this -= a[j]*   out[i-j]) }
         out[i] = this/a[0]
     }
     return out

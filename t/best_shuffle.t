@@ -17,8 +17,8 @@ func best_shuffle(str) {
     var s = str.chars
     var t = s.shuffle
 
-    for i in ^s {
-        for j in ^s {
+    for i in (^s) {
+        for j in (^s) {
             if ((i == j) || (t[i] == s[j]) || (t[j] == s[i])) {
                 next
             }

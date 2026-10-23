@@ -43,7 +43,7 @@ func converge_at(ints) {
     }
 }
 
-for k in [2, 5, 7, 9, 10] {
+[2, 5, 7, 9, 10].each {|k|
     say "EKG(#{k}) = #{EKG(k).first(10)}"
 }
 
@@ -51,7 +51,7 @@ assert_eq(EKG(10).first(10), [1, 10, 2, 4, 6, 3, 9, 12, 8, 14])
 
 var tests = [21, 45]
 
-for arr in [[5,7], [2, 5, 7, 9, 10]] {
+for arr in ([[5,7], [2, 5, 7, 9, 10]]) {
     var c = converge_at(arr)
     say "EKGs of #{arr} converge at term #{c}"
     assert_eq(c, tests.shift)
