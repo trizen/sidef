@@ -45,7 +45,7 @@ use Scalar::Util qw(refaddr);
 #   <  <=  >  >=  ∈ ...                                      PREC_RELATIONAL
 #   ==  !=  <=>  ~~  =~  !~ ...                              PREC_EQUALITY
 #   &&                                                       PREC_ANDAND
-#   ||  \\  (defined-or)                                      PREC_OROR
+#   ||  \\  (defined-or)                                     PREC_OROR
 #   :  ：  ⫶  (pair constructors)                            PREC_PAIR
 #   ?:                                                       PREC_TERNARY     (right)
 #   =                                                        PREC_ASSIGN      (right)
@@ -155,6 +155,39 @@ my %KEYWORD_PREC = (
                     'or'     => PREC_OR,
                     'and'    => PREC_AND,
                    );
+
+# Opening delimiters: [closing delimiter, counter of the open delimiters, name]
+my %OPENING_DELIMITERS = map {
+    my ($counter, $name, $opening) = @{$CLOSING_DELIMITERS{$_}};
+    ($opening => [$_, $counter, $name]);
+} keys %CLOSING_DELIMITERS;
+
+# Prefix operators that are applied on a parenthesized expression only, when it follows them:
+# `say (...)`, `defined (...)`, `@(...)`. Any method call that follows is applied on the result.
+my %PAREN_STYLE_UNARY = map { $_ => 1 } ('say', 'print', 'defined', '>', '>>', '+', '@', '@|');
+
+# Precedence of the argument of a prefix operator (the default is PREC_OPERAND)
+my %UNARY_ARG_PREC = (
+    '-'       => PREC_POW,       # `-a ** b` is `-(a ** b)`
+    'defined' => PREC_SHIFT,     # named unary operator: `defined a + 1` is `defined(a + 1)`
+    'say'     => PREC_ASSIGN,    # list operators
+    'print'   => PREC_ASSIGN,
+    '>'       => PREC_ASSIGN,
+    '>>'      => PREC_ASSIGN,
+    '@'       => PREC_RANGE,
+    '@|'      => PREC_RANGE,
+                     );
+
+# Words from other languages that are not valid in Sidef (used for the hints of the error messages)
+my %FOREIGN_WORDS = (
+                     (map { $_ => 'to declare a function, use: func name(args) {...}' } qw(def fn fun function sub)),
+                     (map { $_ => 'to declare a variable, use: var name = value' } qw(let my our)),
+                     (map { $_ => 'the undefined value is written `nil`' } qw(undef undefined None)),
+                     'True'   => 'the boolean values are written in lowercase: `true`',
+                     'False'  => 'the boolean values are written in lowercase: `false`',
+                     'switch' => 'use: given (expr) { when (value) {...} default {...} }',
+                     'this'   => 'inside a method, the object is available as `self`',
+                    );
 
 # ---------------------------------------------------------------------------
 # Lexical tables and regular expressions (shared by all the parser objects)
@@ -785,6 +818,124 @@ sub _error_context {
     return ($error_line, $point, $column);
 }
 
+# Describes the token found at a position, for the error messages
+sub _describe_token {
+    my ($self, $code, $pos) = @_;
+
+    my $text = substr($code, $pos // 0, 64);
+
+    return 'end of input' if $text eq '';
+
+    if ($text =~ /^([0-9][0-9_]*(?:\.[0-9_]+)?)/) {
+        return "number `$1`";
+    }
+
+    if ($text =~ /^([^\W\d]\w*+(?:::[^\W\d]\w*+)*)/) {
+        my $word = $1;
+        return (exists($self->{keywords}{$word}) ? "keyword `$word`" : "name `$word`");
+    }
+
+    return 'string literal' if $text =~ /^["'“‘„‚]/;
+
+    if ($text =~ /^([^\w\s]{1,3})/) {
+        return "`$1`";
+    }
+
+    return '`' . (split(' ', $text))[0] . '`';
+}
+
+# A hint for an undeclared name that is a word from another language (e.g.: `def`, `let`)
+sub _hint_for_name {
+    my ($self, $name) = @_;
+    return $FOREIGN_WORDS{$name};
+}
+
+# A delimiter was opened, but it was not closed: the code ended, or another closing delimiter was found
+sub _unclosed_delimiter {
+    my ($self, $opener, $pos, $line, %opt) = @_;
+
+    my ($closer, undef, $name) = @{$OPENING_DELIMITERS{$opener}};
+
+    my $found = delete $self->{closed_by};    # set by parse_script() when it stopped at a closing delimiter
+
+    if (defined $found) {
+        $self->fatal_error(
+                           code   => ${$opt{code}},
+                           pos    => $found->[1],
+                           error  => "mismatched closing `$found->[0]`",
+                           reason => "expected `$closer` to close the `$opener` from line $line",
+                          );
+    }
+
+    $self->fatal_error(
+                       code       => ${$opt{code}},
+                       pos        => $pos,
+                       line       => $line,
+                       error      => "unbalanced $name",
+                       incomplete => $self->_at_eof($opt{code}),
+                       reason     => "the `$opener` opened here has no matching `$closer`",
+                      );
+}
+
+# The block of a `for x in EXPR {...}` loop is missing. This usually happens when the expression is not
+# parenthesized: the `{...}` is parsed as the block argument of the last method call (or as a lookup).
+sub _missing_for_body {
+    my ($self, $loop, $expr_pos, $expr_line, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $expr  = $loop->{expr};
+    my $names = join(', ', map { $_->{name} } @{$loop->{vars}});
+
+    my %error = (
+                 error      => "invalid declaration of the `for` loop",
+                 incomplete => $self->_at_eof($opt{code}),
+                 reason     => "expected a block after the loop expression: for x in expr { ... }",
+                 code       => $_,
+                 pos        => pos($_),
+                );
+
+    my $nodes = (ref($expr) eq 'HASH'                     ? $expr->{$self->{class}} : undef);
+    my $node  = (ref($nodes) eq 'ARRAY' && @{$nodes} == 1 ? $nodes->[0]             : undef);
+
+    if (ref($node) eq 'HASH' and defined($expr_pos)) {
+
+        my $last     = (ref($node->{call}) eq 'ARRAY' ? $node->{call}[-1] : undef);
+        my ($method) = grep { defined($_) and not ref($_) and /^[^\W\d]\w*+!?\z/ } ($last ? $last->{method} : ());
+
+        my $line = (substr($_, $expr_pos, 200) =~ /^([^\n]*)/)[0];
+
+        if (defined($method) and grep { ref($_) eq 'Sidef::Types::Block::BlockInit' } @{$last->{arg} // []}) {
+
+            my $text = ($line =~ /^(.*?\.\Q$method\E)\h*\{/ ? $1 : 'EXPR');
+
+            %error = (
+                      error  => "can't find the block of the `for` loop",
+                      reason => "the `{...}` after `.$method` was parsed as an argument of this method call",
+                      hint   => "enclose the loop expression in parentheses: for $names in ($text) {...}",
+                      code   => $_,
+                      pos    => $expr_pos,
+                      line   => $expr_line,
+                     );
+        }
+        elsif (ref($node->{ind}) eq 'ARRAY' and exists $node->{ind}[-1]{hash}) {
+
+            my $text = ($line =~ /^(.*?\S)\h*\{/ ? $1 : 'EXPR');
+
+            %error = (
+                      error  => "can't find the block of the `for` loop",
+                      reason => "the `{...}` after the loop expression was parsed as a hash lookup",
+                      hint   => "enclose the loop expression in parentheses: for $names in ($text) {...}",
+                      code   => $_,
+                      pos    => $expr_pos,
+                      line   => $expr_line,
+                     );
+        }
+    }
+
+    $self->fatal_error(%error);
+}
+
 # Suggestions for an undeclared name: the declared names, the keywords and the built-in classes
 # that are similar to it (e.g.: `retrun` => `return`)
 sub _similar_names {
@@ -883,33 +1034,30 @@ sub check_declarations {
 
     return if ($self->{interactive} or $self->{eval_mode});
 
-    foreach my $class (grep { $_ eq 'main' } keys %{$hash_ref}) {
+    my $array_ref = $hash_ref->{main} // return;
 
-        my $array_ref = $hash_ref->{$class};
+    foreach my $variable (@{$array_ref}) {
 
-        foreach my $variable (@{$array_ref}) {
-            if (ref $variable eq 'ARRAY') {
-                $self->check_declarations({$class => $variable});
-            }
-            elsif ($self->{interactive} or $self->{eval_mode}) {
-                ## Everything is OK in interactive mode
-            }
-            elsif (   $variable->{count} == 0
-                   && $variable->{type} ne 'class'
-                   && $variable->{type} ne 'func'
-                   && $variable->{type} ne 'method'
-                   && $variable->{type} ne 'global'
-                   && $variable->{name} ne 'self'
-                   && $variable->{name} ne ''
-                   && $variable->{type} ne 'del'
-                   && chr(ord $variable->{name}) ne '_') {
+        if (ref $variable eq 'ARRAY') {
+            $self->check_declarations({main => $variable});
+        }
+        elsif (   $variable->{count} == 0
+               && $variable->{type} ne 'class'
+               && $variable->{type} ne 'func'
+               && $variable->{type} ne 'method'
+               && $variable->{type} ne 'global'
+               && $variable->{name} ne 'self'
+               && $variable->{name} ne ''
+               && $variable->{type} ne 'del'
+               && substr($variable->{name}, 0, 1) ne '_') {
 
-                warn '[WARNING] '
-                  . "$variable->{type} '$variable->{name}' has been declared, but not used again at "
-                  . "$self->{file_name} line $variable->{line}\n";
-            }
+            warn '[WARNING] '
+              . "$variable->{type} '$variable->{name}' has been declared, but not used again at "
+              . "$self->{file_name} line $variable->{line}\n";
         }
     }
+
+    return;
 }
 
 # Splits a name into its namespace and its basename: `Foo::bar` => (bar, Foo)
@@ -961,11 +1109,6 @@ sub parse_whitespace {
                 }
 
                 /\G\h+/gc;
-                redo;
-            }
-
-            # Vertical space
-            if (/\G\v+/gc) {    # should not reach here
                 redo;
             }
         }
@@ -1595,93 +1738,47 @@ sub _parse_variable_initializer {
 # Delimited constructs: (...), [...], {...}
 # ---------------------------------------------------------------------------
 
-sub parse_arg {
-    my ($self, %opt) = @_;
+# Parses the content of a delimited construct: (...), [...] or {...}
+# The opening delimiter is consumed here, and the closing one is consumed by parse_script().
+sub _parse_delimited {
+    my ($self, $opener, %opt) = @_;
 
     local *_ = $opt{code};
 
-    if (/\G\(/gc) {
-        my $p    = pos($_);
-        my $line = $self->{line};
-        local $self->{parentheses} = 1;
-        local $self->{no_pipe_op}  = 0;
-        local $self->{no_pair_op}  = 0;
-        my $obj = $self->parse_script(code => $opt{code});
+    /\G\Q$opener\E/gc || return;
 
-        $self->{parentheses}
-          && $self->fatal_error(
-                                code       => $_,
-                                pos        => $p - 1,
-                                error      => "unbalanced parenthesis",
-                                incomplete => $self->_at_eof($opt{code}),
-                                reason     => "the `(` opened here has no matching `)`",
-                                line       => $line,
-                               );
+    my (undef, $counter) = @{$OPENING_DELIMITERS{$opener}};
 
-        return $obj;
-    }
+    my $p    = pos($_);
+    my $line = $self->{line};
 
-    return;
+    local $self->{$counter}   = 1;
+    local $self->{no_pipe_op} = 0;
+    local $self->{no_pair_op} = 0;
+
+    my $obj = $self->parse_script(code => $opt{code});
+
+    $self->{$counter} && $self->_unclosed_delimiter($opener, $p - 1, $line, code => $opt{code});
+
+    return $obj;
+}
+
+# Parses the content of parentheses: (...)
+sub parse_arg {
+    my ($self, %opt) = @_;
+    return $self->_parse_delimited('(', %opt);
 }
 
 # Parses the content of an array in brackets: [...]
 sub parse_array {
     my ($self, %opt) = @_;
-
-    local *_ = $opt{code};
-
-    if (/\G\[/gc) {
-        my $p    = pos($_);
-        my $line = $self->{line};
-        local $self->{right_brackets} = 1;
-        local $self->{no_pipe_op}     = 0;
-        local $self->{no_pair_op}     = 0;
-        my $obj = $self->parse_script(code => $opt{code});
-
-        $self->{right_brackets}
-          && $self->fatal_error(
-                                code       => $_,
-                                pos        => $p - 1,
-                                error      => "unbalanced right bracket",
-                                incomplete => $self->_at_eof($opt{code}),
-                                reason     => "the `[` opened here has no matching `]`",
-                                line       => $line,
-                               );
-
-        return $obj;
-    }
-
-    return;
+    return $self->_parse_delimited('[', %opt);
 }
 
 # Parses the content of a hash lookup, in curly brackets: {...}
 sub parse_lookup {
     my ($self, %opt) = @_;
-
-    local *_ = $opt{code};
-
-    if (/\G\{/gc) {
-        my $p    = pos($_);
-        my $line = $self->{line};
-        local $self->{curly_brackets} = 1;
-        local $self->{no_pipe_op}     = 0;
-        local $self->{no_pair_op}     = 0;
-        my $obj = $self->parse_script(code => $opt{code});
-
-        $self->{curly_brackets}
-          && $self->fatal_error(
-                                code       => $_,
-                                pos        => $p - 1,
-                                error      => "unbalanced curly bracket",
-                                incomplete => $self->_at_eof($opt{code}),
-                                reason     => "the `{` opened here has no matching `}`",
-                                line       => $line,
-                               );
-
-        return $obj;
-    }
-
-    return;
+    return $self->_parse_delimited('{', %opt);
 }
 
 # Parses a block in curly brackets: {...}
@@ -1747,15 +1844,7 @@ sub parse_block {
 
         my $obj = $self->parse_script(code => $opt{code});
 
-        $self->{curly_brackets}
-          && $self->fatal_error(
-                                code       => $_,
-                                pos        => $p - 1,
-                                error      => "unbalanced curly bracket",
-                                incomplete => $self->_at_eof($opt{code}),
-                                reason     => "the `{` opened here has no matching `}`",
-                                line       => $line,
-                               );
+        $self->{curly_brackets} && $self->_unclosed_delimiter('{', $p - 1, $line, code => $opt{code});
 
         if ($has_vars) {
             $block->{init_vars} = bless({vars => $var_objs}, 'Sidef::Variable::Init');
@@ -1836,7 +1925,7 @@ sub parse_expr {
 
         # Bareword followed by a colon becomes a NamedParam with the bareword
         # on the LHS
-        if (/\G([^\W\d]\w*+):(?![=:])/gc) {
+        if (not $self->{no_pair_op} and /\G([^\W\d]\w*+):(?![=:])/gc) {
             my $name = $1;
             my $obj  = $self->parse_obj(code => $opt{code});
             return Sidef::Variable::NamedParam->new($name, $obj);
@@ -1899,12 +1988,12 @@ sub parse_expr {
 
         # "when(expr) {...}" construct
         if (exists($self->{current_given}) && /\Gwhen\b\h*/gc) {
-            return $self->_parse_when(code => $opt{code});
+            return $self->_parse_when_or_case('when', code => $opt{code});
         }
 
         # "case(expr) {...}" construct
         if (exists($self->{current_given}) && /\Gcase\b\h*/gc) {
-            return $self->_parse_case(code => $opt{code});
+            return $self->_parse_when_or_case('case', code => $opt{code});
         }
 
         # "default {...}" or "else { ... }" construct for `given/when`
@@ -2815,6 +2904,7 @@ sub _parse_functional_call {
                                     pos   => ($pos - length($name)),
                                     var   => ($class . '::' . $name),
                                     error => "variable <$name> is not declared in the current scope",
+                                    hint  => $self->_hint_for_name($name),
                                    )
               );
 
@@ -3559,17 +3649,17 @@ sub _parse_given {
     return $given_obj;
 }
 
-# "when(expr) {...}" construct
-sub _parse_when {
-    my ($self, %opt) = @_;
+# "when(expr) {...}" and "case(expr) {...}" constructs
+sub _parse_when_or_case {
+    my ($self, $keyword, %opt) = @_;
 
     local *_ = $opt{code};
 
     my $expr = $self->_parse_arg_or_obj(code => $opt{code});
 
     $expr // $self->fatal_error(
-                                error  => "invalid declaration of the `when` construct",
-                                reason => "expected `when(expr) {...}`",
+                                error  => "invalid declaration of the `$keyword` construct",
+                                reason => "expected `$keyword(expr) {...}`",
                                 code   => $_,
                                 pos    => pos($_),
                                );
@@ -3579,42 +3669,13 @@ sub _parse_when {
                  ? $self->parse_block(code => $opt{code}, with_vars => 1)
                  : $self->fatal_error(
                                       incomplete => $self->_at_eof($opt{code}),
-                                      error      => "expected a block after `when(expr)`",
+                                      error      => "expected a block after `$keyword(expr)`",
                                       code       => $_,
                                       pos        => pos($_),
                                      )
                 );
 
-    return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::When');
-}
-
-# "case(expr) {...}" construct
-sub _parse_case {
-    my ($self, %opt) = @_;
-
-    local *_ = $opt{code};
-
-    my $expr = $self->_parse_arg_or_obj(code => $opt{code});
-
-    $expr // $self->fatal_error(
-                                error  => "invalid declaration of the `case` construct",
-                                reason => "expected `case(expr) {...}`",
-                                code   => $_,
-                                pos    => pos($_),
-                               );
-
-    my $block = (
-                 /\G\h*(?=\{)/gc
-                 ? $self->parse_block(code => $opt{code}, with_vars => 1)
-                 : $self->fatal_error(
-                                      incomplete => $self->_at_eof($opt{code}),
-                                      error      => "expected a block after `case(expr)`",
-                                      code       => $_,
-                                      pos        => pos($_),
-                                     )
-                );
-
-    return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::Case');
+    return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::' . ucfirst($keyword));
 }
 
 # "try/catch" construct
@@ -4053,48 +4114,18 @@ sub _parse_prefix_arg {
     # Function-style operators: say (...), print (...), defined (...), @(...), :(...)
     # The operator is applied only on the parenthesized expression, and any method call
     # that follows is applied on the result: `@(1..2).combinations(2)` is `(@(1..2)).combinations(2)`
-    if (
-        $ref eq 'Sidef::Meta::PrefixColon'
-        or (
-            $ref eq 'Sidef::Operator::Unary'
-            and (   $method eq 'say'
-                 or $method eq 'print'
-                 or $method eq 'defined'
-                 or $method eq '>'
-                 or $method eq '>>'
-                 or $method eq '+'
-                 or $method eq '@'
-                 or $method eq '@|')
-           )
-      ) {
+    if ($ref eq 'Sidef::Meta::PrefixColon' or ($ref eq 'Sidef::Operator::Unary' and $PAREN_STYLE_UNARY{$method})) {
         if (/\G(?=\()/) {
             return $self->parse_arg(code => $opt{code});
         }
     }
 
     # Prefix operators (! ~ \ + * √ ^ @ @|) are applied on the next operand: `!a == b` is `(!a) == b`
-    my $prec = PREC_OPERAND;
-
-    if ($ref eq 'Sidef::Operator::Unary') {
-        if ($method eq '-') {    # `-a ** b` is `-(a ** b)`
-            $prec = PREC_POW;
-        }
-        elsif ($method eq 'defined') {    # named unary operator: `defined a + 1` is `defined(a + 1)`
-            $prec = PREC_SHIFT;
-        }
-        elsif ($method eq 'say' or $method eq 'print' or $method eq '>' or $method eq '>>') {    # list operators
-            $prec = PREC_ASSIGN;
-        }
-        elsif ($method eq '@' or $method eq '@|') {
-            $prec = PREC_RANGE;
-        }
-    }
-    elsif ($ref eq 'Sidef::Variable::Ref' or $ref eq 'Sidef::Meta::PrefixColon') {
-        $prec = PREC_OPERAND;
-    }
-    else {    # return, read, goto
-        $prec = PREC_ASSIGN;
-    }
+    my $prec = (
+                  $ref eq 'Sidef::Operator::Unary'                                       ? ($UNARY_ARG_PREC{$method} // PREC_OPERAND)
+                : ($ref eq 'Sidef::Variable::Ref' or $ref eq 'Sidef::Meta::PrefixColon') ? PREC_OPERAND
+                : PREC_ASSIGN    # return, read, goto
+               );
 
     return $self->parse_obj(code => $opt{code}, prec => $prec);
 }
@@ -4111,9 +4142,11 @@ sub _parse_prefix_expression {
     defined($arg)
       || $self->fatal_error(
                             code       => $_,
-                            error      => "expected an argument. Did you mean '$method()' instead?",
+                            error      => "expected an expression after `$method`",
+                            reason     => "`$method` must be followed by an argument",
+                            hint       => ($method =~ /^[^\W\d]/ ? "to use `$method` without an argument, write: $method()" : undef),
                             incomplete => 0,
-                            pos        => pos($_) - 1,
+                            pos        => pos($_),
                            );
 
     my $ref = ref($obj);
@@ -4186,6 +4219,7 @@ sub _parse_for_in_loop {
     my $class_name = $self->{class};
 
     my @loops;
+    my ($expr_pos, $expr_line);
     {
         my @vars;
         while (/\G([*:])?($self->{var_name_re})/gc) {
@@ -4232,6 +4266,8 @@ sub _parse_for_in_loop {
                                 pos   => pos($_),
                                );
 
+        ($expr_pos, $expr_line) = (pos($_), $self->{line});
+
         my $expr = $self->_parse_arg_or_obj(code => $opt{code});
 
         push @loops,
@@ -4256,13 +4292,7 @@ sub _parse_for_in_loop {
     my $block = (
                  /\G\h*(?=\{)/gc
                  ? $self->parse_block(code => $opt{code})
-                 : $self->fatal_error(
-                                      error      => "invalid declaration of the `for` loop",
-                                      incomplete => $self->_at_eof($opt{code}),
-                                      reason     => "expected a block after the loop expression: for x in expr { ... }",
-                                      code       => $_,
-                                      pos        => pos($_),
-                                     )
+                 : $self->_missing_for_body($loops[-1], $expr_pos, $expr_line, code => $opt{code})
                 );
 
     # Remove the for-loop variables from the outer scope
@@ -4411,21 +4441,6 @@ sub _parse_postfix {
             push @{$struct->{$self->{class}}[-1]{call}}, @{$methods};
             redo;
         }
-
-        # Method call on the next line (leading dot):
-        #
-        #   obj
-        #     .method1
-        #     .method2(...)
-        #
-        # A leading dot at the beginning of a statement is the implicit method
-        # call on the special variable `_`. When this variable doesn't exist,
-        # the dot continues the expression from the previous line.
-        # if (/\G(?=(?:[ \t]*(?:#[^\r\n]*)?\R)+\s*\.(?![.0-9]))/
-        #    and not defined($self->find_var('_', $self->{class}))) {
-        #    $self->parse_whitespace(code => $opt{code});
-        #    redo;
-        # }
 
         # Operators used with the method-call syntax: `a .+ b`, or `a \.` followed by
         # the operator on the next line. The operator binds tighter than any other operator.
@@ -4692,12 +4707,6 @@ sub get_method_name {
     return ({self => $obj // return}, 0, '');
 }
 
-# Parses an expression, using the operator precedence rules.
-#
-# The `prec` option sets the minimum precedence of the operators that are consumed.
-# By default, a full expression is parsed (everything that binds tighter than
-# a comma). The statement-level expressions (see parse_script) also consume the
-# pair constructors and the keyword operators (if, while, and, or).
 # Parses a parenthesized list of arguments `(...)`, or any other expression
 sub _parse_arg_or_obj {
     my ($self, %opt) = @_;
@@ -4724,6 +4733,12 @@ sub _negate {
 # Operators: precedence climbing
 # ---------------------------------------------------------------------------
 
+# Parses an expression, using the operator precedence rules.
+#
+# The `prec` option sets the minimum precedence of the operators that are consumed.
+# By default, a full expression is parsed (everything that binds tighter than
+# a comma). The statement-level expressions (see parse_script) also consume the
+# pair constructors and the keyword operators (if, while, and, or).
 sub parse_obj {
     my ($self, %opt) = @_;
 
@@ -5333,6 +5348,7 @@ sub parse_script {
                                   );
             }
 
+            delete $self->{closed_by};
             $self->check_declarations($self->{ref_vars});
             return \%struct;
         }
@@ -5351,15 +5367,14 @@ sub parse_script {
                                   );
             }
 
+            $self->{closed_by} = [substr($_, pos($_) - 1, 1), pos($_) - 1];
             return \%struct;
         }
 
-        my ($token) = /\G(\S{1,12})/;
-
         $self->fatal_error(
                            code  => $_,
-                           pos   => (pos($_)),
-                           error => (defined($token) ? "unexpected token `$token`" : "unexpected end of input"),
+                           pos   => pos($_),
+                           error => 'unexpected ' . $self->_describe_token($_, pos($_)),
                           );
     }
 }

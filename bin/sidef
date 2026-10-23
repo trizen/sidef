@@ -38,7 +38,7 @@ my $name    = 'Sidef';
 my $version = $Sidef::VERSION;
 
 my %args;
-if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
+if ($#ARGV != -1 and substr($ARGV[0], 0, 1) eq '-') {
     require Getopt::Std;
     $Getopt::Std::STANDARD_HELP_VERSION = 1;
     Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:tCO:kP:M:sN:', \%args);
@@ -1173,13 +1173,14 @@ EOT
         if ($self->{gnu}) {
 
             # Ctrl-C: makes the call of readline() return, when the signal was received
-            $attr->{event_hook} = sub {  # this is buggy
+            $attr->{event_hook} = sub {    # this is buggy
                 if ($self->{interrupted}) {
                     $attr->{line_buffer} = '';
                     $attr->{done}        = 1;
                 }
                 return 0;
-            } if 0;
+              }
+              if 0;
 
             $attr->{attempted_completion_function} = sub {
                 my ($text, $line, $start, $end) = @_;
