@@ -451,6 +451,14 @@ sub _constant {
     return ($$cache = "($self->{environment_name}\::$name)");
 }
 
+sub _lvalue_op_call {
+    my ($self, $code, $method_name, @args) = @_;
+
+    $self->_prelude('sub _LVALUE_OP_CALL : lvalue { my ($r, $op, @args) = @_; $$r = $$r->$op(@args) }');
+
+    "$self->{environment_name}\::_LVALUE_OP_CALL(" . join(',', "\\$code", $self->_dump_string($method_name), (@args ? $self->deparse_args(@args) : ())) . ')';
+}
+
 # The method call that is used for the operators: `->$OP1`
 sub _op_call {
     my ($self, $method) = @_;
@@ -1962,10 +1970,7 @@ sub _special_call {
 
     # Reassignment operators: +=, -=, *=, /=, ...
     if (exists $REASSIGN_OPS{$method}) {
-        $self->_prelude('sub _LVALUE : lvalue { my ($r, $op, @args) = @_; $$r = $$r->$op(@args) }');
-
-        #return "CORE::sub:lvalue{my\$r=\\$code;\$\$r=\$\$r" . $self->_op_call($REASSIGN_OPS{$method}) . $self->deparse_args(@args) . '}->()';
-        return "$self->{environment_name}\::_LVALUE(" . join(',', "\\$code", $self->_dump_string($REASSIGN_OPS{$method}), $self->deparse_args(@args)) . ')';
+        return $self->_lvalue_op_call($code, $REASSIGN_OPS{$method}, @args);
     }
 
     # == and !=
@@ -2023,10 +2028,7 @@ sub _generic_call {
 
             # A method that ends with `!` modifies the object in place
             if (substr($method, -1) eq '!') {
-                return
-                    "CORE::sub:lvalue{my\$r=\\$code;\$\$r=\$\$r\->"
-                  . substr($method, 0, -1)
-                  . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . '}->()';
+                return $self->_lvalue_op_call($code, substr($method, 0, -1), (exists($call->{arg}) ? @{$call->{arg}} : ()));
             }
 
             $code .= '->' if $code ne '';
