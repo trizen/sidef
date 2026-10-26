@@ -1185,10 +1185,13 @@ EOT
             $attr->{attempted_completion_function} = sub {
                 my ($text, $line, $start, $end) = @_;
 
-                my $result = eval { $self->complete(Encode::decode_utf8($text), Encode::decode_utf8(substr($line, 0, $start))) };
+                my $result = eval { $self->complete(Encode::decode_utf8($text), Encode::decode_utf8(substr(Encode::encode_utf8($line), 0, $start))) };
 
                 # An error in the completion must never break the session
-                $@ and return ($attr->{attempted_completion_over} = 1, ());
+                if ($@) {
+                    $attr->{attempted_completion_over} = 1;
+                    return;
+                }
 
                 defined($result) or return;    # file names
 
