@@ -453,9 +453,7 @@ sub _constant {
 
 sub _lvalue_op_call {
     my ($self, $code, $method_name, @args) = @_;
-
     $self->_prelude('sub _LVALUE_OP_CALL : lvalue { my ($r, $op, @args) = @_; $$r = $$r->$op(@args) }');
-
     "$self->{environment_name}\::_LVALUE_OP_CALL(" . join(',', "\\$code", $self->_dump_string($method_name), (@args ? $self->deparse_args(@args) : ())) . ')';
 }
 
@@ -651,7 +649,7 @@ sub _initialize_var {
     return $code;
 }
 
-# Declaration of variables: `var a, b = 1, 2`
+# Declaration of variables: `var(a, b) = (1, 2)`
 sub _node_init {
     my ($self, $init) = @_;
 

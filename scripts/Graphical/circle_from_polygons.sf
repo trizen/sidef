@@ -14,8 +14,8 @@ img.box(filled => 1, color => 'white');
 iter.times { |k|
     var points = gather {
         k.times { |n|
-            var x = (size*k   + 100*cos(n*Number.pi / k/2));
-            var y = (height/2 + 100*sin(n*Number.pi / k/2));
+            var x = (size*k   + 100*cos(n*Number.tau / k));
+            var y = (height/2 + 100*sin(n*Number.tau / k));
             take([x.round(0), y.round(0)]);
         }
     }
