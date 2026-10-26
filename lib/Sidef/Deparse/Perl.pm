@@ -1962,7 +1962,10 @@ sub _special_call {
 
     # Reassignment operators: +=, -=, *=, /=, ...
     if (exists $REASSIGN_OPS{$method}) {
-        return "CORE::sub:lvalue{my\$r=\\$code;\$\$r=\$\$r" . $self->_op_call($REASSIGN_OPS{$method}) . $self->deparse_args(@args) . '}->()';
+        $self->_prelude('sub _LVALUE : lvalue { my ($r, $op, @args) = @_; $$r = $$r->$op(@args) }');
+
+        #return "CORE::sub:lvalue{my\$r=\\$code;\$\$r=\$\$r" . $self->_op_call($REASSIGN_OPS{$method}) . $self->deparse_args(@args) . '}->()';
+        return "$self->{environment_name}\::_LVALUE(" . join(',', "\\$code", $self->_dump_string($REASSIGN_OPS{$method}), $self->deparse_args(@args)) . ')';
     }
 
     # == and !=
