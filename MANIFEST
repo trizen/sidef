@@ -1095,6 +1095,7 @@ scripts/Tests/smart_match_operator.sf
 scripts/Tests/smooth_numbers.sf
 scripts/Tests/smooth_rough.sf
 scripts/Tests/solve_modular_congruences.sf
+scripts/Tests/solve_thue.sf
 scripts/Tests/sort_disjoint_sublist.sf
 scripts/Tests/sort_with_custom_cmp.sf
 scripts/Tests/soundex.sf

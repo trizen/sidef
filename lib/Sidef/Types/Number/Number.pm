@@ -9960,12 +9960,8 @@ sub solve_thue {
 
     $k >= 1 or return _array();
 
-    my $N = defined($N_in) ? do { _any2mpz($$N_in) // return _array() } : Math::GMPz::Rmpz_init_set($ONE);
-
-    my $bound =
-      defined($bound_in)
-      ? do { ref($bound_in) eq __PACKAGE__ or _valid(\$bound_in); _any2ui($$bound_in) // return _array() }
-      : 1e6;
+    my $N     = defined($N_in)     ? do { _any2mpz($$N_in) // return _array() } : Math::GMPz::Rmpz_init_set($ONE);
+    my $bound = defined($bound_in) ? do { ref($bound_in) eq __PACKAGE__ or _valid(\$bound_in); _any2ui($$bound_in) // return _array() } : 1e3;
 
     $bound > 0 or return _array();
 
@@ -9995,12 +9991,44 @@ sub solve_thue {
         return _array([_array([bless(\$x), bless(\$y)])]);
     }
 
+    my @solutions;
+
+    # Try to return faster
     my $k_even = ($k % 2 == 0);
+    if (Math::GMPz::Rmpz_sgn($D) < 0 and $k_even) {
+        if (Math::GMPz::Rmpz_sgn($N) <= 0) { return _array(); }
+
+        state $abs_D = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_abs($abs_D, $D);
+
+        state $div_z = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_tdiv_q($div_z, $N, $abs_D);
+
+        state $ymax_z = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_root($ymax_z, $div_z, $k);
+
+        my $ymax = Math::GMPz::Rmpz_get_ui($ymax_z);
+        $bound = $ymax if $ymax < $bound;
+
+        return _array() if $bound == 0;
+    }
+
+    if ($k == 1) {
+        my $limit = $first_only ? 1 : $bound;
+
+        for (my $y = 1 ; $y <= $limit ; ++$y) {
+            state $x_z = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_mul_ui($x_z, $D, $y);
+            Math::GMPz::Rmpz_add($x_z, $x_z, $N);
+            push @solutions, [Math::GMPz::Rmpz_init_set($x_z), Math::GMPz::Rmpz_init_set_ui($y)];
+            last if $first_only;
+        }
+
+        return _array([map { _array([bless(\$_->[0]), bless(\$_->[1])]) } @solutions]);
+    }
 
     state $t   = Math::GMPz::Rmpz_init_nobless();
     state $x_z = Math::GMPz::Rmpz_init_nobless();
-
-    my @solutions;
 
     for (my $y = 1 ; $y <= $bound ; ++$y) {
 
@@ -10009,23 +10037,13 @@ sub solve_thue {
         Math::GMPz::Rmpz_add($t, $t, $N);
 
         my $sign = Math::GMPz::Rmpz_sgn($t);
-
-        # IMPORTANT: mpz_root() invokes undefined behaviour when given a
-        # negative operand together with an even root.
         next if $k_even and $sign < 0;
 
         if ($sign == 0) {
             push @solutions, [Math::GMPz::Rmpz_init_set_ui(0), Math::GMPz::Rmpz_init_set_ui($y)];
         }
-        elsif ($k == 1) {
-            push @solutions, [Math::GMPz::Rmpz_init_set($t), Math::GMPz::Rmpz_init_set_ui($y)];
-        }
-        elsif (Math::GMPz::Rmpz_root($x_z, $t, $k)) {    # exact k-th root?
-                                                         # Rmpz_root acts as both the perfect power check and the extraction.
+        elsif (Math::GMPz::Rmpz_root($x_z, $t, $k)) {
             push @solutions, [Math::GMPz::Rmpz_init_set($x_z), Math::GMPz::Rmpz_init_set_ui($y)];
-        }
-        else {
-            next;
         }
 
         last if $first_only;
@@ -10108,12 +10126,13 @@ sub solve_lcg_all {
     state $z = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_mul($z, $u_val, $r_val);
 
-    my @solutions;
+    Math::GMPz::Rmpz_fits_ulong_p($g_val) || die "Too large value!";
     my $limit = Math::GMPz::Rmpz_get_ui($g_val);    # Safe assuming g isn't cryptographically huge
 
     # Pre-allocate loop variables
     state $term = Math::GMPz::Rmpz_init_nobless();
 
+    my @solutions;
     for my $t (0 .. $limit - 1) {
         Math::GMPz::Rmpz_mul_ui($term, $m_val, $t);
         Math::GMPz::Rmpz_add($term, $z, $term);
