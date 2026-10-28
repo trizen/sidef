@@ -778,6 +778,7 @@ scripts/Tests/chebyshev_polynomials.sf
 scripts/Tests/class_attr_inheritance.sf
 scripts/Tests/class_attributes.sf
 scripts/Tests/class_bug_79.sf
+scripts/Tests/class_def_method.sf
 scripts/Tests/class_field_inheritance.sf
 scripts/Tests/class_fields.sf
 scripts/Tests/class_global_variables.sf

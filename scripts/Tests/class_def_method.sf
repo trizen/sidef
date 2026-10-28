@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+# See: https://github.com/trizen/sidef/issues/73
+
+class Example(a, b, :extra) {
+
+    method init {
+        for k,v in (extra) {
+
+            -> tmp(self) {
+                "[#{k}] #{v} without arg"
+            }
+
+            -> tmp(self, arg) {
+                "[#{k}] #{v} with arg=#{arg}"
+            }
+
+            __CLASS__.def_method(k, tmp)
+        }
+    }
+}
+
+var obj = Example(1, 2, c => 3, d => 4)
+
+assert_eq(obj.a, 1)
+assert_eq(obj.b, 2)
+assert_eq(obj.c, "[c] 3 without arg")
+assert_eq(obj.c(42), "[c] 3 with arg=42")
+assert_eq(obj.d, "[d] 4 without arg")
+assert_eq(obj.d(43), "[d] 4 with arg=43")
