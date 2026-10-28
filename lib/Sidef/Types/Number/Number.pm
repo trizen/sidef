@@ -9609,21 +9609,14 @@ sub _pell_fundamental_unit {
     my ($d, $is_negative) = @_;
 
     if ($USE_PARI_GP and Math::GMPz::Rmpz_sizeinbase($d, 2) > 16) {
-
-        my $code;
         my $d_str = Math::GMPz::Rmpz_get_str($d, 10);
 
-        if ($is_negative) {
-            $code = "iferr(my(u=quadunit(4*$d_str)); my(p=u.pol);
-                           my(a=polcoef(p,0)); my(b=polcoef(p,1));
-                           if(a^2-$d_str*b^2==-1, [a,b], []), E, \"\")" =~ s/\s+/ /gr;
-        }
-        else {
-            $code = "iferr(my(u=quadunit(4*$d_str)); my(p=u.pol);
-                            my(a=polcoef(p,0)); my(b=polcoef(p,1));
-                            if(a^2-$d_str*b^2==-1, u=u^2; a=polcoef(u.pol,0);
-                            b=polcoef(u.pol,1)); [a,b], E, \"\")" =~ s/\s+/ /gr;
-        }
+        state $tmpl_neg = q{iferr(my(u=quadunit(4*D_STR)); my(p=u.pol); my(a=polcoef(p,0)); my(b=polcoef(p,1)); if(a^2-D_STR*b^2==-1, [a,b], []), E, "")};
+        state $tmpl_pos =
+q{iferr(my(u=quadunit(4*D_STR)); my(p=u.pol); my(a=polcoef(p,0)); my(b=polcoef(p,1)); if(a^2-D_STR*b^2==-1, u=u^2; a=polcoef(u.pol,0); b=polcoef(u.pol,1)); [a,b], E, "")};
+
+        my $code = ($is_negative ? $tmpl_neg : $tmpl_pos);
+        $code =~ s/D_STR/$d_str/g;
 
         if (my $res = _execute_pari_gp($code)) {
             if (my ($x_str, $y_str) = $res =~ /^\[(-?\d+),\s+(-?\d+)\]\z/) {
@@ -9664,39 +9657,33 @@ sub _pell_fundamental_unit {
     state $next_P = Math::GMPz::Rmpz_init_nobless();
     state $next_Q = Math::GMPz::Rmpz_init_nobless();
 
+    my $target_sgn = $is_negative ? -1 : 1;
+
     my $max = Math::GMPz::Rmpz_get_d($a0);
     $max = CORE::int(4 * $max * CORE::log($max) + 10);
 
     for (my $i = 0 ; $i <= $max ; ++$i) {
-        Math::GMPz::Rmpz_mul($h, $A, $h1);
-        Math::GMPz::Rmpz_add($h, $h, $h2);
 
-        Math::GMPz::Rmpz_mul($k, $A, $k1);
-        Math::GMPz::Rmpz_add($k, $k, $k2);
+        # Numerator convergents: h = h2 + A * h1
+        Math::GMPz::Rmpz_set($h, $h2);
+        Math::GMPz::Rmpz_addmul($h, $A, $h1);
+
+        # Denominator convergents: k = k2 + A * k1
+        Math::GMPz::Rmpz_set($k, $k2);
+        Math::GMPz::Rmpz_addmul($k, $A, $k1);
 
         Math::GMPz::Rmpz_mul($next_P, $A, $Q);
         Math::GMPz::Rmpz_sub($next_P, $next_P, $P);
 
-        Math::GMPz::Rmpz_mul($next_Q, $next_P, $next_P);
-        Math::GMPz::Rmpz_sub($next_Q, $d, $next_Q);
+        # Remainder calculation: next_Q = d - next_P^2
+        Math::GMPz::Rmpz_set($next_Q, $d);
+        Math::GMPz::Rmpz_submul($next_Q, $next_P, $next_P);
+
         Math::GMPz::Rmpz_divexact($next_Q, $next_Q, $Q);
 
         if (Math::GMPz::Rmpz_cmp_ui($next_Q, 1) == 0) {
-            my $sgn = ($i % 2 == 0) ? -1 : 1;
-
-            if ($is_negative) {
-                if ($sgn == -1) {
-                    my $ret_h = Math::GMPz::Rmpz_init_set($h);
-                    my $ret_k = Math::GMPz::Rmpz_init_set($k);
-                    return ($ret_h, $ret_k);
-                }
-            }
-            else {
-                if ($sgn == 1) {
-                    my $ret_h = Math::GMPz::Rmpz_init_set($h);
-                    my $ret_k = Math::GMPz::Rmpz_init_set($k);
-                    return ($ret_h, $ret_k);
-                }
+            if ((($i % 2 == 0) ? -1 : 1) == $target_sgn) {
+                return (Math::GMPz::Rmpz_init_set($h), Math::GMPz::Rmpz_init_set($k));
             }
         }
 
@@ -9712,6 +9699,8 @@ sub _pell_fundamental_unit {
         Math::GMPz::Rmpz_set($k2, $k1);
         Math::GMPz::Rmpz_set($k1, $k);
     }
+
+    return ();
 }
 
 sub _reduce_pell_solution {
