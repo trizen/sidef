@@ -581,28 +581,27 @@ say c.area.round(-4)                    # 78.5398
 say c.scale(2).circumference.round(-4)  # 62.8319
 ```
 
-### Method Overriding and `super`
+### Class inheritance
 
 ```ruby
 class Shape {
     method area { 0 }
-    method describe { "Shape with area #{self.area.round(2)}" }
+    method describe { "#{self.class} with area #{self.area}" }
 }
 
 class Rectangle(Number w, Number h) < Shape {
     method area { w * h }
 }
 
-class Square(Number side) < Rectangle {
-    method init {
-        # a square is a rectangle with equal sides
-    }
-
+class Square(Number side) < Shape {
     method area { side**2 }
 }
 
 var s = Square(5)
-say s.describe    # Shape with area 25
+var r = Rectangle(3,4)
+
+say r.describe    # Rectangle with area 12
+say s.describe    # Square with area 25
 ```
 
 ### Subsets for Type Refinement
