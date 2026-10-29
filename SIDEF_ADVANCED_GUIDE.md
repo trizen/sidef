@@ -622,27 +622,22 @@ say next_odd(7)       # 9
 say log_safe(Num.e)   # 1
 ```
 
-### Mixins with Modules
-
-Modules are first-class namespaces that can be used as mixins:
+### Multiple class inheritance
 
 ```ruby
-module Printable {
+class Printable {
     method print_info {
         say "#{self.class}: #{self}"
     }
 }
 
-module Serializable {
+class Serializable {
     method to_string {
         self.class + "(" + self.to_a.join(", ") + ")"
     }
 }
 
-class Point(Number x, Number y) {
-    include Printable
-    include Serializable
-
+class Point(Number x, Number y) < Printable, Serializable {
     method to_a { [x, y] }
     method to_s { "(#{x}, #{y})" }
 }
