@@ -207,7 +207,14 @@ sub read {
         $Sidef::Term::ReadLine //= Term::ReadLine->new("$0");
     };
 
-    my $input = $term->readline($message) // return undef;
+    my $input;
+    if (not -t STDIN) {
+        print $message;
+        $input = <STDIN> // return undef;
+    }
+    else {
+        $input = $term->readline($message) // return undef;
+    }
 
     defined($type)
       ? $type->new($input)

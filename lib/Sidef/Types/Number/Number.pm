@@ -41612,11 +41612,15 @@ sub is_prob_squarefree {
         Math::GMPz::Rmpz_divexact($t, $n, $g);
         Math::GMPz::Rmpz_gcd($g, $t, $g);
 
-        # Divisible by a small square
+        # Divisible by a small square (p^2 where p <= k)
         return $FALSE if Math::GMPz::Rmpz_cmp_ui($g, 1) > 0;
 
-        # k-rough part is a perfect power
+        # Check for pure powers (e.g., x^2, x^3, ...)
         return $FALSE if Math::GMPz::Rmpz_perfect_power_p($t);
+
+        # Optional: For extremely large numbers, we can add a lightweight
+        # trial division or Pollard's rho step here to catch composite
+        # square factors (like p^2 * q) that escape pure power checks.
     }
 
     return $TRUE;
@@ -43762,6 +43766,21 @@ sub times {
     my ($x, $block) = @_;
 
     $x = CORE::int(__numify__($$x));
+
+    if (!defined($block)) {
+        return Sidef::Object::Enumerator->new(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    my ($callback) = @_;
+
+                    for (my $i = 0 ; $i < $x ; ++$i) {
+                        $callback->run($i < SMALL_INTS_SIZE ? $SMALL_INTS[$i] : bless(\(my $o = $i)));
+                    }
+
+                }
+            )
+        );
+    }
 
     for (my $i = 0 ; $i < $x ; ++$i) {
         $block->run($i < SMALL_INTS_SIZE ? $SMALL_INTS[$i] : bless(\(my $o = $i)));
