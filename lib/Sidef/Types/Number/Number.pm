@@ -19553,10 +19553,7 @@ sub _count_from_checkpoint {
     my ($checkpoint, $delta, $direction) = _find_prime_count_checkpoint($y, $keys);
 
     return undef unless defined $checkpoint;
-
     my $threshold = CORE::int(CORE::sqrt($checkpoint));
-    $threshold = SIEVE_UTIL_MAX if ($threshold > SIEVE_UTIL_MAX);
-
     return undef if $delta > $threshold;
 
     say STDERR "prime_count($y): incremental from checkpoint $checkpoint (delta=$delta)"
@@ -19667,7 +19664,7 @@ sub _prime_count {
     # Large path 1: external primecount binary (arbitrary precision)
     # ----------------------------------------------------------------
     if ($diff > PRIMECOUNT_MIN && $USE_PRIMECOUNT) {
-        my $y_count = `primecount $y`;
+        my $y_count = `primecount \Q$y\E`;
 
         if ($? == 0 && defined $y_count) {
             chomp $y_count;
@@ -21585,7 +21582,7 @@ sub nth_prime {
     if ($n > 1_000_000) {
 
         if ($n > (PRIMECOUNT_MIN >> 6) and $USE_PRIMECOUNT) {
-            my $p = `primecount -n $n`;
+            my $p = `primecount -n \Q$n\E`;
             if ($? == 0 and defined($p)) {
                 chomp($p);
                 if ($p) {    # make sure p is not zero
@@ -41314,7 +41311,7 @@ sub rough_count {
 
     if ($k > 50 and $USE_PRIMECOUNT and Math::GMPz::Rmpz_sizeinbase($n, 2) <= 63 and $n > PRIMECOUNT_MIN) {
         my $c     = _prime_count($k - 1);
-        my $count = `primecount --phi $n $c`;
+        my $count = `primecount --phi \Q$n\E \Q$c\E`;
 
         if ($? == 0 and defined($count)) {
             chomp $count;
