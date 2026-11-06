@@ -19364,7 +19364,7 @@ sub _prime_count_step {
     # clamped below.
     my $y_approx = 0 + $y_str;    # explicit coercion
     if ($y_approx > 0) {
-        my $step = CORE::int(1e5 * CORE::log($y_str));
+        my $step = CORE::int(5e5 * (CORE::log($y_str) - 1));
         return $step if ($step > 0 && $step <= SIEVE_UTIL_MAX && $step <= ULONG_MAX);
     }
 
@@ -26189,7 +26189,7 @@ sub primes_each {
             my ($from) = @_;
 
             my $t    = Math::GMPz::Rmpz_get_d($from);
-            my $step = CORE::int(1e5 * CORE::log($t));
+            my $step = CORE::int(5e5 * (CORE::log($t) - 1));
 
             if ($step <= 0 or $step > 1e6) {
                 $step = 1e6;
