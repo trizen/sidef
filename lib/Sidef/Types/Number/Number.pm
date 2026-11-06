@@ -19359,16 +19359,13 @@ sub _nth_almost_prime_lower {
 sub _prime_count_step {
     my ($y_str) = @_;
 
-    # Use native float arithmetic intentionally here; precision loss is
-    # acceptable because the result is only a performance hint and is
-    # clamped below.
-    my $y_approx = 0 + $y_str;    # explicit coercion
+    my $y_approx = $y_str + 0;
     if ($y_approx > 0) {
-        my $step = CORE::int(5e5 * (CORE::log($y_str) - 1));
+        my $step = CORE::int(2e4 * (CORE::log($y_approx) - 1));
         return $step if ($step > 0 && $step <= SIEVE_UTIL_MAX && $step <= ULONG_MAX);
     }
 
-    return SIEVE_INLINE_MAX;      # safe fallback
+    return SIEVE_INLINE_MAX;    # safe fallback
 }
 
 # ---------------------------------------------------------------------------
@@ -26189,7 +26186,7 @@ sub primes_each {
             my ($from) = @_;
 
             my $t    = Math::GMPz::Rmpz_get_d($from);
-            my $step = CORE::int(5e5 * (CORE::log($t) - 1));
+            my $step = CORE::int(1e4 * (CORE::log($t) - 1));
 
             if ($step <= 0 or $step > 1e6) {
                 $step = 1e6;
