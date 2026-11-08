@@ -182,7 +182,14 @@ my %UNARY_ARG_PREC = (
 my %FOREIGN_WORDS = (
                      (map { $_ => 'to declare a function, use: func name(args) {...}' } qw(def fn fun function sub)),
                      (map { $_ => 'to declare a variable, use: var name = value' } qw(let my our)),
-                     (map { $_ => 'the undefined value is written `nil`' } qw(undef undefined None)),
+                     (map { $_ => 'the undefined value is written `nil`' } qw(undef undefined None NULL Nil)),
+                     (map { $_ => 'blocks are enclosed in curly brackets: if (cond) { ... }' } qw(then end endif endwhile endfor fi done)),
+                     (map { $_ => 'to print a value, use: say value' } qw(puts println echo)),
+                     'new'    => 'to create an object, call the class: ClassName(args), or: ClassName.new(args)',
+                     'method' => 'a `method` can be declared only inside a class; outside of a class, use: func name(args) {...}',
+                     'lambda' => 'anonymous functions are written as: func(args) {...}, or as a block: { |args| ... }',
+                     'last'   => 'to exit a loop, use `break` (and `next` for the next iteration)',
+                     'self'   => 'the `self` variable is available only inside the methods of a class',
                      'True'   => 'the boolean values are written in lowercase: `true`',
                      'False'  => 'the boolean values are written in lowercase: `false`',
                      'switch' => 'use: given (expr) { when (value) {...} default {...} }',
@@ -1590,6 +1597,24 @@ sub parse_init_vars {
         }
 
         if (!$opt{private} and $var_name ne '') {
+
+            # With -w: warn about the variables that are declared again in the same scope
+            if (    $self->{opt}{w}
+                and $opt{type} eq 'var'
+                and !$opt{params}
+                and !$self->{interactive}
+                and !$self->{eval_mode}) {
+
+                my ($previous, $same_scope) = $self->find_var($var_name, $class_name);
+
+                if (    $same_scope
+                    and ref($previous) eq 'HASH'
+                    and $previous->{type} eq 'var'
+                    and substr($var_name, 0, 1) ne '_') {
+                    warn "[WARNING] variable '$var_name' is already declared in this scope (line $previous->{line}),"
+                      . " and it is declared again at $self->{file_name} line $self->{line}\n";
+                }
+            }
             $self->_unshift_var(
                                 $class_name,
                                 {
@@ -1897,7 +1922,7 @@ sub parse_expr {
             }
         }
 
-        if (/$self->{quote_operators_re}/goc) {
+        if (/\G(?=['\x{2018}\x{201A}\x{2019}"\x{201C}\x{201E}\x{201D}%`])/ and /$self->{quote_operators_re}/goc) {
             return $self->_parse_quote_operator(code => $opt{code}, info => $^R);
         }
 
@@ -2152,7 +2177,7 @@ sub parse_expr {
         }
 
         # Beginning of a here-document (<<"EOT", <<'EOT', <<EOT)
-        if (/\G<<(-)?+(?=\S)/gc) {
+        if (/\G<<([-~])?+(?=\S)/gc) {
             return $self->_parse_heredoc(code => $opt{code}, match => $1);
         }
 
@@ -2284,14 +2309,28 @@ sub _parse_number {
     }
 
     # Binary, hexadecimal and octal numbers
-    if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|o[0-7_]*|[0-7_]+)\b/gc) {
-        my $num = $1 =~ tr/_//dr;
+    if (/\G0([bB][10_]*|[xX][0-9A-Fa-f_]*|[oO][0-7_]*|[0-7_]+)\b/gc) {
+        my $literal = $1;
+        my $num     = $literal =~ tr/_//dr;
+
+        # A prefix without digits: `0x`, `0b`, `0o`
+        if ($num =~ /^[bBxXoO]\z/) {
+            $self->fatal_error(
+                               code   => $_,
+                               pos    => pos($_) - length($literal) - 1,
+                               error  => "invalid numeric literal `0$literal`",
+                               reason => "expected at least one digit after `0" . substr($num, 0, 1) . "`",
+                              );
+        }
+
+        my $base = lc(substr($num, 0, 1));
+
         return
           Sidef::Types::Number::Number->new(
-                                              $num =~ /^b/ ? (substr($num, 1) || 0, 2)
-                                            : $num =~ /^o/ ? (substr($num, 1) || 0, 8)
-                                            : $num =~ /^x/ ? (substr($num, 1) || 0, 16)
-                                            :                ($num            || 0, 8)
+                                              $base eq 'b' ? (substr($num, 1), 2)
+                                            : $base eq 'o' ? (substr($num, 1), 8)
+                                            : $base eq 'x' ? (substr($num, 1), 16)
+                                            :                ($num || 0, 8)
                                            );
     }
 
@@ -2491,7 +2530,7 @@ sub _parse_magic_constant {
     }
 
     if ($name eq '__COMPILED__') {
-        return Sidef::Types::Bool::Bool->new($self->{opt}{R} eq 'Perl' or $self->{opt}{c});
+        return Sidef::Types::Bool::Bool->new((($self->{opt}{R} // '') eq 'Perl') or $self->{opt}{c});
     }
 
     if ($name eq '__OPTIMIZED__') {
@@ -2557,7 +2596,7 @@ sub _parse_implicit_topic_call {
                        code  => $_,
                        pos   => pos($_),
                        error => q{attempt of using an implicit method call on an inexistent "_" variable},
-                       hint => q{a leading `.method` is the method call on the topic variable `_`, which exists only inside blocks, such as: arr.each { .say }},
+                       hint  => $self->_topic_call_hint,
                       );
 }
 
@@ -2664,13 +2703,79 @@ sub _parse_eval {
     return bless(
         {
          expr   => $obj,
-         parser => Sidef::Object::Object::dclone(scalar {%$self}),
+         parser => Sidef::Object::Object::dclone($self->_eval_state),
 
          #vars          => {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
          #ref_vars_refs => {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]},
 
         }, 'Sidef::Eval::Eval');
 #>>>
+}
+
+# The state of the parser that is saved by `eval`. The static tables (the regular expressions,
+# the keywords, etc.) are never modified, so they are shared with the parser instead of being copied.
+my %EVAL_SHARED_KEYS = map { $_ => 1 } qw(
+  postfix_ops         hyper_ops           built_in_classes    keywords
+  delim_pairs         special_words       static_obj_re       prefix_obj_re
+  quote_operators_re  match_flags_re      var_name_re         method_name_re
+  var_init_sep_re     operators_re        _delim_re           static_objects
+);
+
+sub _eval_state {
+    my ($self) = @_;
+
+    my %state = map { ($_ => $self->{$_}) } grep { !$EVAL_SHARED_KEYS{$_} } keys %{$self};
+
+    return \%state;
+}
+
+#
+## Hints for the error messages (the code that is parsed is `$_`)
+#
+
+# The hint for a missing block: `if (cond)` followed by a `{` on the next line, or a condition without parentheses
+sub _block_hint {
+    my ($self, $check_parentheses) = @_;
+
+    if (/\G\h*\R\s*\{/) {
+        return 'the opening `{` must be on the same line as the statement that it belongs to, such as: if (cond) {';
+    }
+
+    if ($check_parentheses and $self->{no_paren_cond}) {
+        return 'the condition must be enclosed in parentheses, such as: if (x > 1) {...}';
+    }
+
+    return undef;
+}
+
+# The hint for an operator that has no right-side operand (the position is after the operator)
+sub _operator_hint {
+    my ($self, $method) = @_;
+
+    if (($method eq '==' or $method eq '!=') and /\G=/) {
+        return "there is no `$method=` operator in Sidef; use `$method` instead";
+    }
+
+    return undef;
+}
+
+# The hint for the implicit method call (`.method`), when the topic variable `_` is not available
+sub _topic_call_hint {
+    my ($self) = @_;
+
+    my $before = substr($_, 0, pos($_) // 0);
+
+    # `a . b`: the concatenation of strings in Perl style
+    if ($before =~ /\S\h*\z/ and /\G\.\h+(?=["'\$\w])/) {
+        return 'Sidef has no `.` operator for concatenation; use `+` instead (e.g.: a + b), or an interpolated string: "#{a}#{b}"';
+    }
+
+    # A method chain that starts with a dot, after a statement that ended with `;`
+    if ($before =~ /;\s*\z/ and $before =~ /\R\h*\z/) {
+        return 'a line that starts with `.` continues the expression of the previous line, but the previous statement was ended with `;`';
+    }
+
+    return 'a leading `.method` is the method call on the topic variable `_`, which exists only inside blocks, such as: arr.each { .say }';
 }
 
 # Misplaced keywords: the better error messages, for the keywords that can't be used as variables
@@ -2687,10 +2792,13 @@ sub _check_misplaced_keyword {
                            pos    => pos($_) - length($word),
                            error  => "unexpected `$word`",
                            reason => (
-                                      $word eq 'orwith'
-                                      ? "`orwith` must follow a `with` statement"
+                                      $word eq 'orwith' ? "`orwith` must follow a `with` statement"
                                       : "`$word` must follow an `if` statement"
                                      ),
+                           hint => (
+                                    ($word eq 'else' and /\G\h*\R\s*\{/) ? 'the `{` of the `else` block must be on the same line: } else {...}'
+                                    : undef
+                                   ),
                           );
     }
 
@@ -2808,6 +2916,7 @@ sub _parse_variable_access {
                        pos   => (pos($_) - length($name)),
                        var   => ($class . '::' . $name),
                        error => "variable <$class\::$name> is not declared in the current scope",
+                       hint  => $self->_hint_for_name($name),
                       );
 }
 
@@ -3417,6 +3526,7 @@ sub _parse_class_definition {
                             error      => "invalid class declaration",
                             incomplete => $self->_at_eof($opt{code}),
                             reason     => "expected: class $name(...){...}",
+                            hint       => $self->_block_hint,
                             code       => $_,
                             pos        => pos($_)
                            );
@@ -3517,6 +3627,7 @@ sub _parse_function_definition {
                             error      => "invalid `$type` declaration",
                             incomplete => $self->_at_eof($opt{code}),
                             reason     => "expected: $type $name(...){...}",
+                            hint       => $self->_block_hint,
                             code       => $_,
                             pos        => pos($_)
                            );
@@ -4104,11 +4215,16 @@ sub _parse_prefix_arg {
 
     # Block constructs: if (...) {...}, while (...) {...}, for (...) {...}, etc.
     if ($ref =~ /^Sidef::Types::Block::(?:If|With|While|ForEach|For)\z/) {
-        return (
-                /\G(?=\()/
-                ? $self->parse_arg(code => $opt{code})
-                : $self->parse_obj(code => $opt{code}, prec => PREC_ASSIGN)
-               );
+        if (/\G(?=\()/) {
+            my $arg = $self->parse_arg(code => $opt{code});
+            $self->{no_paren_cond} = 0;
+            return $arg;
+        }
+
+        # The condition is not enclosed in parentheses: `if x > 1 {...}` (it is used by the error hints)
+        my $arg = $self->parse_obj(code => $opt{code}, prec => PREC_ASSIGN);
+        $self->{no_paren_cond} = 1;
+        return $arg;
     }
 
     # Function-style operators: say (...), print (...), defined (...), @(...), :(...)
@@ -4262,6 +4378,7 @@ sub _parse_for_in_loop {
         /\G\h*(?:in|∈|=|)\h*/gc
           || $self->fatal_error(
                                 error => "expected the token <<in>> after variable declaration in for-loop",
+                                hint  => 'the syntax is: for var in expr {...}, or: for (init; condition; step) {...}',
                                 code  => $_,
                                 pos   => pos($_),
                                );
@@ -4423,6 +4540,7 @@ sub _parse_control_block {
                             incomplete => $self->_at_eof($opt{code}),
                             error      => $error,
                             reason     => $reason,
+                            hint       => $self->_block_hint(1),
                            );
 
     return $self->parse_block(code => $opt{code}, %{$opt{block_opts} // {}});
@@ -4478,8 +4596,9 @@ sub _parse_postfix {
         }
 
         # Parse array and hash fetchers ([...] and {...})
-        if (/\G\.\h*(?=[\[\{])/gc or 1) {
-            $self->parse_suffixes(code => $opt{code}, struct => $struct) && redo;
+        /\G\.\h*(?=[\[\{])/gc;
+        if (/\G(?=[\[\{])/ and $self->parse_suffixes(code => $opt{code}, struct => $struct)) {
+            redo;
         }
 
         # Postfix operators (e.g.: x++, x--, n!, n!!, x...)
@@ -4666,6 +4785,19 @@ sub append_method {
     }
 }
 
+# Matches an operator at the current position (the code is `$_`) and returns:
+#   (operator, true when it requires an argument, type of the operator)
+# It returns nothing when there is no operator.
+sub _scan_operator {
+    my ($self) = @_;
+
+    m{\G$self->{operators_re}}goc || return;
+
+    my ($key) = keys(%+);
+
+    return ($+, (exists($self->{hyper_ops}{$key}) ? $self->{hyper_ops}{$key}[0] : !exists($self->{postfix_ops}{$+})), $key,);
+}
+
 ## get_method_name() returns the following values:
 # 1st: method/operator (or undef)
 # 2nd: a true value if the operator requires an argument
@@ -4689,17 +4821,8 @@ sub get_method_name {
     }
 
     # Operator-like method name
-    if (m{\G$self->{operators_re}}goc) {
-        my ($key) = keys(%+);
-        return (
-                $+,
-                (
-                 exists($self->{hyper_ops}{$key})
-                 ? $self->{hyper_ops}{$key}[0]
-                 : not(exists $self->{postfix_ops}{$+})
-                ),
-                $key
-               );
+    if (my @token = $self->_scan_operator) {
+        return @token;
     }
 
     # Method name as expression
@@ -4887,6 +5010,7 @@ sub parse_infix {
                                    pos        => $token->{start},
                                    incomplete => $self->_at_eof($opt{code}),
                                    error      => "operator `$method` requires a right-side operand",
+                                   hint       => $self->_operator_hint($method),
                                   );
 
         # The result of a prefix operator is a new operand
@@ -5005,13 +5129,14 @@ sub _peek_operator {
     if (
            /\G(?=[-|&^.%~!<=:>+\/÷*\\：«»`\x{2200}-\x{22FF}\x{2A00}-\x{2AFF}])/
         && /\G(?![=-]>)/    # not '=>' or '->'
-        && (
-            /\G(?=$self->{operators_re})/o                      # operator
-            || /\G\.\h*(?!\.\.)(?=$self->{operators_re})/gco    # dot followed by operator
-           )
       ) {
 
-        my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
+        my ($method, $req_arg, $op_type) = $self->_scan_operator;
+
+        # A dot followed by an operator (e.g.: `.+`)
+        if (!defined($method) and /\G\.\h*(?!\.\.)(?=$self->{operators_re})/gco) {
+            ($method, $req_arg, $op_type) = $self->_scan_operator;
+        }
 
         if (
                 defined($method)
@@ -5134,6 +5259,7 @@ sub _parse_ternary {
                                 error      => "invalid usage of the ternary operator",
                                 incomplete => $self->_at_eof($opt{code}),
                                 reason     => "expected an expression after '?'",
+                                hint       => (/\G\?/ ? 'Sidef has no `??` operator; use `//` (the defined-or operator) instead' : undef),
                                );
 
     $self->parse_whitespace(code => $opt{code});

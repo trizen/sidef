@@ -104,9 +104,9 @@ assert_eq([01], [1])
 assert_eq([001], [1])
 
 assert_eq(0_, 0)
-assert_eq(0x, 0)
-assert_eq(0b, 0)
-assert_eq(0o, 0)
+assert_eq(0x0, 0)
+assert_eq(0b0, 0)
+assert_eq(0o0, 0)
 
 assert_eq(0b1101, 13)
 assert_eq(01234,  668)
