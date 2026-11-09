@@ -5259,7 +5259,7 @@ sub _parse_ternary {
                                 error      => "invalid usage of the ternary operator",
                                 incomplete => $self->_at_eof($opt{code}),
                                 reason     => "expected an expression after '?'",
-                                hint       => (/\G\?/ ? 'Sidef has no `??` operator; use `//` (the defined-or operator) instead' : undef),
+                                hint       => (/\G\?/ ? 'Sidef has no `??` operator; use `\\\\` (the defined-or operator) instead' : undef),
                                );
 
     $self->parse_whitespace(code => $opt{code});
