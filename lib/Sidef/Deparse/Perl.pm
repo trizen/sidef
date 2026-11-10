@@ -703,7 +703,7 @@ sub _condition {
     my $arg  = $self->deparse_args($expr);
     my $vars = $self->_block_vars($block);
 
-    return ($vars ne '' ? "(my ($vars) = $arg)[-1]" : $self->_form('bool', $arg));
+    return ($vars ne '' ? "(my ($vars) = $arg)[-1]" : $arg);
 }
 
 #----------------------------------------------------------------------
