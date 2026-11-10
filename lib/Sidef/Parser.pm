@@ -4567,7 +4567,7 @@ sub _parse_postfix {
 
     {
         # Fast exit: nothing that can follow an operand starts here
-        /\G[\h.\\(\[{\-+!»«<>]/ or return;
+        /\G[\h.\\(\[{\-+!»«<>wu]/ or return;
 
         # Method call
         if (/\G\h*(?=\.\s*(?:$self->{method_name_re}|[(\$]))/ogc) {
