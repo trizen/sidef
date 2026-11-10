@@ -1428,9 +1428,7 @@ sub _node_cfor {
     my ($self, $obj) = @_;
     my @parts = map { $self->deparse_args($_) } @{$obj->{expr}};
 
-    # The initialization and the step of the loop are not used
-    $parts[0] = $self->_form('void', $parts[0]) if @parts;
-    $parts[2] = $self->_form('void', $parts[2]) if @parts > 2;
+    # The condition is evaluated only for truth.
     $parts[1] = $self->_form('bool', $parts[1]) if @parts > 1;
 
     return 'for(' . join(';', @parts) . ')' . $self->_deparse_scoped($obj->{block}, 1);
