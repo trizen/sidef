@@ -425,6 +425,13 @@ my @SPECIAL_WORDS = qw(
   RangeNum RangeNumber RangeStr RangeString
 );
 
+# The words (and the arrow) that start a declaration or a construct handled by the
+# first group of keyword checks of parse_expr()
+my $DECLARATION_KEYWORD_RE = qr{\G(?:->|(?:var|global|del|has|define|const|static|struct|subset|enum|local|func|class|method|given|when|case|default|else|continue|do|loop|try|gather|take|module|import|include)\b)};
+
+# The characters that start whitespace, a comment or a history reference
+my $WHITESPACE_START_RE = qr{\G[\s#/\x{200B}]};
+
 # Small regular expressions
 my $MATCH_FLAGS_RE  = qr{[msixpogcaludn]+};
 my $VAR_NAME_RE     = qr/[^\W\d]\w*+(?>::[^\W\d]\w*)*/;
@@ -1894,10 +1901,10 @@ sub parse_expr {
 
     local *_ = $opt{code};
     {
-        $self->parse_whitespace(code => $opt{code}, history_refs => ($self->{interactive} ? 2 : 0));
+        /$WHITESPACE_START_RE/ and $self->parse_whitespace(code => $opt{code}, history_refs => ($self->{interactive} ? 2 : 0));
 
         # End of an expression, or end of the script
-        if (/\G;/gc || /\G\z/) {
+        if (/\G;/gc || /\G(?:\z|[)\]}])/) {
             return;
         }
 
@@ -1956,119 +1963,122 @@ sub parse_expr {
             return Sidef::Variable::NamedParam->new($name, $obj);
         }
 
-        # Declaration of variables (global and lexical)
-        if (/\G(var|global|del)\b\h*/gc) {
-            my $type = $1;
-            $type = 'global' if ($type eq 'var' and $self->_repl_toplevel);
-            return $self->_parse_variable_declaration(code => $opt{code}, match => $type);
-        }
-
-        # "has" class attributes
-        if (exists($self->{current_class}) and /\Ghas\b\h*/gc) {
-            return $self->_parse_class_attributes(code => $opt{code});
-        }
-
-        # Declaration of constants and static variables
-        if (/\G(define|const|static)\b\h*/gc) {
-            if ($self->_repl_toplevel) {
-                return $self->_parse_variable_declaration(code => $opt{code}, match => 'global');
+        # The declaration keywords (a single check skips all the keyword checks below)
+        if (/$DECLARATION_KEYWORD_RE/) {
+            # Declaration of variables (global and lexical)
+            if (/\G(var|global|del)\b\h*/gc) {
+                my $type = $1;
+                $type = 'global' if ($type eq 'var' and $self->_repl_toplevel);
+                return $self->_parse_variable_declaration(code => $opt{code}, match => $type);
             }
-            return $self->_parse_constant_declaration(code => $opt{code}, match => $1);
-        }
 
-        # Struct declaration
-        if (/\Gstruct\b\h*/gc) {
-            return $self->_parse_struct(code => $opt{code});
-        }
+            # "has" class attributes
+            if (exists($self->{current_class}) and /\Ghas\b\h*/gc) {
+                return $self->_parse_class_attributes(code => $opt{code});
+            }
 
-        # Subset declaration
-        if (/\Gsubset\b\h*/gc) {
-            return $self->_parse_subset(code => $opt{code});
-        }
+            # Declaration of constants and static variables
+            if (/\G(define|const|static)\b\h*/gc) {
+                if ($self->_repl_toplevel) {
+                    return $self->_parse_variable_declaration(code => $opt{code}, match => 'global');
+                }
+                return $self->_parse_constant_declaration(code => $opt{code}, match => $1);
+            }
 
-        # Declaration of enums
-        if (/\Genum\b\h*/gc) {
-            return $self->_parse_enum(code => $opt{code});
-        }
+            # Struct declaration
+            if (/\Gstruct\b\h*/gc) {
+                return $self->_parse_struct(code => $opt{code});
+            }
 
-        # Local variables
-        if (/\Glocal\b\h*/gc) {
-            return $self->_parse_local(code => $opt{code});
-        }
+            # Subset declaration
+            if (/\Gsubset\b\h*/gc) {
+                return $self->_parse_subset(code => $opt{code});
+            }
 
-        # Declaration of classes, methods and functions
-        if (
-               /\G(func|class)\b\h*/gc
-            || /\G(->)\h*/gc
-            || (exists($self->{current_class})
-                && /\G(method)\b\h*/gc)
-          ) {
-            return $self->_parse_function_or_class(code => $opt{code}, match => $1);
-        }
+            # Declaration of enums
+            if (/\Genum\b\h*/gc) {
+                return $self->_parse_enum(code => $opt{code});
+            }
 
-        # "given(expr) {...}" construct
-        if (/\Ggiven\b\h*/gc) {
-            return $self->_parse_given(code => $opt{code});
-        }
+            # Local variables
+            if (/\Glocal\b\h*/gc) {
+                return $self->_parse_local(code => $opt{code});
+            }
 
-        # "when(expr) {...}" construct
-        if (exists($self->{current_given}) && /\Gwhen\b\h*/gc) {
-            return $self->_parse_when_or_case('when', code => $opt{code});
-        }
+            # Declaration of classes, methods and functions
+            if (
+                   /\G(func|class)\b\h*/gc
+                || /\G(->)\h*/gc
+                || (exists($self->{current_class})
+                    && /\G(method)\b\h*/gc)
+              ) {
+                return $self->_parse_function_or_class(code => $opt{code}, match => $1);
+            }
 
-        # "case(expr) {...}" construct
-        if (exists($self->{current_given}) && /\Gcase\b\h*/gc) {
-            return $self->_parse_when_or_case('case', code => $opt{code});
-        }
+            # "given(expr) {...}" construct
+            if (/\Ggiven\b\h*/gc) {
+                return $self->_parse_given(code => $opt{code});
+            }
 
-        # "default {...}" or "else { ... }" construct for `given/when`
-        if (exists($self->{current_given}) && /\G(?:default|else)\h*(?=\{)/gc) {
-            my $block = $self->parse_block(code => $opt{code});
-            return bless({block => $block}, 'Sidef::Types::Block::Default');
-        }
+            # "when(expr) {...}" construct
+            if (exists($self->{current_given}) && /\Gwhen\b\h*/gc) {
+                return $self->_parse_when_or_case('when', code => $opt{code});
+            }
 
-        # `continue` keyword inside a given/when construct
-        if (exists($self->{current_given}) && /\Gcontinue\b/gc) {
-            state $x = bless({}, 'Sidef::Types::Block::Continue');
-            return $x;
-        }
+            # "case(expr) {...}" construct
+            if (exists($self->{current_given}) && /\Gcase\b\h*/gc) {
+                return $self->_parse_when_or_case('case', code => $opt{code});
+            }
 
-        # "do {...}" and "loop {...}" constructs
-        if (/\G(do|loop)\h*(?=\{)/gc) {
-            my $class = ($1 eq 'do' ? 'Sidef::Types::Block::Do' : 'Sidef::Types::Block::Loop');
-            return bless({block => $self->parse_block(code => $opt{code})}, $class);
-        }
+            # "default {...}" or "else { ... }" construct for `given/when`
+            if (exists($self->{current_given}) && /\G(?:default|else)\h*(?=\{)/gc) {
+                my $block = $self->parse_block(code => $opt{code});
+                return bless({block => $block}, 'Sidef::Types::Block::Default');
+            }
 
-        # "try/catch" construct
-        if (/\Gtry\h*(?=\{)/gc) {
-            return $self->_parse_try(code => $opt{code});
-        }
+            # `continue` keyword inside a given/when construct
+            if (exists($self->{current_given}) && /\Gcontinue\b/gc) {
+                state $x = bless({}, 'Sidef::Types::Block::Continue');
+                return $x;
+            }
 
-        # "gather/take" construct
-        if (/\Ggather\h*(?=\{)/gc) {
-            return $self->_parse_gather(code => $opt{code});
-        }
+            # "do {...}" and "loop {...}" constructs
+            if (/\G(do|loop)\h*(?=\{)/gc) {
+                my $class = ($1 eq 'do' ? 'Sidef::Types::Block::Do' : 'Sidef::Types::Block::Loop');
+                return bless({block => $self->parse_block(code => $opt{code})}, $class);
+            }
 
-        if (exists($self->{current_gather}) and /\Gtake\b\h*/gc) {
+            # "try/catch" construct
+            if (/\Gtry\h*(?=\{)/gc) {
+                return $self->_parse_try(code => $opt{code});
+            }
 
-            my $obj = $self->_parse_arg_or_obj(code => $opt{code});
+            # "gather/take" construct
+            if (/\Ggather\h*(?=\{)/gc) {
+                return $self->_parse_gather(code => $opt{code});
+            }
 
-            return bless({expr => $obj, gather => $self->{current_gather}}, 'Sidef::Types::Block::Take');
-        }
+            if (exists($self->{current_gather}) and /\Gtake\b\h*/gc) {
 
-        # Declaration of a module
-        if (/\Gmodule\b\h*/gc) {
-            return $self->_parse_module(code => $opt{code});
-        }
+                my $obj = $self->_parse_arg_or_obj(code => $opt{code});
 
-        if (/\Gimport\b\h*/gc) {
-            return $self->_parse_import(code => $opt{code});
-        }
+                return bless({expr => $obj, gather => $self->{current_gather}}, 'Sidef::Types::Block::Take');
+            }
 
-        if (/\Ginclude\b\h*/gc) {
-            my $included = $self->_parse_include(code => $opt{code});
-            redo if (ref($included) and refaddr($included) == refaddr(REDO_PARSE));
-            return $included;
+            # Declaration of a module
+            if (/\Gmodule\b\h*/gc) {
+                return $self->_parse_module(code => $opt{code});
+            }
+
+            if (/\Gimport\b\h*/gc) {
+                return $self->_parse_import(code => $opt{code});
+            }
+
+            if (/\Ginclude\b\h*/gc) {
+                my $included = $self->_parse_include(code => $opt{code});
+                redo if (ref($included) and refaddr($included) == refaddr(REDO_PARSE));
+                return $included;
+            }
         }
 
         # Numbers
@@ -2096,7 +2106,7 @@ sub parse_expr {
 
         # Quoted words, numbers, vectors and matrices
         # %w(...), %i(...), %n(...), %v(...), %m(...), «...», <...>
-        if (/\G%([wWinvm])\b/gc || /\G(?=(«|<(?!<)))/) {
+        if (/\G(?=[%«<])/ and (/\G%([wWinvm])\b/gc || /\G(?=(«|<(?!<)))/)) {
             return $self->_parse_quoted_words(code => $opt{code}, match => $1);
         }
 
@@ -2109,33 +2119,36 @@ sub parse_expr {
             return ($^R, 1, $1);
         }
 
-        # Assertions
-        if (/\G(assert(?:_(?:eq|ne))?+)\b\h*/gc) {
-            return $self->_parse_assert(code => $opt{code}, match => $1);
-        }
+        # The keywords that are followed by an expression (a single check skips them all)
+        if (/\G(?=assert|not\b|die\b|warn\b|eval\b|Parser\b)/) {
+            # Assertions
+            if (/\G(assert(?:_(?:eq|ne))?+)\b\h*/gc) {
+                return $self->_parse_assert(code => $opt{code}, match => $1);
+            }
 
-        # Function-style `not(...)`: it is applied only on the parenthesized expression
-        if (/\Gnot(?=\()/gc) {
-            return $self->_negate($self->parse_arg(code => $opt{code}));
-        }
+            # Function-style `not(...)`: it is applied only on the parenthesized expression
+            if (/\Gnot(?=\()/gc) {
+                return $self->_negate($self->parse_arg(code => $opt{code}));
+            }
 
-        # Logical `not` (it has a lower precedence than comparisons: `not a == b` is `not (a == b)`)
-        if (/\Gnot\b\h*/gc) {
-            return $self->_parse_not(code => $opt{code});
-        }
+            # Logical `not` (it has a lower precedence than comparisons: `not a == b` is `not (a == b)`)
+            if (/\Gnot\b\h*/gc) {
+                return $self->_parse_not(code => $opt{code});
+            }
 
-        # die/warn
-        if (/\G(die|warn)\b\h*/gc) {
-            return $self->_parse_die_warn(code => $opt{code}, match => $1);
-        }
+            # die/warn
+            if (/\G(die|warn)\b\h*/gc) {
+                return $self->_parse_die_warn(code => $opt{code}, match => $1);
+            }
 
-        # Eval keyword
-        if (/\Geval\b\h*/gc) {
-            return $self->_parse_eval(code => $opt{code});
-        }
+            # Eval keyword
+            if (/\Geval\b\h*/gc) {
+                return $self->_parse_eval(code => $opt{code});
+            }
 
-        if (/\GParser\b/gc) {
-            return $self;
+            if (/\GParser\b/gc) {
+                return $self;
+            }
         }
 
         # Regular expression
@@ -4553,6 +4566,9 @@ sub _parse_postfix {
     local *_ = $opt{code};
 
     {
+        # Fast exit: nothing that can follow an operand starts here
+        /\G[\h.\\(\[{\-+!»«<>]/ or return;
+
         # Method call
         if (/\G\h*(?=\.\s*(?:$self->{method_name_re}|[(\$]))/ogc) {
             my $methods = $self->parse_methods(code => $opt{code});
@@ -5423,7 +5439,7 @@ sub parse_script {
     my %struct;
     local *_ = $opt{code};
   MAIN: {
-        $self->parse_whitespace(code => $opt{code}, history_refs => ($self->{interactive} ? 1 : 0));
+        /$WHITESPACE_START_RE/ and $self->parse_whitespace(code => $opt{code}, history_refs => ($self->{interactive} ? 1 : 0));
 
         if (/\G\@:([^\W\d]\w*+)/gc) {
             push @{$struct{$self->{class}}}, {self => bless({name => $1}, 'Sidef::Variable::Label')};

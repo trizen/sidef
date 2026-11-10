@@ -150,6 +150,32 @@ my %DATA_TYPES = (
                   'Sidef::Time::Date'                       => 'Sidef::Time::Date',
                  );
 
+# A scalar variable: `$x_1`
+my $SCALAR_VAR_RE = qr/\$[^\W\d]\w*/;
+
+# The types whose calls can be special, even when the method is a word
+# (see `_special_call`: Hash(...), return, and the prefix operators `say`, `print`, `defined`)
+my %SPECIAL_METHOD_TYPES = map { $_ => 1 } qw(
+  Sidef::DataTypes::Hash::Hash
+  Sidef::Meta::PrefixColon
+  Sidef::Types::Block::Return
+  Sidef::Operator::Unary
+);
+
+# The nodes that don't create a subroutine around the code of their children.
+# A `return` statement that is only nested in such nodes returns directly from the function.
+my %DIRECT_NODES = map { $_ => 1 } qw(
+  HASH
+  Sidef::Types::Block::If
+  Sidef::Types::Block::With
+  Sidef::Types::Block::While
+  Sidef::Types::Block::CFor
+  Sidef::Types::Block::Loop
+  Sidef::Types::Block::Do
+  Sidef::Types::Block::Return
+  Sidef::Types::Bool::Ternary
+);
+
 # The node handlers: type of the node => method
 my %NODE_HANDLERS = (
 
@@ -451,8 +477,61 @@ sub _constant {
     return ($$cache = "($self->{environment_name}\::$name)");
 }
 
+# Alternative forms of an expression, which are valid only in a restricted context:
+#   void: the value of the expression is not used
+#   bool: the value of the expression is only tested for truth
+# The forms are indexed by the code of the expression.
+sub _with_forms {
+    my ($self, $code, %forms) = @_;
+
+    foreach my $kind (keys %forms) {
+        $self->{forms}{$kind}{$code} = $forms{$kind} if $forms{$kind} ne $code;
+    }
+
+    return $code;
+}
+
+# The form of the code for the given context, or the code itself
+sub _form {
+    my ($self, $kind, $code) = @_;
+
+    my $forms = $self->{forms}{$kind} or return $code;
+
+    exists($forms->{$code}) and return $forms->{$code};
+
+    # The arguments are wrapped in parentheses
+    if (substr($code, 0, 1) eq '(' and substr($code, -1) eq ')') {
+        my $inner = substr($code, 1, -1);
+        my $form  = $self->_form($kind, $inner);
+        return ($form eq $inner ? $code : "($form)");
+    }
+
+    return $code;
+}
+
+# The statements of a sequence, where the value of all but the last one is not used
+sub _void_statements {
+    my ($self, @statements) = @_;
+    $_ = $self->_form('void', $_) for @statements[0 .. $#statements - 1];
+    return @statements;
+}
+
+# A scalar variable, which can be evaluated many times without side effects: `$x_1` or `($x_1)`
+# Returns the name of the variable.
+sub _simple_var {
+    my ($self, $code) = @_;
+    return ($code =~ /\A\(?($SCALAR_VAR_RE)\)?\z/o ? $1 : undef);
+}
+
 sub _lvalue_op_call {
     my ($self, $code, $method_name, @args) = @_;
+
+    # The variable is assigned directly: `$x = $x->OP(args)`
+    if (defined(my $var = $self->_simple_var($code))) {
+        my $call = ($method_name =~ /^[^\W\d]/ ? "->$method_name" : $self->_op_call($method_name));
+        return "($var=$var$call" . (@args ? $self->deparse_args(@args) : '()') . ')';
+    }
+
     $self->_prelude('sub _LVALUE_OP_CALL : lvalue { my ($r, $op, @args) = @_; $$r = $$r->$op(@args) }');
     "$self->{environment_name}\::_LVALUE_OP_CALL(" . join(',', "\\$code", $self->_dump_string($method_name), (@args ? $self->deparse_args(@args) : ())) . ')';
 }
@@ -486,6 +565,10 @@ sub _op_call {
     # The Perl double-quoted string with the given content
     sub _dump_string {
         my ($self, $str) = @_;
+
+        # Fast exit: printable ASCII characters, none of them requiring an escape (not: " $ @ \)
+        return qq("$str") if ($str !~ /[^ !#%-?A-Z\[\]-~]/);
+
         $str =~ s/([\\\"\@\$])/\\$1/g;
         return qq("$str") if ($str !~ /[^\040-\176]/);    # fast exit
 
@@ -590,15 +673,21 @@ sub _deparse_value {
 }
 
 # The statements of a block, joined: `a; b; c`
+# The value of the last statement is not used, when the block is the body of a loop.
 sub _statements {
-    my ($self, $block_code) = @_;
-    return join(';', $self->deparse_script($block_code));
+    my ($self, $block_code, $is_loop) = @_;
+
+    my @statements = $self->deparse_script($block_code);
+
+    @statements = ($is_loop ? (map { $self->_form('void', $_) } @statements) : $self->_void_statements(@statements));
+
+    return join(';', @statements);
 }
 
 # A block with its own scope: `{...}`
 sub _deparse_scoped {
-    my ($self, $block) = @_;
-    return $self->_scoped_block(sub { $self->_statements($block->{code}) });
+    my ($self, $block, $is_loop) = @_;
+    return $self->_scoped_block(sub { $self->_statements($block->{code}, $is_loop) });
 }
 
 # The variables of the block, as a list: `$a_1,$b_2`
@@ -614,7 +703,7 @@ sub _condition {
     my $arg  = $self->deparse_args($expr);
     my $vars = $self->_block_vars($block);
 
-    return ($vars ne '' ? "(my ($vars) = $arg)[-1]" : $arg);
+    return ($vars ne '' ? "(my ($vars) = $arg)[-1]" : $self->_form('bool', $arg));
 }
 
 #----------------------------------------------------------------------
@@ -681,8 +770,9 @@ sub _node_init {
 
     # The result is a list of lvalues
     if (@code > 1 or exists($init->{args})) {
+        my $void = join(';', @code);
         push @code, '(' . join(',', map { $self->_var($_) } @vars) . ')';
-        return 'CORE::sub:lvalue{' . join(';', @code) . '}->()';
+        return $self->_with_forms('CORE::sub:lvalue{' . join(';', @code) . '}->()', void => $void);
     }
 
     return '(' . $code[0] . ')';
@@ -740,6 +830,34 @@ sub _param_descriptor {
 sub _param_descriptors {
     my ($self, @vars) = @_;
     return '[' . join(',', map { $self->_param_descriptor($_) } @vars) . ']';
+}
+
+# The attributes `vars=>[...]` and `table=>{...}` of a block.
+# They are constants that are shared by the blocks, unless a descriptor has a closure.
+sub _param_attributes {
+    my ($self, @vars) = @_;
+
+    my %code = (
+                vars  => $self->_param_descriptors(@vars),
+                table => $self->_param_table(@vars),
+               );
+
+    my $shared = !grep { exists($_->{where_block}) or exists($_->{where_expr}) } @vars;
+
+    return map {
+        my $label = $_;
+        my $value = $code{$label};
+
+        if ($shared) {
+            $value = ($self->{cache}{"param_$label"}{$value} //= do {
+                my $constant = 'Param' . ucfirst($label) . ++$self->{counters}{"param_$label"};
+                $self->_prelude("use constant $constant => +$value;");
+                "($self->{environment_name}\::$constant)";
+            });
+        }
+
+        "$label=>$value";
+    } qw(vars table);
 }
 
 sub _param_table {
@@ -1020,15 +1138,12 @@ sub _node_block_init {
         sub {
             my $code = ($has_params ? $self->_bind_params(@{$obj->{init_vars}{vars}}) : '');
 
-            $code .= 'my @return;' if $is_function;
+            my @statements = do {
+                local $self->{direct} = ($is_function ? $id : undef);
+                $self->_void_statements($self->deparse_script($obj->{code}));
+            };
 
-            my @statements = $self->deparse_script($obj->{code});
-
-            if ($is_function and @statements) {
-                $statements[-1] = 'return do{' . $statements[-1] . '}';
-            }
-
-            return $code . join(';', @statements) . ($is_function ? ";END_$id: \@return;" : '');
+            return $code . ($is_function ? $self->_function_body($id, @statements) : join(';', @statements));
         }
     );
 
@@ -1050,11 +1165,50 @@ sub _node_block_init {
     }
 
     if ($has_params) {
-        my @vars = @{$obj->{init_vars}{vars}};
-        push @attributes, 'vars=>' . $self->_param_descriptors(@vars), 'table=>' . $self->_param_table(@vars);
+        push @attributes, $self->_param_attributes(@{$obj->{init_vars}{vars}});
     }
 
-    return "$var=Sidef::Types::Block::Block->new(code=>sub{" . $declarations . $body . '},' . join(',', @attributes) . $extra . ')';
+    # Equivalent to `Block->new(...)`, without the overhead of the call
+    return "$var=bless({" . join(',', 'code=>sub{' . $declarations . $body . '}', @attributes) . $extra . "}, 'Sidef::Types::Block::Block')";
+}
+
+# The body of a function: the result of the last statement is returned,
+# and the `@return` variable and the `END_n` label are declared only when they are needed.
+sub _function_body {
+    my ($self, $id, @statements) = @_;
+
+    # An empty function returns an empty list
+    @statements or return "my \@return;;END_$id: \@return;";
+
+    if (not $self->{direct_returns}{$statements[-1]}) {
+        $statements[-1] = 'return do{' . $statements[-1] . '}';
+    }
+
+    my $code = join(';', @statements);
+
+    $self->{has_return}{$id} or return $code;
+
+    return "my \@return;$code" . ($self->{has_goto}{$id} ? ";END_$id: \@return;" : '');
+}
+
+# The `return` statement of a function: the result is stored in `@return`.
+# Inside a nested subroutine, the execution jumps to the end of the function.
+sub _return_statement {
+    my ($self, $args) = @_;
+
+    my $id = $self->{function};
+
+    $self->{has_return}{$id} = 1;
+
+    if (defined($self->{direct}) and $self->{direct} == $id) {
+        my $code = 'return(' . (defined($args) ? "\@return=$args" : '@return') . ')';
+        $self->{direct_returns}{$code} = 1;
+        return $code;
+    }
+
+    $self->{has_goto}{$id} = 1;
+
+    return 'do{' . (defined($args) ? "\@return=$args;" : '') . "goto END_$id}";
 }
 
 sub _node_return {
@@ -1064,7 +1218,7 @@ sub _node_return {
     exists($expr->{call}) and return '';
 
     if (defined $self->{function}) {
-        return "goto END_$self->{function}";
+        return $self->_return_statement();
     }
 
     return 'return;';
@@ -1238,7 +1392,7 @@ sub _node_if {
         $code .= 'else' . $self->_deparse_scoped($obj->{else}{block});
     }
 
-    return $code . '}';
+    return $self->_with_forms($code . '}', void => substr($code, 3));
 }
 
 sub _node_with {
@@ -1257,12 +1411,12 @@ sub _node_with {
         $code .= 'else' . $self->_deparse_scoped($obj->{else}{block});
     }
 
-    return $code . '}';
+    return $self->_with_forms($code . '}', void => substr($code, 3));
 }
 
 sub _node_while {
     my ($self, $obj) = @_;
-    return 'while(' . $self->_condition($obj->{expr}, $obj->{block}) . ')' . $self->_deparse_scoped($obj->{block});
+    return 'while(' . $self->_condition($obj->{expr}, $obj->{block}) . ')' . $self->_deparse_scoped($obj->{block}, 1);
 }
 
 sub _node_foreach {
@@ -1272,7 +1426,14 @@ sub _node_foreach {
 
 sub _node_cfor {
     my ($self, $obj) = @_;
-    return 'for(' . join(';', map { $self->deparse_args($_) } @{$obj->{expr}}) . ')' . $self->_deparse_scoped($obj->{block});
+    my @parts = map { $self->deparse_args($_) } @{$obj->{expr}};
+
+    # The initialization and the step of the loop are not used
+    $parts[0] = $self->_form('void', $parts[0]) if @parts;
+    $parts[2] = $self->_form('void', $parts[2]) if @parts > 2;
+    $parts[1] = $self->_form('bool', $parts[1]) if @parts > 1;
+
+    return 'for(' . join(';', @parts) . ')' . $self->_deparse_scoped($obj->{block}, 1);
 }
 
 sub _node_forin {
@@ -1283,7 +1444,7 @@ sub _node_forin {
     my @loops = @{$obj->{loops}};
     my @binds = map { $self->_bind_params(@{$_->{vars}}) } @loops;
 
-    my $code = 'do' . $self->_deparse_scoped($obj->{block});
+    my $code = 'do' . $self->_deparse_scoped($obj->{block}, 1);
 
     while (@loops) {
         my $loop = pop(@loops);
@@ -1301,7 +1462,7 @@ sub _node_forin {
 
 sub _node_ternary {
     my ($self, $obj) = @_;
-    return '(' . scalar($self->deparse_script($obj->{cond})) . '?' . $self->deparse_args($obj->{true}) . ':' . $self->deparse_args($obj->{false}) . ')';
+    return '(' . $self->_form('bool', scalar($self->deparse_script($obj->{cond}))) . '?' . $self->deparse_args($obj->{true}) . ':' . $self->deparse_args($obj->{false}) . ')';
 }
 
 sub _node_do {
@@ -1311,7 +1472,7 @@ sub _node_do {
 
 sub _node_loop {
     my ($self, $obj) = @_;
-    return 'while(1)' . $self->_deparse_scoped($obj->{block});
+    return 'while(1)' . $self->_deparse_scoped($obj->{block}, 1);
 }
 
 sub _node_given {
@@ -1752,14 +1913,19 @@ sub _dump_indices {
         elsif (ref($entry)) {
             my $str = $self->deparse_expr(ref($entry) eq 'HASH' ? $entry : {self => $entry});
 
-            if ($str ne '') {
-                push @indices,
-                  (   '(map { ref($_) eq "Sidef::Types::Number::Number" ? '
-                    . '(ref($$_) ? Sidef::Types::Number::Number::__numify__($$_) : $$_) '
-                    . ': do {my$sub=ref($_) && UNIVERSAL::can($_, "..."); '
-                    . '$sub ? $sub->($_) : CORE::int($_) } } '
-                    . $str
-                    . ')');
+            my $convert =
+                'ref($_) eq "Sidef::Types::Number::Number" ? '
+              . '(ref($$_) ? Sidef::Types::Number::Number::__numify__($$_) : $$_) '
+              . ': do {my$sub=ref($_) && UNIVERSAL::can($_, "..."); '
+              . '$sub ? $sub->($_) : CORE::int($_) }';
+
+            if ($str =~ /\A$SCALAR_VAR_RE\z/o) {
+
+                # A variable that holds a native integer is the index
+                push @indices, "(ref($str) eq \"Sidef::Types::Number::Number\" && !ref(\$$str) ? \$$str : (map { $convert } $str))";
+            }
+            elsif ($str ne '') {
+                push @indices, "(map { $convert } $str)";
             }
         }
         else {
@@ -1841,7 +2007,7 @@ sub _apply_indices {
 
 sub _bool_code {
     my ($self, $code) = @_;
-    return "(($code) ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)";
+    return $self->_with_forms("(($code) ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)", void => $code, bool => "($code)");
 }
 
 # The prefix operators (!, -, +, @, ...) applied on the argument of the call.
@@ -1852,7 +2018,8 @@ sub _unary_operator {
     my $args = sub { $self->deparse_args(@{$call->{arg} // []}) };
 
     if ($method eq '!') {
-        return '(' . $args->() . '? Sidef::Types::Bool::Bool::FALSE : Sidef::Types::Bool::Bool::TRUE)';
+        my $arg = $args->();
+        return $self->_with_forms("($arg? Sidef::Types::Bool::Bool::FALSE : Sidef::Types::Bool::Bool::TRUE)", bool => '(!' . $self->_form('bool', $arg) . ')');
     }
 
     if ($method eq '-') {
@@ -1919,7 +2086,13 @@ sub _special_call {
     my ($self, $ref, $code, $call, $index, $unary) = @_;
 
     my $method = $call->{method};
-    my @args   = @{$call->{arg} // []};
+
+    # Fast exit: a method name (a word) is special only for these types
+    if (defined($method) and not $SPECIAL_METHOD_TYPES{$ref} and $method =~ /^[^\W\d]/) {
+        return;
+    }
+
+    my @args = @{$call->{arg} // []};
 
     # Hash literals: Hash(...) and :(...)
     if (   ($ref eq 'Sidef::DataTypes::Hash::Hash' and $index == 0 and ($method eq 'call' or $method eq 'new'))
@@ -1931,9 +2104,7 @@ sub _special_call {
     if ($ref eq 'Sidef::Types::Block::Return') {
 
         if (defined $self->{function}) {
-            my $result = $code . 'do{';
-            $result .= '@return=' . $self->deparse_args(@args) . ';' if @args;
-            return $result . "goto END_$self->{function}}";
+            return $code . $self->_return_statement(@args ? $self->deparse_args(@args) : ());
         }
 
         return $code . 'return' . $self->deparse_args(@args);
@@ -1949,21 +2120,39 @@ sub _special_call {
 
         if (exists $INC_DEC_OPS{$method}) {
             my $var = $self->deparse_args(@args);
+
+            if (defined(my $name = $self->_simple_var($var))) {
+                return "($name=$name\->$INC_DEC_OPS{$method})";
+            }
+
             return "do{my\$r=\\$var;\$\$r=\$\$r\->$INC_DEC_OPS{$method}}";
         }
     }
 
     # Postfix ++ and --
     if (exists $INC_DEC_OPS{$method}) {
+
+        if (defined(my $name = $self->_simple_var($code))) {
+            return $self->_with_forms("do{my\$v=$name;$name=\$v\->$INC_DEC_OPS{$method};\$v}", void => "$name=$name\->$INC_DEC_OPS{$method}");
+        }
+
         return "do{my\$r=\\$code;my\$v=\$\$r;\$\$r=\$v\->$INC_DEC_OPS{$method};\$v}";
     }
 
     if (exists $LAZY_OPS{$method}) {
-        return $code . $LAZY_OPS{$method} . $self->deparse_args(@args);
+        my $args   = $self->deparse_args(@args);
+        my $result = $code . $LAZY_OPS{$method} . $args;
+
+        if ($method eq '&&' or $method eq '||') {
+            $self->_with_forms($result, bool => $self->_form('bool', $code) . $LAZY_OPS{$method} . $self->_form('bool', $args));
+        }
+
+        return $result;
     }
 
     if ($method eq '=') {
-        return "($code=" . $self->deparse_args(@args) . ")[-1]";
+        my $args = $self->deparse_args(@args);
+        return $self->_with_forms("($code=$args)[-1]", void => "$code=$args");
     }
 
     # Reassignment operators: +=, -=, *=, /=, ...
@@ -1973,12 +2162,14 @@ sub _special_call {
 
     # == and !=
     if ($method eq '==' or $method eq '!=') {
-        return
-            'do{my$bool='
-          . $code . 'eq'
-          . $self->deparse_args(@args)
-          . ';ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)}'
-          . ($method eq '!=' ? '->not' : '');
+        my $args = $self->deparse_args(@args);
+
+        my $result = "do{my\$bool=${code}eq$args;ref(\$bool) ? \$bool : (\$bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)}";
+
+        # The object that is returned by the comparison is not needed, when the result is tested for truth
+        my $bool = ($method eq '==' ? "(${code}eq$args)" : "do{my\$bool=${code}eq$args;ref(\$bool) ? \$bool->not : !\$bool}");
+
+        return $self->_with_forms($result . ($method eq '!=' ? '->not' : ''), bool => $bool);
     }
 
     # ~~ and !~
@@ -2085,6 +2276,12 @@ sub deparse_expr {
     my $obj = $expr->{self};
     my $ref = ref($obj) || return '';
 
+    # The code of the node is inside another subroutine
+    if ($self->{direct} and not $DIRECT_NODES{$ref}) {
+        local $self->{direct} = undef;
+        return $self->deparse_expr($expr);
+    }
+
     my $code;
 
     if (exists $NODE_HANDLERS{$ref}) {
@@ -2130,7 +2327,11 @@ sub deparse_script {
 
     my @results;
 
-    foreach my $namespace (sort keys %{$struct}) {
+    # A single namespace is the common case
+    my @namespaces = keys %{$struct};
+    @namespaces = sort @namespaces if @namespaces > 1;
+
+    foreach my $namespace (@namespaces) {
         foreach my $expr (@{$struct->{$namespace}}) {
             push @results, $self->deparse_expr(ref($expr) eq 'HASH' ? $expr : {self => $expr});
         }
@@ -2144,7 +2345,7 @@ sub _program {
 
     my $persistent = ($self->{persistent} and $opt{header});
 
-    my ($declarations, @statements) = $self->_with_scope(sub { $self->deparse_script($ast) }, persistent => $persistent);
+    my ($declarations, @statements) = $self->_with_scope(sub { $self->_void_statements($self->deparse_script($ast)) }, persistent => $persistent);
 
     my $code =
         $self->{before}
