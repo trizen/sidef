@@ -503,7 +503,7 @@ sub _form {
     if (substr($code, 0, 1) eq '(' and substr($code, -1) eq ')') {
         my $inner = substr($code, 1, -1);
         my $form  = $self->_form($kind, $inner);
-        return ($form eq $inner ? $code : "($form)");
+        return ($form eq $inner ? $code : ($kind eq 'void' ? "do{$form}" : "($form)"));
     }
 
     return $code;
@@ -849,11 +849,13 @@ sub _param_attributes {
         my $value = $code{$label};
 
         if ($shared) {
-            $value = ($self->{cache}{"param_$label"}{$value} //= do {
-                my $constant = 'Param' . ucfirst($label) . ++$self->{counters}{"param_$label"};
-                $self->_prelude("use constant $constant => +$value;");
-                "($self->{environment_name}\::$constant)";
-            });
+            $value = (
+                $self->{cache}{"param_$label"}{$value} //= do {
+                    my $constant = 'Param' . ucfirst($label) . ++$self->{counters}{"param_$label"};
+                    $self->_prelude("use constant $constant => +$value;");
+                    "($self->{environment_name}\::$constant)";
+                }
+            );
         }
 
         "$label=>$value";
@@ -1460,7 +1462,11 @@ sub _node_forin {
 
 sub _node_ternary {
     my ($self, $obj) = @_;
-    return '(' . $self->_form('bool', scalar($self->deparse_script($obj->{cond}))) . '?' . $self->deparse_args($obj->{true}) . ':' . $self->deparse_args($obj->{false}) . ')';
+    return
+        '('
+      . $self->_form('bool', scalar($self->deparse_script($obj->{cond}))) . '?'
+      . $self->deparse_args($obj->{true}) . ':'
+      . $self->deparse_args($obj->{false}) . ')';
 }
 
 sub _node_do {

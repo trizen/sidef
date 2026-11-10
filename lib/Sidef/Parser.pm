@@ -427,7 +427,8 @@ my @SPECIAL_WORDS = qw(
 
 # The words (and the arrow) that start a declaration or a construct handled by the
 # first group of keyword checks of parse_expr()
-my $DECLARATION_KEYWORD_RE = qr{\G(?:->|(?:var|global|del|has|define|const|static|struct|subset|enum|local|func|class|method|given|when|case|default|else|continue|do|loop|try|gather|take|module|import|include)\b)};
+my $DECLARATION_KEYWORD_RE =
+qr{\G(?:->|(?:var|global|del|has|define|const|static|struct|subset|enum|local|func|class|method|given|when|case|default|else|continue|do|loop|try|gather|take|module|import|include)\b)};
 
 # The characters that start whitespace, a comment or a history reference
 my $WHITESPACE_START_RE = qr{\G[\s#/\x{200B}]};
@@ -1965,6 +1966,7 @@ sub parse_expr {
 
         # The declaration keywords (a single check skips all the keyword checks below)
         if (/$DECLARATION_KEYWORD_RE/) {
+
             # Declaration of variables (global and lexical)
             if (/\G(var|global|del)\b\h*/gc) {
                 my $type = $1;
@@ -2121,6 +2123,7 @@ sub parse_expr {
 
         # The keywords that are followed by an expression (a single check skips them all)
         if (/\G(?=assert|not\b|die\b|warn\b|eval\b|Parser\b)/) {
+
             # Assertions
             if (/\G(assert(?:_(?:eq|ne))?+)\b\h*/gc) {
                 return $self->_parse_assert(code => $opt{code}, match => $1);
