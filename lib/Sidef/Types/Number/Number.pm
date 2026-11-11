@@ -24501,18 +24501,6 @@ sub _pollard_rho_factor {
     return ($r, @factors);
 }
 
-sub _check_remainder_special {
-    my ($remainder, $type) = @_;
-
-    return _is_prob_prime($remainder) if $type eq 'almost';
-
-    if (HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($remainder)) {
-        return Math::Prime::Util::is_prime_power(Math::GMPz::Rmpz_get_ui($remainder));
-    }
-
-    return _prime_power_factor($remainder);
-}
-
 # Helper function to consolidate size threshold checks
 sub _should_break_trial_division {
     my ($j, $r_size) = @_;
@@ -24552,9 +24540,20 @@ sub _process_special_factors {
         }
     }
 
-    if ($type eq 'almost' && (scalar(@prime_factors) + 2 * scalar(@composite_factors) > $k)) {
-        return {result => 0};
+    my $omega_lb = scalar(@prime_factors);
+    foreach my $f (@composite_factors) {
+
+        my $e = _prime_power_factor($$f);
+
+        if ($e) {
+            $omega_lb += ($type eq 'almost') ? $e : 1;
+        }
+        else {
+            $omega_lb += 2;
+        }
     }
+
+    return {result => 0} if ($omega_lb > $k);
 
     my $prod      = Sidef::Types::Number::Number::prod(@prime_factors);
     my $c         = $n_obj->idiv($prod);
@@ -24635,6 +24634,10 @@ sub _is_k_prime {
         return $result ? $TRUE : $FALSE;
     }
 
+    if (my $pp = _prime_power_factor($n_val)) {
+        return (($type eq 'almost' ? ($pp == $k) : ($k == 1)) ? $TRUE : $FALSE);
+    }
+
     my $count     = 0;
     my $remainder = $n_val;
     my $min_size  = (INTSIZE <= 32) ? 32 : 40;
@@ -24696,15 +24699,29 @@ sub _is_k_prime {
             return ($count == $k ? $TRUE : $FALSE) if Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0;
             return $FALSE                          if $count >= $k;
 
+            if ($type eq 'almost') {
+                my $max_possible = Math::GMPz::Rmpz_sizeinbase($remainder, 2) - 1;
+                return $FALSE if ($count + $max_possible < $k);
+            }
+
             # Ensure remaining space is sufficient for needed prime factors
-            Math::GMPz::Rmpz_set_str($t, "$trial_limit", 10);
-            Math::GMPz::Rmpz_nextprime($t, $t);
-            Math::GMPz::Rmpz_pow_ui($t, $t, $k - $count);
+            if ($type eq 'almost') {
+                Math::GMPz::Rmpz_set_str($t, _next_prime("$trial_limit"), 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $k - $count);
+            }
+            else {
+                my @primes = (_next_prime("$trial_limit"));
+                for my $i (1 .. $k - $count - 1) {
+                    push @primes, _next_prime($primes[-1]);
+                }
+                Math::GMPz::Rmpz_set_str($t, Math::Prime::Util::GMP::vecprod(@primes), 10);
+            }
             return $FALSE if Math::GMPz::Rmpz_cmp($remainder, $t) < 0;
 
-            my $r_is_special = _check_remainder_special($remainder, $type);
-            return ($count + 1 == $k ? $TRUE : $FALSE) if $r_is_special;
-            return $FALSE if $count + ($r_is_special ? 1 : 2) > $k;
+            my $special_e = _prime_power_factor($remainder);
+            $special_e = 1 if ($special_e and $type eq 'omega');
+            return ($count + $special_e == $k ? $TRUE : $FALSE) if $special_e;
+            return $FALSE                                       if ($count + ($special_e || 2)) > $k;
 
             # Size thresholds helper replaces the ladder of checks
             my $r_size = Math::GMPz::Rmpz_sizeinbase($remainder, 2);
