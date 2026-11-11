@@ -24690,7 +24690,7 @@ sub _is_k_prime {
                 @trial_factors = List::Util::uniq(@trial_factors);
             }
 
-            $count     = List::Util::max($count, scalar(@trial_factors));
+            $count     = scalar(@trial_factors);
             $remainder = _any2mpz($r);
 
             return ($count == $k ? $TRUE : $FALSE) if Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0;
