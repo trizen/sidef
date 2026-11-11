@@ -24684,7 +24684,11 @@ sub _is_k_prime {
                 }
             }
 
-            push @trial_factors, ($type eq 'omega') ? List::Util::uniq(@new_factors) : @new_factors;
+            push @trial_factors, @new_factors;
+
+            if ($type eq 'omega') {
+                @trial_factors = List::Util::uniq(@trial_factors);
+            }
 
             $count     = List::Util::max($count, scalar(@trial_factors));
             $remainder = _any2mpz($r);
