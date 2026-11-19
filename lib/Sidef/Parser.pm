@@ -3564,7 +3564,7 @@ sub _parse_class_inheritance {
     local *_ = $opt{code};
 
     # Class inheritance (class Name(...) << Name1, Name2)
-    if (/\G\h*<<?\h*/gc) {
+    if (/\G\h*(?::|<<?)\h*/gc) {
         while (/\G($self->{var_name_re})\h*/gco) {
             my ($name, $class_name) = $self->get_name_and_class($1);
             if (defined(my $class = $self->find_var($name, $class_name))) {
