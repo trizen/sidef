@@ -20688,13 +20688,13 @@ sub omega_prime_count {
         return ZERO;
     }
 
-    if ((HAS_PRIME_UTIL or (HAS_PRIME_UTIL and $k < 15)) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+    if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
         return _set_int(Math::Prime::Util::omega_prime_count($k, Math::GMPz::Rmpz_get_ui($n)));
     }
 
     state $t = Math::GMPz::Rmpz_init_nobless();
     state $u = Math::GMPz::Rmpz_init_nobless();
-    state $v = Math::GMPz::Rmpz_init_nobless();
+    my @V = map { Math::GMPz::Rmpz_init() } (0 .. $k - 1);
 
     my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -20707,67 +20707,49 @@ sub omega_prime_count {
             Math::GMPz::Rmpz_get_ui($t);
         };
 
-        if ($k == 2) {
+        for (; $p <= $s ; ++$j) {
+            my $r =
+              HAS_PRIME_UTIL
+              ? Math::Prime::Util::next_prime($p)
+              : Math::Prime::Util::GMP::next_prime($p);
 
-            for (; $p <= $s ; ++$j) {
+            my $v = $V[$k - 1];
+            for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ; Math::GMPz::Rmpz_cmp($v, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
 
-                my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
+                Math::GMPz::Rmpz_div($t, $n, $v);
+                if ($k == 2) {
+                    last if Math::GMPz::Rmpz_cmp_ui($t, $r) < 0;
+                    Math::GMPz::Rmpz_set($u, $t);
 
-                for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ; Math::GMPz::Rmpz_cmp($v, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
+                    for (my $e = 2 ; Math::GMPz::Rmpz_cmp_ui($u, $r) >= 0 ; ++$e) {
+                        my $x =
+                            Math::GMPz::Rmpz_fits_ulong_p($u)
+                          ? Math::GMPz::Rmpz_get_ui($u)
+                          : Math::GMPz::Rmpz_get_str($u, 10);
 
-                    Math::GMPz::Rmpz_div($t, $n, $v);
+                        my $pi =
+                          (HAS_PRIME_UTIL and $x < PRIMECOUNT_MIN)
+                          ? Math::Prime::Util::prime_count($x)
+                          : _prime_count($x);
 
-                    if (Math::GMPz::Rmpz_cmp_ui($t, $r) < 0) {
-                        last;
-                    }
-
-                    my $w  = Math::GMPz::Rmpz_fits_ulong_p($t)        ? Math::GMPz::Rmpz_get_ui($t)        : Math::GMPz::Rmpz_get_str($t, 10);
-                    my $pi = (HAS_PRIME_UTIL and $w < PRIMECOUNT_MIN) ? Math::Prime::Util::prime_count($w) : _prime_count($w);
-
-                    if (FAST_MODE and $pi < ULONG_MAX) {
-                        Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
-                    }
-                    else {
-                        Math::GMPz::Rmpz_set_str($t, "$pi", 10);
-                        Math::GMPz::Rmpz_sub_ui($t, $t, $j);
-                        Math::GMPz::Rmpz_add($count, $count, $t);
-                    }
-
-                    for (my $r2 = $r ; $r2 <= $w ; $r2 = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($r2) : Math::Prime::Util::GMP::next_prime($r2))) {
-
-                        Math::GMPz::Rmpz_mul_ui($u, $v, $r2);
-                        Math::GMPz::Rmpz_mul_ui($u, $u, $r2);
-
-                        if (Math::GMPz::Rmpz_cmp($u, $n) > 0) {
-                            last;
+                        if (FAST_MODE and $pi < ULONG_MAX) {
+                            Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set_str($u, "$pi", 10);
+                            Math::GMPz::Rmpz_sub_ui($u, $u, $j);
+                            Math::GMPz::Rmpz_add($count, $count, $u);
                         }
 
-                        my $i = 0;
-                        for (; Math::GMPz::Rmpz_cmp($u, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($u, $u, $r2)) {
-                            ++$i;
-                        }
-                        Math::GMPz::Rmpz_add_ui($count, $count, $i);
+                        Math::GMPz::Rmpz_root($u, $t, $e);
                     }
                 }
-
-                $p = $r;
-            }
-
-            return;
-        }
-
-        for (; $p <= $s ; ++$j) {
-
-            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
-
-            for (my $w = $m * $p ; Math::GMPz::Rmpz_cmp($w, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($w, $w, $p)) {
-
-                Math::GMPz::Rmpz_div($t, $n, $w);
-                Math::GMPz::Rmpz_root($t, $t, $k - 1);
-
-                my $s = Math::GMPz::Rmpz_get_ui($t);
-                last if ($r > $s);
-                __SUB__->($w, $r, $k - 1, $j + 1, $s);
+                else {
+                    Math::GMPz::Rmpz_root($t, $t, $k - 1);
+                    my $sub_s = Math::GMPz::Rmpz_get_ui($t);
+                    last if $r > $sub_s;
+                    __SUB__->($v, $r, $k - 1, $j + 1, $sub_s);
+                }
             }
 
             $p = $r;
