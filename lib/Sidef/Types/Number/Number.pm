@@ -20406,10 +20406,13 @@ sub almost_prime_sum {
         return ZERO;
     }
 
-    state $t = Math::GMPz::Rmpz_init_nobless();
-    state $u = Math::GMPz::Rmpz_init_nobless();
+    state $t     = Math::GMPz::Rmpz_init_nobless();
+    state $u     = Math::GMPz::Rmpz_init_nobless();
+    state $total = Math::GMPz::Rmpz_init_nobless();
 
-    my $total = Math::GMPz::Rmpz_init_set_ui(0);
+    Math::GMPz::Rmpz_set_ui($total, 0);
+
+    my @V = map { Math::GMPz::Rmpz_init() } (0 .. $k - 1);
 
     sub {
         my ($m, $p, $k, $j) = @_;
@@ -20447,14 +20450,20 @@ sub almost_prime_sum {
 
         while ($p <= $s) {
             my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
-            __SUB__->($m * $p, $p, $k - 1, $j);
+            Math::GMPz::Rmpz_mul_ui($V[$k - 1], $m, $p);
+            __SUB__->($V[$k - 1], $p, $k - 1, $j);
             $j += $p;
             $p = $r;
         }
       }
-      ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
+      ->($ONE, 2, $k, 0);
 
-    bless \$total;
+    my $r2 =
+        Math::GMPz::Rmpz_fits_ulong_p($total)
+      ? Math::GMPz::Rmpz_get_ui($total)
+      : Math::GMPz::Rmpz_init_set($total);
+
+    bless \$r2;
 }
 
 sub bigomega_inverse_sum {
@@ -20503,6 +20512,8 @@ sub squarefree_almost_prime_count {
 
     Math::GMPz::Rmpz_set_ui($count, 0);
 
+    my @V = map { Math::GMPz::Rmpz_init() } (0 .. $k - 1);
+
     sub {
         my ($m, $p, $k, $j) = @_;
 
@@ -20539,11 +20550,12 @@ sub squarefree_almost_prime_count {
 
         for (; $p <= $hi ; ++$j) {
             my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
-            __SUB__->($m * $p, $r, $k - 1, $j + 1);
+            Math::GMPz::Rmpz_mul_ui($V[$k - 1], $m, $p);
+            __SUB__->($V[$k - 1], $r, $k - 1, $j + 1);
             $p = $r;
         }
       }
-      ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 1);
+      ->($ONE, 2, $k, 1);
 
     my $r2 =
         Math::GMPz::Rmpz_fits_ulong_p($count)
@@ -20602,10 +20614,13 @@ sub squarefree_almost_prime_sum {
         return ZERO;
     }
 
-    state $t = Math::GMPz::Rmpz_init_nobless();
-    state $u = Math::GMPz::Rmpz_init_nobless();
+    state $t     = Math::GMPz::Rmpz_init_nobless();
+    state $u     = Math::GMPz::Rmpz_init_nobless();
+    state $total = Math::GMPz::Rmpz_init_nobless();
 
-    my $total = Math::GMPz::Rmpz_init_set_ui(0);
+    Math::GMPz::Rmpz_set_ui($total, 0);
+
+    my @V = map { Math::GMPz::Rmpz_init() } (0 .. $k - 1);
 
     sub {
         my ($m, $p, $k, $j) = @_;
@@ -20643,13 +20658,19 @@ sub squarefree_almost_prime_sum {
         while ($p <= $s) {
             my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
             $j += $p;
-            __SUB__->($m * $p, $r, $k - 1, $j);
+            Math::GMPz::Rmpz_mul_ui($V[$k - 1], $m, $p);
+            __SUB__->($V[$k - 1], $r, $k - 1, $j);
             $p = $r;
         }
       }
-      ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
+      ->($ONE, 2, $k, 0);
 
-    bless \$total;
+    my $r2 =
+        Math::GMPz::Rmpz_fits_ulong_p($total)
+      ? Math::GMPz::Rmpz_get_ui($total)
+      : Math::GMPz::Rmpz_init_set($total);
+
+    bless \$r2;
 }
 
 sub omega_prime_count {
@@ -20692,11 +20713,13 @@ sub omega_prime_count {
         return _set_int(Math::Prime::Util::omega_prime_count($k, Math::GMPz::Rmpz_get_ui($n)));
     }
 
-    state $t = Math::GMPz::Rmpz_init_nobless();
-    state $u = Math::GMPz::Rmpz_init_nobless();
-    my @V = map { Math::GMPz::Rmpz_init() } (0 .. $k - 1);
+    state $t     = Math::GMPz::Rmpz_init_nobless();
+    state $u     = Math::GMPz::Rmpz_init_nobless();
+    state $count = Math::GMPz::Rmpz_init_nobless();
 
-    my $count = Math::GMPz::Rmpz_init_set_ui(0);
+    Math::GMPz::Rmpz_set_ui($count, 0);
+
+    my @V = map { Math::GMPz::Rmpz_init() } (0 .. $k - 1);
 
     sub {
         my ($m, $p, $k, $j, $s) = @_;
@@ -20755,9 +20778,14 @@ sub omega_prime_count {
             $p = $r;
         }
       }
-      ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 1);
+      ->($ONE, 2, $k, 1);
 
-    bless \$count;
+    my $r2 =
+        Math::GMPz::Rmpz_fits_ulong_p($count)
+      ? Math::GMPz::Rmpz_get_ui($count)
+      : Math::GMPz::Rmpz_init_set($count);
+
+    bless \$r2;
 }
 
 *omega_primepi = \&omega_prime_count;
