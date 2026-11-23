@@ -105,6 +105,25 @@ Aliases: I<call>
 
 =cut
 
+=head2 from_roots
+
+    Poly.from_roots(r1, r2, ...)
+
+Constructs a C<Polynomial> whose roots are the given values. The resulting polynomial is monic (leading coefficient of 1) and has degree equal to the number of roots provided. Specifically, it computes the expanded form of:
+
+    (x - r1) (x - r2) ... * (x - rn)
+
+If no roots are provided, returns the constant polynomial C<1>. If a single root is provided, returns the linear polynomial C<x - r>. For multiple roots, the factors are multiplied together:
+
+    var p = Polynomial.from_roots(1, 2, 3)  # represents: (x-1)*(x-2)*(x-3)
+    say p                                   # x^3 - 6*x^2 + 11*x - 6
+
+The coefficients correspond to descending powers of x: the above expands to C<x³ - 6x² + 11x - 6>, which indeed has roots at 1, 2, and 3.
+
+Note that this method is a class method (static), not an instance method. It does not operate on an existing polynomial but constructs a new one from scratch.
+
+=cut
+
 =head2 with_value
 
     self.with_value(value)

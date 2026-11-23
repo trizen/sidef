@@ -733,7 +733,7 @@ say p.eval(1)                # 0   (1 is a root)
 say p.eval(2)                # 0   (2 is a root)
 
 # Polynomial from roots
-say Poly.from_roots([1, 2, 3])    # x³ - 6x² + 11x - 6
+say Poly.from_roots(1, 2, 3)    # x³ - 6x² + 11x - 6
 
 # Derivative
 say p.derivative    # 2x - 3

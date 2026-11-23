@@ -134,6 +134,14 @@ sub with_value {
     __PACKAGE__->new(0 => $value);
 }
 
+sub from_roots {
+    my ($self, @roots) = @_;
+    state $x = __PACKAGE__->new(Sidef::Types::Number::Number::ONE);
+    my @terms = map { $x->sub($_) } @roots;
+    @terms || return __PACKAGE__->new(0 => Sidef::Types::Number::Number::ONE);
+    Sidef::Types::Number::Number::_binsplit(\@terms, \&Sidef::Types::Number::Polynomial::mul);
+}
+
 sub to_poly {
     $_[0];
 }
