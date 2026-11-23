@@ -126,7 +126,7 @@ use constant {
     # HAS_NEWER_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::nth_powerfree))    // 0,
 
     # Check if we have a recent enough version of Math::Prime::Util::GMP
-    # HAS_NEW_PRIME_UTIL_GMP => defined(&Math::Prime::Util::GMP::nth_powerfree) // 0,
+    HAS_NEW_PRIME_UTIL_GMP => defined(&Math::Prime::Util::GMP::primepowersum) // 0,
 
     FACTOR_EXP_CACHE_SIZE => 1000,
     FACTOR_CACHE_SIZE     => 1000,
@@ -27003,6 +27003,10 @@ sub _prime_sum_native {
 
     if ($n <= 1) {
         return ZERO;
+    }
+
+    if (FAST_MODE and HAS_NEW_PRIME_UTIL_GMP) {
+        return _set_int(Math::Prime::Util::GMP::primepowersum($n, $k));
     }
 
     my $r = Math::Prime::Util::GMP::sqrtint($n);
