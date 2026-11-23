@@ -27140,11 +27140,20 @@ sub primes_sum {
 
     if ($from > 2) {
 
-        if ($from / $to >= 0.999) {
+        if ($from eq $to) {
+            if (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($from) : Math::Prime::Util::GMP::is_prime($from)) {
+                return _set_int(Math::Prime::Util::GMP::powint($from, $k));
+            }
+            return ZERO;
+        }
+
+        my $diff = $to - $from;
+        if ($diff <= 1000 or $from / $to >= 0.999 or $diff < CORE::sqrt($to)) {
             return _set_int(Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::powint($_, $k) } @{_primes($from, $to)}));
         }
 
-        return ((TWO)->primes_sum(_set_int($to), _set_int($k))->sub((TWO)->primes_sum(_set_int($from)->dec, _set_int($k))));
+        my $k_obj = _set_int($k);
+        return ((TWO)->primes_sum(_set_int($to), $k_obj)->sub((TWO)->primes_sum(_set_int(Math::Prime::Util::GMP::subint($from, 1)), $k_obj)));
     }
 
     if (FAST_MODE and $to < ULONG_MAX) {
