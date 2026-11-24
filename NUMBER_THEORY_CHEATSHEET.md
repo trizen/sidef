@@ -4,17 +4,6 @@ A hands-on guide for practitioners, covering Sidef's integer and number-theoreti
 
 ---
 
-## Operator Precedence via Whitespace
-
-Sidef determines operator priority from surrounding whitespace: an operator written **without** spaces binds **tighter** than one surrounded by spaces.
-
-```ruby
-say (3+5 * 6+7)    # means: say((3+5) * (6+7))  — '+' is tight, '*' is loose
-say (3 + 5*6 + 7)  # means: say(3 + (5*6) + 7)  — '*' is tight, '+' is loose
-```
-
----
-
 ## Table of Contents
 
 1. [Configuration and Precision](#1-configuration-and-precision)

@@ -1996,8 +1996,6 @@ Common cases flagged:
 
 =item * Method calls without an explicit receiver
 
-=item * Ambiguous operator precedence interpretations
-
 =item * Potential variable/function name confusion
 
 =back
