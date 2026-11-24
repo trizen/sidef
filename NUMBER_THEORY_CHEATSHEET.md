@@ -91,7 +91,7 @@ say (1/3 + 1/6)            # exact rational arithmetic: 1/2
 say 42.to_s        # "42"
 say 42.to_n        # numify a string/object back into a Number
 say 42.to_f        # floating-point value
-say (1/3).to_poly  # lift a rational into a Polynomial-compatible form
+say (1/3->to_poly) # lift a rational into a Polynomial-compatible form
 ```
 
 ### String Representations in Arbitrary Bases
@@ -100,14 +100,14 @@ say (1/3).to_poly  # lift a rational into a Polynomial-compatible form
 say 42.as_bin          # "101011"     — base 2
 say 42.as_oct          # "52"         — base 8
 say 42.as_hex          # "2a"         — base 16
-say (1/17).as_dec(10)  # "0.05882352941"   — decimal expansion to k places (alias: as_float)
+say (1/17->as_dec(10)) # "0.05882352941"   — decimal expansion to k places (alias: as_float)
 
 # General base, 2..62:
 say 1234.base(36)      # alias: in_base
 say Number("2az", 36)  # parse back from base 36
 
 say 1000.commify          # "1,000"        — thousands separators
-say (-12345.678).commify  # "-12,345.678"
+say (-12345.678->commify) # "-12,345.678"
 ```
 
 ### Digits
@@ -2325,21 +2325,19 @@ say pi(50, 100)  # primes in the range [50, 100]
 say complex(3, 4)  # 3+4i     — equivalent to Complex(3, 4)
 say 5.complex      # 5+0i     — real number lifted to complex
 
-say (3+4i).re     # 3   — real part           (alias: real)
-say (3+4i).im     # 4   — imaginary part      (aliases: imag, imaginary)
-say (3+4i).parts  # [3, 4]
-say reals(3+4i)   # (3, 4) as a list
-
-say (3+4i).pair(0)  # combine via a.pair(b) == Complex(a, b)
+say re(3+4i)     # 3   — real part           (alias: real)
+say im(3+4i)     # 4   — imaginary part      (aliases: imag, imaginary)
+say parts(3+4i)  # [3, 4]
+say reals(3+4i)  # (3, 4) as a list
 ```
 
 ### Magnitude, Argument, Conjugate
 
 ```ruby
-say (3+4i).abs   # 5   — modulus
+say abs(3+4i)    # 5   — modulus
 say norm(3+4i)   # 25  — abs(x)^2
-say (3+4i).arg   # phase angle in radians    (aliases: angle, phase)
-say (3+4i).conj  # 3-4i  — complex conjugate (fixed point for reals)
+say arg(3+4i)    # phase angle in radians    (aliases: angle, phase)
+say conj(3+4i)   # 3-4i  — complex conjugate (fixed point for reals)
 
 say cis(Num.pi/2)  # cos(x) + sin(x)i  — Euler's formula, i
 ```
@@ -2447,23 +2445,23 @@ say n.miller_rabin_random(20)  # 20 independent random-base Miller-Rabin rounds
 ### Numeric Type Checks
 
 ```ruby
-say 42.is_int          # true
-say 4.2.is_float       # true
-say (1/3).is_rat       # true
-say (3+4i).is_complex  # true
-say (0/0).is_nan       # true
-say (1/0).is_inf       # true
-say (-1/0).is_ninf     # true
+say is_int(42)         # true
+say is_float(4.2f)     # true
+say is_rat(1/3)        # true
+say is_complex(3+4i)   # true
+say is_nan(0/0)        # true
+say is_inf(1/0)        # true
+say is_ninf(-1/0)      # true
 ```
 
 ### Sign and Special Values
 
 ```ruby
 say 5.is_pos      # true    (alias: is_positive)
-say (-5).is_neg   # true    (alias: is_negative)
+say is_neg(-5)    # true    (alias: is_negative)
 say 0.is_zero     # true
 say 1.is_one      # true
-say (-1).is_mone  # true
+say is_mone(-1)   # true
 ```
 
 ### Parity and Elementary Shape
